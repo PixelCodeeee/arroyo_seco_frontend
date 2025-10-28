@@ -1,0 +1,282 @@
+/* ==============================
+   GLOBAL STYLE (matches Home)
+============================== */
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+:root {
+  --accent: #e3008c;
+}
+
+/* ==============================
+   AUTH CONTAINER
+============================== */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a1a;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 80px;
+  padding: 2rem;
+}
+
+/* ==============================
+   AUTH CARD
+============================== */
+.auth-card {
+  background-color: #222;
+  border-radius: 25px;
+  box-shadow: 0 0 25px rgba(227, 0, 140, 0.15);
+  padding: 3rem 3.5rem;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============================
+   TITLES
+============================== */
+.auth-card h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.subtitle {
+  color: var(--accent);
+  font-size: 1rem;
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+}
+
+/* ==============================
+   FORM
+============================== */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background-color: #111;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(227, 0, 140, 0.4);
+}
+
+/* Form Hints */
+.form-hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.3rem;
+  display: block;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+/* ==============================
+   BUTTONS
+============================== */
+.btn-primary {
+  margin-top: 1rem;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #c9007a;
+  box-shadow: 0 0 12px rgba(227, 0, 140, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: 20px;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-outline:hover {
+  background-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(227, 0, 140, 0.4);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-outline {
+  flex: 1;
+  text-align: center;
+}
+
+/* ==============================
+   MESSAGES
+============================== */
+.error-message {
+  background-color: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff6b6b;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #888;
+  font-size: 1rem;
+}
+
+/* ==============================
+   FORM HEADER (for edit page)
+============================== */
+.form-header {
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #c9007a;
+}
+
+/* ==============================
+   FOOTER
+============================== */
+.auth-footer {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.auth-footer .link {
+  color: var(--accent);
+  font-weight: 600;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+.auth-footer .link:hover {
+  color: #fff;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 2rem;
+  }
+
+  .auth-card h1 {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+} 

@@ -1,0 +1,428 @@
+/* ==============================
+   GLOBAL
+============================== */
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-page {
+  overflow-x: hidden;
+  background-color: #1a1a1a;
+}
+
+/* Accent color */
+:root {
+  --accent: #e3008c;
+}
+
+/* ==============================
+   NAVBAR
+============================== */
+.navbar {
+  width: 100%;
+  height: 60px;
+  background-color: #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-icons i {
+  font-size: 1.2rem;
+}
+
+.perfil-link {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.perfil-link:hover {
+  color: var(--accent);
+}
+
+/* ==============================
+   HERO SECTION
+============================== */
+.hero-section {
+  position: relative;
+  height: 90vh;
+  margin-top: 60px;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.hero-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-section .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.hero-section h1 span {
+  color: var(--accent);
+}
+
+.play-btn {
+  margin-top: 1rem;
+  width: 100px;
+  height: 100px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* ==============================
+   TESORO SECTION
+============================== */
+.tesoro-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6rem 4rem;
+  gap: 3rem;
+  position: relative;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+.tesoro-text {
+  flex: 1;
+  max-width: 480px;
+}
+
+.tesoro-text h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.tesoro-text span {
+  color: var(--accent);
+}
+
+.tesoro-text p {
+  font-size: 0.9rem;
+  color: #d1d1d1;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.tesoro-img {
+  flex: 1;
+  height: 680px;
+  margin: auto;
+  border-radius: 20px;
+  background: url("/images/tesoro.jpg") center/cover no-repeat;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1.6rem;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #c9007a;
+}
+
+.scroll-icon {
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+  color: var(--accent);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+/* ==============================
+   GASTRONOMÍA SECTION
+============================== */
+.gastronomia-section {
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rem 4rem;
+  gap: 3rem;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+
+.gastronomia-text {
+  flex: 1;
+  max-width: 480px;
+  text-align: right;
+}
+
+.gastronomia-text h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.gastronomia-text span {
+  color: var(--accent);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #1a1a1a;
+  border-radius: 20px;
+  padding: 0.6rem 1.6rem;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ==============================
+   ARTESANÍAS SECTION
+============================== */
+.artesanias-section {
+    margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6rem 4rem;
+  gap: 3rem;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+.artesanias-text {
+  flex: 1;
+  max-width: 480px;
+}
+
+.artesanias-text h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.artesanias-text span {
+  color: var(--accent);
+}
+
+/* ==============================
+   GASTRONOMÍA IMAGES
+============================== */
+.gastronomia-imgs {
+  position: relative;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  width: 100%;
+  max-width: 450px;
+  height: 420px;
+  margin: 0 30px;
+}
+
+.gastronomia-imgs img {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 20px;
+  object-fit: cover;
+  position: absolute;
+  transition: transform 0.3s ease;
+}
+
+/* Top image (front) */
+.gastronomia-imgs img:first-child {
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* Bottom image (back) */
+.gastronomia-imgs img:last-child {
+  top: 80px;   /* more visible overlap */
+  left: 60px;  /* stronger horizontal shift */
+  z-index: 1;
+}
+
+
+/* ==============================
+   ARTESANÍAS IMAGES
+============================== */
+.artesanias-imgs {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  height: 460px;
+  margin: 80px auto;
+}
+
+.artesanias-imgs img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 20px;
+  object-fit: cover;
+  position: absolute;
+  transition: transform 0.3s ease;
+}
+
+/* Top image (front) */
+.artesanias-imgs img:first-child {
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* Bottom image (back) */
+.artesanias-imgs img:last-child {
+  top: -150px;   /* shallower vertical offset */
+  left: 230px;  /* smaller horizontal shift for balance */
+  z-index: 1;
+}
+
+
+
+/* ==============================
+   FOOTER
+============================== */
+.footer {
+    margin-top: 20px;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #111;
+  border-top: 1px solid #333;
+}
+
+.footer h3 {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.footer p {
+  color: #bbb;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.footer-icons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.footer-icons i {
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #bbb;
+  transition: color 0.3s;
+}
+
+.footer-icons i:hover {
+  color: var(--accent);
+}
+
+.footer small {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 900px) {
+  .tesoro-section,
+  .gastronomia-section,
+  .artesanias-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .gastronomia-text,
+  .tesoro-text,
+  .artesanias-text {
+    text-align: center !important;
+  }
+
+  .gastronomia-imgs,
+  .artesanias-imgs {
+    flex-direction: column;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+}
