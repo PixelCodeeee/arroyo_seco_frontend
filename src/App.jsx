@@ -10,6 +10,8 @@ import EditarOferente from './pages/EditarOferente';
 import Servicios from './pages/Servicios';
 import CrearServicio from './pages/CrearServicio';
 import EditarServicio from './pages/EditarServicio';
+import Catalogo from './pages/Catalogo';
+import Carrito from './pages/Carrito';
 
 function App() {
   return (
@@ -26,7 +28,9 @@ function App() {
         <Route path="/Servicios" element={<Servicios />} />
         <Route path="/Servicios/crear" element={<CrearServicio />} />
         <Route path="/Servicios/editar/:id" element={<EditarServicio />} />
-        
+        <Route path="/gastronomia" element={<Catalogo />} />
+        <Route path="/artesanias" element={<Catalogo />} />
+        <Route path="/carrito" element={<Carrito />} />
       </Routes>
     </Router>
   );

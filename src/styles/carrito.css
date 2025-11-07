@@ -1,0 +1,359 @@
+/* styles/carrito.css */
+
+.carrito-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d1b2e 100%);
+  padding: 2rem 1rem;
+  color: white;
+}
+
+.carrito-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.carrito-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ff1493;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+/* Secciones con bordes redondeados */
+.carrito-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Botón ver detalles */
+.ver-detalles-btn {
+  background: none;
+  border: none;
+  color: #ff1493;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.ver-detalles-btn:hover {
+  transform: scale(1.05);
+}
+
+.arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Detalles de productos */
+.productos-detalle {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.carrito-vacio {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.producto-carrito-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.producto-carrito-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
+}
+
+.producto-info-carrito {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.producto-imagen-mini {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.producto-info-carrito h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+}
+
+.producto-negocio-mini {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.producto-controles {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Control de cantidad */
+.cantidad-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 20, 147, 0.1);
+  border-radius: 20px;
+  padding: 0.3rem;
+}
+
+.cantidad-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #ff1493;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cantidad-btn:hover {
+  background: #ff45b3;
+  transform: scale(1.1);
+}
+
+.cantidad-texto {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.producto-precio-carrito {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 80px;
+  text-align: right;
+}
+
+.eliminar-btn {
+  background: rgba(255, 0, 0, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4444;
+}
+
+.eliminar-btn:hover {
+  background: rgba(255, 0, 0, 0.4);
+  transform: scale(1.1);
+}
+
+/* Método de pago */
+.payment-icons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.payment-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.paypal-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* Resumen de compra */
+.resumen-section {
+  background: rgba(255, 20, 147, 0.05);
+  border-color: rgba(255, 20, 147, 0.3);
+}
+
+.resumen-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.resumen-items {
+  margin-top: 1.5rem;
+}
+
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+}
+
+.resumen-producto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.resumen-nombre {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.resumen-cantidad {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.resumen-precio {
+  font-weight: 600;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.resumen-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 1.5rem 0;
+}
+
+.resumen-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.total-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.total-precio {
+  color: #ff1493;
+  font-size: 1.5rem;
+}
+
+/* Botón de pagar */
+.pagar-btn {
+  width: 100%;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, #ff1493 0%, #ff45b3 100%);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(255, 20, 147, 0.3);
+}
+
+.pagar-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 20, 147, 0.5);
+}
+
+.pagar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vaciar-carrito-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.vaciar-carrito-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+  border-color: rgba(255, 0, 0, 0.5);
+  color: #ff4444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .carrito-title {
+    font-size: 2rem;
+  }
+
+  .carrito-section {
+    padding: 1rem 1.5rem;
+  }
+
+  .producto-carrito-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .producto-controles {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .payment-icons {
+    align-self: flex-end;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
