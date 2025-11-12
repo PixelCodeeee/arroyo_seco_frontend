@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
+import TwoFactorVerification from '../components/TwoFactorVerification';
 import '../styles/Auth.css';
 
 function Register() {
   const navigate = useNavigate();
+  const [step, setStep] = useState('registration'); // 'registration' or '2fa'
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     correo: '',
@@ -19,15 +22,14 @@ function Register() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError(''); // Clear error when user types
+    setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleRegistrationSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Validate password length
     if (formData.contrasena.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       setLoading(false);
@@ -37,18 +39,46 @@ function Register() {
     try {
       const response = await usuariosAPI.register(formData);
       
-      // Store user info
-      localStorage.setItem('currentUser', JSON.stringify(response.usuario));
-      
-      // Show success message and redirect
-      alert('¡Cuenta creada exitosamente!');
-      navigate('/usuarios');
+      if (response.requiresVerification) {
+        setUserId(response.userId);
+        setStep('2fa');
+      }
     } catch (err) {
-      setError(err.message || 'Error al crear la cuenta');
+      setError(err.response?.data?.error || err.message || 'Error al crear la cuenta');
     } finally {
       setLoading(false);
     }
   };
+
+  const handle2FAVerification = async (code) => {
+    const response = await usuariosAPI.verify2FA({ userId, codigo: code });
+
+    if (response.token && response.user) {
+      // Save session data
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("currentUser", JSON.stringify(response.user));
+
+      // Show success and redirect
+      alert('¡Cuenta creada y verificada exitosamente!');
+      navigate("/");
+    } else {
+      throw new Error("Error en la verificación");
+    }
+  };
+
+  const handleResend2FA = async () => {
+    await usuariosAPI.resend2FA({ userId });
+  };
+
+  if (step === '2fa') {
+    return (
+      <TwoFactorVerification
+        userId={userId}
+        onSuccess={handle2FAVerification}
+        onResend={handleResend2FA}
+      />
+    );
+  }
 
   return (
     <div className="auth-container">
@@ -58,7 +88,7 @@ function Register() {
 
         {error && <div className="error-message">{error}</div>}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleRegistrationSubmit}>
           <div className="form-group">
             <label htmlFor="nombre">Nombre Completo</label>
             <input

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usuariosAPI } from "../services/api";
+import TwoFactorVerification from "../components/TwoFactorVerification";
 import "../styles/Auth.css";
 
 function Login() {
   const navigate = useNavigate();
+  const [step, setStep] = useState('credentials'); // 'credentials' or '2fa'
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
     correo: "",
     contrasena: "",
@@ -20,31 +23,53 @@ function Login() {
     setError("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      // Send login request to backend API
       const response = await usuariosAPI.login(formData);
 
-      if (!response || !response.user || !response.token) {
-        throw new Error("Credenciales inválidas o respuesta del servidor incorrecta");
+      if (response.requiresVerification) {
+        setUserId(response.userId);
+        setStep('2fa');
       }
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handle2FAVerification = async (code) => {
+    const response = await usuariosAPI.verify2FA({ userId, codigo: code });
+
+    if (response.token && response.user) {
       // Save session data
       localStorage.setItem("authToken", response.token);
       localStorage.setItem("currentUser", JSON.stringify(response.user));
 
       // Redirect to homepage
       navigate("/");
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || "Error al iniciar sesión");
-    } finally {
-      setLoading(false);
+    } else {
+      throw new Error("Error en la verificación");
     }
   };
+
+  const handleResend2FA = async () => {
+    await usuariosAPI.resend2FA({ userId });
+  };
+
+  if (step === '2fa') {
+    return (
+      <TwoFactorVerification
+        userId={userId}
+        onSuccess={handle2FAVerification}
+        onResend={handleResend2FA}
+      />
+    );
+  }
 
   return (
     <div className="auth-container">
@@ -54,7 +79,7 @@ function Login() {
 
         {error && <div className="error-message">{error}</div>}
 
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleCredentialsSubmit}>
           <div className="form-group">
             <label htmlFor="correo">Correo Electrónico</label>
             <input
@@ -86,7 +111,7 @@ function Login() {
             className="btn btn-primary"
             disabled={loading}
           >
-            {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
+            {loading ? "Iniciando sesión..." : "Continuar"}
           </button>
         </form>
 

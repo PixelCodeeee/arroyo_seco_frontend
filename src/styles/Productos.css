@@ -1,0 +1,586 @@
+/* src/styles/Productos.css */
+
+/* ==============================
+   PRODUCTOS CONTAINER
+============================== */
+.productos-container {
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+/* ==============================
+   PRODUCTOS HEADER
+============================== */
+.productos-header {
+  background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 2rem 3rem;
+  box-shadow: 0 4px 20px rgba(227, 0, 140, 0.2);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.welcome-text {
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin: 0.3rem 0 0;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ==============================
+   BUTTONS
+============================== */
+.btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #c9007a;
+  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid #444;
+  color: #ccc;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(227, 0, 140, 0.3);
+}
+
+/* ==============================
+   ALERTS
+============================== */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin: 1rem 3rem;
+  font-size: 0.95rem;
+}
+
+.alert-error {
+  background-color: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff6b6b;
+}
+
+/* ==============================
+   PRODUCTOS CONTENT
+============================== */
+.productos-content {
+  padding: 2rem 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ==============================
+   STATISTICS CARDS
+============================== */
+.productos-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #222;
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(227, 0, 140, 0.2);
+  border-color: var(--accent);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* ==============================
+   FILTER CONTROLS
+============================== */
+.productos-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 3rem;
+  background-color: #222;
+  border: 1px solid #333;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(227, 0, 140, 0.3);
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.6rem 1.2rem;
+  background-color: transparent;
+  border: 1px solid #444;
+  color: #999;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.filter-btn.active {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ==============================
+   TABLE
+============================== */
+.productos-table-container {
+  background-color: #222;
+  border-radius: 15px;
+  padding: 1.5rem;
+  overflow-x: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.productos-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.productos-table thead {
+  background-color: #1a1a1a;
+}
+
+.productos-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #333;
+}
+
+.productos-table tbody tr {
+  border-bottom: 1px solid #333;
+  transition: background-color 0.2s ease;
+}
+
+.productos-table tbody tr:hover {
+  background-color: rgba(227, 0, 140, 0.05);
+}
+
+.productos-table td {
+  padding: 1rem;
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+/* Columna de imagen */
+.producto-imagen {
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #1a1a1a;
+}
+
+.producto-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-imagen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #666;
+  background-color: #1a1a1a;
+}
+
+/* Columna de nombre */
+.producto-nombre {
+  max-width: 250px;
+}
+
+.producto-nombre strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.producto-nombre small {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* Precio */
+.precio {
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+/* Inventario */
+.inventario {
+  font-weight: 600;
+}
+
+.inventario.agotado {
+  color: #ff6b6b;
+}
+
+/* Estados */
+.estado {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.estado.disponible {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.estado.no-disponible {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+/* Badges */
+.badge {
+  padding: 0.3rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge-gastronomica {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+.badge-artesanal {
+  background-color: rgba(156, 39, 176, 0.2);
+  color: #9C27B0;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: none;
+  color: #999;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-action:hover {
+  transform: scale(1.2);
+}
+
+.btn-edit:hover {
+  color: #4CAF50;
+}
+
+.btn-delete:hover {
+  color: #ff6b6b;
+}
+
+/* ==============================
+   EMPTY STATE
+============================== */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* ==============================
+   LOADING
+============================== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #888;
+}
+
+.spinner {
+  border: 3px solid #333;
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 768px) {
+  .productos-header {
+    padding: 1.5rem 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .productos-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .productos-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .productos-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .filter-buttons {
+    justify-content: center;
+  }
+
+  .productos-table-container {
+    padding: 0.5rem;
+    border-radius: 10px;
+  }
+
+  .productos-table {
+    font-size: 0.85rem;
+  }
+
+  .productos-table th,
+  .productos-table td {
+    padding: 0.5rem;
+  }
+
+  /* Ocultar algunas columnas en móvil */
+  .productos-table th:nth-child(7),
+  .productos-table td:nth-child(7) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .productos-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Más columnas ocultas en móviles pequeños */
+  .productos-table th:nth-child(4),
+  .productos-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Add to Productos.css */
+
+.categorias-content {
+  padding: 2rem;
+}
+
+.categorias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.categorias-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 200px;
+}
+
+.filter-select:hover {
+  border-color: #667eea;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.badge-gastronomica {
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+}
+
+.badge-artesanal {
+  background: linear-gradient(135deg, #4ecdc4, #44a3aa);
+}
+
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-action:disabled:hover {
+  transform: none;
+}
+}

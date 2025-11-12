@@ -12,11 +12,19 @@ import CrearServicio from './pages/CrearServicio';
 import EditarServicio from './pages/EditarServicio';
 import Catalogo from './pages/Catalogo';
 import Carrito from './pages/Carrito';
+import Productos from './pages/Productos';
+import CrearProducto from './pages/CrearProducto';
+import EditarProducto from './pages/EditarProducto';
+import CrearCategoria from './pages/CrearCategoria';
+import EditarCategoria from './pages/EditarCategoria';
+
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/categorias/crear" element={<CrearCategoria />} />
+<Route path="/categorias/editar/:id" element={<EditarCategoria />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -31,6 +39,9 @@ function App() {
         <Route path="/gastronomia" element={<Catalogo />} />
         <Route path="/artesanias" element={<Catalogo />} />
         <Route path="/carrito" element={<Carrito />} />
+        <Route path="/productos" element={<Productos />} />
+        <Route path="/productos/crear" element={<CrearProducto />} />
+        <Route path="/productos/editar/:id" element={<EditarProducto />} />
       </Routes>
     </Router>
   );
