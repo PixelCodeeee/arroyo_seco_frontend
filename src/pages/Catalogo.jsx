@@ -1,298 +1,357 @@
-// pages/Catalogo.jsx
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/catalogo.css';
+import React, { useState, useEffect } from "react";
+import { Search, Star, ChevronLeft, ChevronRight, MapPin, Clock, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { oferentesAPI } from "../services/api";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import "../styles/catalogo.css";
 
-const Catalogo = () => {
-  const location = useLocation();
+function Catalogo() {
   const navigate = useNavigate();
-  
-  // Detectar tipo según la ruta actual
-  const getTipoFromPath = () => {
-    if (location.pathname === '/gastronomia') return 'gastronomica';
-    if (location.pathname === '/artesanias') return 'artesanal';
-    return 'todos';
-  };
-
-  const [productos, setProductos] = useState([]);
-  const [negocios, setNegocios] = useState([]);
-  const [filtroActivo, setFiltroActivo] = useState(getTipoFromPath());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+  const [oferentes, setOferentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [slideActual, setSlideActual] = useState(0);
+  const [error, setError] = useState("");
+  const [tipoFilter, setTipoFilter] = useState("todos"); // "todos", "restaurante", "artesanal"
 
-  // Actualizar filtro cuando cambie la ruta
+  // Placeholder hero slides - you can later populate this with featured oferentes
+  const heroSlides = [
+    {
+      id: 1,
+      images: ["/images/tesoro.jpg"]
+    },
+    {
+      id: 2,
+      images: ["/images/tesoro.jpg"]
+    }
+  ];
+
   useEffect(() => {
-    setFiltroActivo(getTipoFromPath());
-  }, [location.pathname]);
+    fetchOferentes();
+  }, []);
 
-  useEffect(() => {
-    cargarProductos();
-    cargarNegocios();
-  }, [filtroActivo]);
-
-  const cargarProductos = async () => {
+  const fetchOferentes = async () => {
     try {
       setLoading(true);
-      setError('');
-      
-      const url = `http://localhost:5000/api/productos/${filtroActivo}`;
-      
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.success) {
-        setProductos(data.data);
-      } else {
-        setError('Error al cargar productos');
-      }
+      // Fetch only approved oferentes
+      const response = await oferentesAPI.getAll({ estado: "aprobado" });
+      setOferentes(response.oferentes || []);
+      setError("");
     } catch (err) {
-      setError('Error de conexión con el servidor');
-      console.error(err);
+      console.error("Error fetching oferentes:", err);
+      setError("Error al cargar los oferentes. Por favor intenta de nuevo.");
     } finally {
       setLoading(false);
     }
   };
 
-  const cargarNegocios = async () => {
-    try {
-      const tipo = filtroActivo === 'todos' ? '' : `?tipo=${filtroActivo}`;
-      const url = `http://localhost:5000/api/negocios${tipo}`;
-      
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.success) {
-        setNegocios(data.data);
-      }
-    } catch (err) {
-      console.error('Error al cargar negocios:', err);
+  // Filter oferentes based on search query and tipo
+  const getFilteredOferentes = () => {
+    let filtered = oferentes;
+
+    // Filter by tipo
+    if (tipoFilter !== "todos") {
+      filtered = filtered.filter(o => o.tipo === tipoFilter);
     }
-  };
 
-  const cambiarFiltro = (nuevoFiltro) => {
-    // Navegar a la ruta correspondiente
-    if (nuevoFiltro === 'gastronomica') {
-      navigate('/gastronomia');
-    } else if (nuevoFiltro === 'artesanal') {
-      navigate('/artesanias');
-    } else {
-      setFiltroActivo('todos');
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(o => 
+        o.nombre_negocio.toLowerCase().includes(query) ||
+        o.direccion?.toLowerCase().includes(query) ||
+        o.tipo.toLowerCase().includes(query)
+      );
     }
+
+    return filtered;
   };
 
-  const siguienteSlide = () => {
-    setSlideActual((prev) => (prev + 1) % negocios.length);
+  // Separate oferentes by tipo
+  const getRestaurantes = () => {
+    return getFilteredOferentes().filter(o => o.tipo === "restaurante");
   };
 
-  const anteriorSlide = () => {
-    setSlideActual((prev) => (prev - 1 + negocios.length) % negocios.length);
+  const getArtesanias = () => {
+    return getFilteredOferentes().filter(o => o.tipo === "artesanal");
   };
 
-  const agregarAlCarrito = (producto) => {
-    const carritoActual = JSON.parse(sessionStorage.getItem('cartItems') || '[]');
-    
-    const productoExistente = carritoActual.find(p => p.id_producto === producto.id_producto);
-    
-    if (productoExistente) {
-      productoExistente.cantidad += 1;
-    } else {
-      carritoActual.push({
-        ...producto,
-        cantidad: 1
-      });
-    }
-    
-    sessionStorage.setItem('cartItems', JSON.stringify(carritoActual));
-    alert(`${producto.nombre} agregado al carrito`);
-    
-    // Disparar evento para actualizar el contador del navbar
-    window.dispatchEvent(new Event('cartUpdated'));
-  };
-
-  const obtenerPrimeraImagen = (imagenes) => {
-    if (!imagenes || imagenes.length === 0) {
-      return '/images/placeholder.jpg';
-    }
-    return imagenes[0];
-  };
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="loading">Cargando catálogo...</div>
-      </>
+  const handlePrevSlide = () => {
+    setCurrentHeroSlide((prev) => 
+      prev === 0 ? heroSlides.length - 1 : prev - 1
     );
-  }
+  };
 
-  const negocioActual = negocios[slideActual];
-  const mostrarCarousel = filtroActivo !== 'todos' && negocios.length > 0;
+  const handleNextSlide = () => {
+    setCurrentHeroSlide((prev) => 
+      prev === heroSlides.length - 1 ? 0 : prev + 1
+    );
+  };
 
-  return (
-    <>
-      <Navbar />
-      <div className="catalog-page">
-        {/* Carousel de negocios destacados */}
-        {mostrarCarousel && negocioActual && (
-          <div className="featured-carousel">
-            <div className="carousel-content">
-              <div className="carousel-text">
-                <h2 className="carousel-title">
-                  {filtroActivo === 'artesanal' ? 'Artesanía' : 'Restaurantes'}
-                </h2>
-                <p className="carousel-description">
-                  {negocioActual.descripcion || 
-                    'Descubre los mejores productos y experiencias que Querétaro tiene para ofrecer. Tradición, calidad y autenticidad en cada detalle.'}
-                </p>
-                <div className="carousel-buttons">
-                  <button className="btn-white">
-                    Ubicación
-                  </button>
-                  <button className="btn-primary">
-                    Más detalles
-                  </button>
-                </div>
-              </div>
+  const handleCardClick = (oferenteId) => {
+    navigate(`/oferente/${oferenteId}`);
+  };
 
-              <div className="carousel-image-container">
-                {negocios.length > 1 && (
-                  <button 
-                    className="carousel-nav carousel-nav-left"
-                    onClick={anteriorSlide}
-                    aria-label="Anterior"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                )}
-                
-                <div className="carousel-image">
-                  <img 
-                    src={obtenerPrimeraImagen(negocioActual.imagenes)} 
-                    alt={negocioActual.nombre}
-                    onError={(e) => {
-                      e.target.src = '/images/placeholder.jpg';
-                    }}
-                  />
-                </div>
+  const getHorarioDisplay = (horario) => {
+    if (!horario || typeof horario !== 'object') return "Horario no disponible";
+    
+    const { horario_apertura, horario_cierre, dias } = horario;
+    
+    if (horario_apertura && horario_cierre) {
+      return `${horario_apertura} - ${horario_cierre}`;
+    }
+    
+    if (dias && dias.length > 0) {
+      return dias.length === 7 ? "Todos los días" : `${dias.length} días`;
+    }
+    
+    return "Horario disponible";
+  };
 
-                {negocios.length > 1 && (
-                  <button 
-                    className="carousel-nav carousel-nav-right"
-                    onClick={siguienteSlide}
-                    aria-label="Siguiente"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {negocios.length > 1 && (
-              <div className="carousel-dots">
-                {negocios.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`carousel-dot ${index === slideActual ? 'active' : ''}`}
-                    onClick={() => setSlideActual(index)}
-                    aria-label={`Ir a slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Header con filtros */}
-        <div className="catalog-header">
-          <h1>
-            {filtroActivo === 'gastronomica' && 'Gastronomía'}
-            {filtroActivo === 'artesanal' && 'Artesanías'}
-            {filtroActivo === 'todos' && 'Catálogo'}
-          </h1>
-          
-          <div className="filter-buttons">
-            <button 
-              className={filtroActivo === 'todos' ? 'btn-primary' : 'btn-outline'}
-              onClick={() => cambiarFiltro('todos')}
-            >
-              Todos
-            </button>
-            <button 
-              className={filtroActivo === 'gastronomica' ? 'btn-primary' : 'btn-outline'}
-              onClick={() => cambiarFiltro('gastronomica')}
-            >
-              Gastronomía
-            </button>
-            <button 
-              className={filtroActivo === 'artesanal' ? 'btn-primary' : 'btn-outline'}
-              onClick={() => cambiarFiltro('artesanal')}
-            >
-              Artesanías
-            </button>
-          </div>
-        </div>
-
-        {error && <div className="error-message">{error}</div>}
-
-        {/* Grid de productos */}
-        <div className="catalog-grid">
-          {productos.length === 0 ? (
-            <p className="no-products">
-              No hay productos disponibles en esta categoría
-            </p>
-          ) : (
-            productos.map((producto) => (
-              <div key={producto.id_producto} className="product-card">
-                <div className="product-image">
-                  <img 
-                    src={obtenerPrimeraImagen(producto.imagenes)} 
-                    alt={producto.nombre}
-                    onError={(e) => {
-                      e.target.src = '/images/placeholder.jpg';
-                    }}
-                  />
-                  {producto.inventario <= 5 && producto.inventario > 0 && (
-                    <span className="stock-badge">¡Últimas unidades!</span>
-                  )}
-                  {producto.inventario === 0 && (
-                    <span className="stock-badge sold-out">Agotado</span>
-                  )}
-                </div>
-                
-                <div className="product-info">
-                  <h3>{producto.nombre}</h3>
-                  <p className="product-business">{producto.nombre_negocio}</p>
-                  <p className="product-description">{producto.descripcion}</p>
-                  
-                  {producto.categoria_nombre && (
-                    <span className="category-badge">{producto.categoria_nombre}</span>
-                  )}
-                  
-                  <div className="product-footer">
-                    <p className="product-price">${parseFloat(producto.precio).toFixed(2)}</p>
-                    
-                    <button 
-                      className="btn-primary"
-                      onClick={() => agregarAlCarrito(producto)}
-                      disabled={producto.inventario === 0}
-                    >
-                      {producto.inventario === 0 ? 'Agotado' : 'Añadir'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+  const renderOferenteCard = (oferente) => (
+    <div 
+      key={oferente.id_oferente} 
+      className="Catalogo-card"
+      onClick={() => handleCardClick(oferente.id_oferente)}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="card-images single">
+        <div className="card-image-wrapper">
+          <img 
+            src={oferente.imagen || "/images/placeholder.png"} 
+            alt={oferente.nombre_negocio}
+            onError={(e) => {
+              e.target.src = oferente.tipo === "restaurante" 
+                ? "/images/taco.png" 
+                : "/images/artesania1.png";
+            }}
+          />
         </div>
       </div>
-    </>
+      
+      <div className="card-content">
+        <div className="card-header">
+          <div className="card-info">
+            <h3>{oferente.nombre_negocio}</h3>
+            <p className="card-type">
+              {oferente.tipo === "restaurante" ? "🍽️ Gastronomía" : "🎨 Artesanía"}
+            </p>
+          </div>
+        </div>
+
+        <div className="card-details">
+          {oferente.direccion && (
+            <div className="detail-item">
+              <MapPin size={14} />
+              <span>{oferente.direccion}</span>
+            </div>
+          )}
+          
+          {oferente.horario_disponibilidad && (
+            <div className="detail-item">
+              <Clock size={14} />
+              <span>{getHorarioDisplay(oferente.horario_disponibilidad)}</span>
+            </div>
+          )}
+          
+          {oferente.telefono && (
+            <div className="detail-item">
+              <Phone size={14} />
+              <span>{oferente.telefono}</span>
+            </div>
+          )}
+        </div>
+        
+        <button className="btn-detail" onClick={(e) => {
+          e.stopPropagation();
+          handleCardClick(oferente.id_oferente);
+        }}>
+          Ver Detalle
+        </button>
+      </div>
+    </div>
   );
-};
+
+  const restaurantes = getRestaurantes();
+  const artesanias = getArtesanias();
+  const showingAll = tipoFilter === "todos";
+
+  return (
+    <div className="Catalogo-page">
+      <Navbar />
+      <div style={{ height: '80px', width: '100%' }}></div>
+
+      {/* Hero Section - Selección Semanal */}
+      <section className="Catalogo-hero">
+        <div className="hero-container">
+          <div className="hero-text">
+            <h1>Nuestra selección Semanal</h1>
+            <p>
+              Descubre lo mejor de Arroyo Seco. Desde deliciosa gastronomía local hasta 
+              artesanías únicas hechas a mano. Explora nuestros negocios destacados y 
+              encuentra experiencias auténticas que celebran nuestra cultura y tradición.
+            </p>
+          </div>
+          
+          <div className="hero-carousel-wrapper">
+            <div className="hero-carousel">
+              <button className="hero-carousel-btn prev" onClick={handlePrevSlide}>
+                <ChevronLeft size={28} />
+              </button>
+              
+              <div className="hero-images-container">
+                {heroSlides[currentHeroSlide].images.map((img, idx) => (
+                  <div key={idx} className="hero-image-wrapper">
+                    <img src={img} alt={`Weekly selection ${idx + 1}`} />
+                  </div>
+                ))}
+              </div>
+              
+              <button className="hero-carousel-btn next" onClick={handleNextSlide}>
+                <ChevronRight size={28} />
+              </button>
+            </div>
+            
+            <div className="hero-dots">
+              {heroSlides.map((_, index) => (
+                <span
+                  key={index}
+                  className={`dot ${index === currentHeroSlide ? "active" : ""}`}
+                  onClick={() => setCurrentHeroSlide(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Search Section */}
+      <section className="search-section">
+        <div className="search-container">
+          <Search className="search-icon" size={20} />
+          <input
+            type="text"
+            placeholder="Buscar negocios en Arroyo Seco..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="filter-tabs">
+          <button 
+            className={`filter-tab ${tipoFilter === "todos" ? "active" : ""}`}
+            onClick={() => setTipoFilter("todos")}
+          >
+            Todos ({oferentes.length})
+          </button>
+          <button 
+            className={`filter-tab ${tipoFilter === "restaurante" ? "active" : ""}`}
+            onClick={() => setTipoFilter("restaurante")}
+          >
+            🍽️ Gastronomía ({oferentes.filter(o => o.tipo === "restaurante").length})
+          </button>
+          <button 
+            className={`filter-tab ${tipoFilter === "artesanal" ? "active" : ""}`}
+            onClick={() => setTipoFilter("artesanal")}
+          >
+            🎨 Artesanías ({oferentes.filter(o => o.tipo === "artesanal").length})
+          </button>
+        </div>
+      </section>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando oferentes...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="error-container">
+          <p className="error-message">{error}</p>
+          <button onClick={fetchOferentes} className="btn-retry">
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && oferentes.length === 0 && (
+        <div className="empty-state">
+          <p>No hay oferentes disponibles en este momento.</p>
+        </div>
+      )}
+
+      {/* No Results State */}
+      {!loading && !error && oferentes.length > 0 && getFilteredOferentes().length === 0 && (
+        <div className="empty-state">
+          <Search size={48} />
+          <p>No se encontraron resultados para "{searchQuery}"</p>
+          <button onClick={() => setSearchQuery("")} className="btn-clear">
+            Limpiar búsqueda
+          </button>
+        </div>
+      )}
+
+      {/* Content Sections */}
+      {!loading && !error && (
+        <>
+          {/* Restaurantes Section */}
+          {(showingAll || tipoFilter === "restaurante") && restaurantes.length > 0 && (
+            <section className="Catalogo-section">
+              <div className="Catalogo-content">
+                <div className="section-header">
+                  <h2>🍽️ Gastronomía</h2>
+                  {showingAll && restaurantes.length > 4 && (
+                    <button 
+                      className="view-all"
+                      onClick={() => setTipoFilter("restaurante")}
+                    >
+                      Ver todos
+                    </button>
+                  )}
+                </div>
+                
+                <div className="cards-grid">
+                  {(showingAll ? restaurantes.slice(0, 4) : restaurantes).map(renderOferenteCard)}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Artesanías Section */}
+          {(showingAll || tipoFilter === "artesanal") && artesanias.length > 0 && (
+            <section className="Catalogo-section">
+              <div className="Catalogo-content">
+                <div className="section-header">
+                  <h2>🎨 Artesanías</h2>
+                  {showingAll && artesanias.length > 2 && (
+                    <button 
+                      className="view-all"
+                      onClick={() => setTipoFilter("artesanal")}
+                    >
+                      Ver todos
+                    </button>
+                  )}
+                </div>
+                
+                <div className="cards-grid">
+                  {(showingAll ? artesanias.slice(0, 4) : artesanias).map(renderOferenteCard)}
+                </div>
+              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      <Footer />
+    </div>
+  );
+}
 
 export default Catalogo;

@@ -60,6 +60,7 @@ const apiRequest = async (endpoint, options = {}) => {
     throw error;
   }
 };
+
 /* ======================================================
    USERS API
 ====================================================== */
@@ -109,6 +110,7 @@ export const usuariosAPI = {
       method: 'DELETE',
     }),
 };
+
 /* ======================================================
    OFERENTES API
 ====================================================== */
@@ -119,10 +121,17 @@ export const oferentesAPI = {
       body: JSON.stringify(oferenteData),
     }),
 
-  getAll: () =>
-    apiRequest('/oferentes', {
-      method: 'GET',
-    }),
+  getAll: (filters = {}) => {
+    const queryParams = new URLSearchParams();
+    
+    if (filters.estado) queryParams.append('estado', filters.estado);
+    if (filters.tipo) queryParams.append('tipo', filters.tipo);
+    
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/oferentes?${queryString}` : '/oferentes';
+    
+    return apiRequest(endpoint, { method: 'GET' });
+  },
 
   getById: (id) =>
     apiRequest(`/oferentes/${id}`, {
@@ -138,6 +147,12 @@ export const oferentesAPI = {
     apiRequest(`/oferentes/${id}`, {
       method: 'PUT',
       body: JSON.stringify(oferenteData),
+    }),
+
+  updateEstado: (id, estadoData) =>
+    apiRequest(`/oferentes/${id}/estado`, {
+      method: 'PATCH',
+      body: JSON.stringify(estadoData),
     }),
 
   delete: (id) =>
@@ -183,88 +198,36 @@ export const serviciosAPI = {
     }),
 };
 
-/* ======================================================
-   PRODUCTOS API
-====================================================== */
+// ---------------------------------------------------------------------
+// PRODUCTOS
+// ---------------------------------------------------------------------
 export const productosAPI = {
-  getAll: () => apiRequest('/productos/todos'),
+  // PUBLIC
+  getAll: () => request('/productos'),                     // GET  /api/productos
+  getById: (id) => request(`/productos/detalle/${id}`),    // GET  /api/productos/detalle/:id
+  getByTipo: (tipo) => request(`/productos/categoria/${tipo}`),
 
-  getByTipo: (tipo) => apiRequest(`/productos/tipo/${tipo}`),
-
-  getById: (id) => apiRequest(`/productos/detalle/${id}`),
-
-  getServiciosRestaurante: () => apiRequest('/productos/servicios/restaurante'),
-
-  checkStock: (id, cantidad) =>
-    apiRequest(`/productos/stock/${id}?cantidad=${cantidad}`),
-
-  getMisProductos: () =>
-    apiRequest('/productos/mis-productos', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
-
-  create: (productoData) =>
-    apiRequest('/productos/crear', {
-      method: 'POST',
-      body: JSON.stringify(productoData),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
-
-  update: (id, productoData) =>
-    apiRequest(`/productos/actualizar/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(productoData),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
-
-  delete: (id) =>
-    apiRequest(`/productos/eliminar/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
-
-  updateInventario: (id, cantidadData) =>
-    apiRequest(`/productos/inventario/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(cantidadData),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
+  // OFERENTE (protected – the middleware adds the token)
+  getMis: () => request('/productos/mis-productos'),       // GET  /api/productos/mis-productos
+  create: (body) => request('/productos/crear', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/productos/actualizar/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: (id) => request(`/productos/eliminar/${id}`, { method: 'DELETE' }),
+  updateInventario: (id, { cantidad }) => request(`/productos/inventario/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ cantidad })
+  }),
+  checkStock: (id, qty = 1) => request(`/productos/stock/${id}?cantidad=${qty}`)
 };
 
-/* ======================================================
-   CATEGORIAS API
-====================================================== */
+// ---------------------------------------------------------------------
+// CATEGORIAS (admin only – you already have a categoriasAPI, just keep the same shape)
+// ---------------------------------------------------------------------
 export const categoriasAPI = {
-  getAll: () => apiRequest('/categorias'),
-
-  getByTipo: (tipo) => apiRequest(`/categorias/tipo/${tipo}`),
-
-  create: (categoriaData) =>
-    apiRequest('/categorias', {
-      method: 'POST',
-      body: JSON.stringify(categoriaData),
-    }),
-
-  update: (id, categoriaData) =>
-    apiRequest(`/categorias/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(categoriaData),
-    }),
-
-  delete: (id) =>
-    apiRequest(`/categorias/${id}`, {
-      method: 'DELETE',
-    }),
+  getAll: () => request('/categorias'),                     // GET  /api/categorias
+  getById: (id) => request(`/categorias/${id}`),
+  create: (body) => request('/categorias', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => request(`/categorias/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: (id) => request(`/categorias/${id}`, { method: 'DELETE' })
 };
 
 /* ======================================================

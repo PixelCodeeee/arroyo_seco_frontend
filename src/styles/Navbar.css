@@ -1,0 +1,154 @@
+/* ==============================
+   NAVBAR - IMPROVED & CONSISTENT
+============================== */
+
+.navbar {
+  width: 100%;
+  height: 70px;
+  background-color: var(--dark-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* ------------------------------
+   LINKS
+------------------------------ */
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-links a {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------
+   RIGHT SIDE ICONS & BUTTONS
+------------------------------ */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* session links */
+.perfil-link {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.perfil-link:hover {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* ------------------------------
+   CART BUTTON
+------------------------------ */
+.cart-button {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  padding: 0.4rem;
+  transition: transform 0.2s ease, color 0.25s ease;
+}
+
+.cart-button:hover {
+  transform: scale(1.15);
+  color: var(--accent);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  background-color: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  box-shadow: 0 0 6px rgba(227, 0, 140, 0.55);
+}
+
+/* ------------------------------
+   ROLE BUTTON (ADMIN / OFERENTE)
+------------------------------ */
+.nav-role-btn {
+  padding: 0.35rem 1rem;
+  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.nav-role-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 1.8rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+  }
+
+  .nav-icons {
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 650px) {
+  .navbar {
+    padding: 0 1.2rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+  }
+
+  .perfil-link {
+    font-size: 0.8rem;
+  }
+}

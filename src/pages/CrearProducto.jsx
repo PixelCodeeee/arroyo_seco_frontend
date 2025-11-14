@@ -1,4 +1,4 @@
-// src/components/CrearProducto.js
+/// src/components/CrearProducto.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI, categoriasAPI, oferentesAPI } from '../services/api';
@@ -6,6 +6,8 @@ import '../styles/CrearProducto.css';
 
 function CrearProducto() {
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -13,131 +15,81 @@ function CrearProducto() {
     inventario: 0,
     id_categoria: '',
     id_oferente: '',
-    imagenes: [],
+    imagen: [],          // <-- backend expects "imagen"
     esta_disponible: true
   });
-  
+
   const [categorias, setCategorias] = useState([]);
   const [oferentes, setOferentes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
-  const [imagenesInput, setImagenesInput] = useState('');
+  const [imagenInput, setimagenInput] = useState('');
 
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-
+  // ---------------------------------------------------------------
+  // INITIAL DATA
+  // ---------------------------------------------------------------
   useEffect(() => {
-    fetchInitialData();
+    (async () => {
+      try {
+        const [catRes, ofeRes] = await Promise.all([
+          categoriasAPI.getAll(),
+          oferentesAPI.getAll()
+        ]);
+        setCategorias(catRes.categorias || []);
+        setOferentes(ofeRes.oferentes || []);
+
+        // Pre-select the logged-in oferente
+        if (currentUser?.rol === 'oferente' && currentUser?.id_oferente) {
+          setFormData(p => ({ ...p, id_oferente: currentUser.id_oferente }));
+        }
+      } catch (e) {
+        setError('Error al cargar datos iniciales');
+      }
+    })();
   }, []);
 
-  const fetchInitialData = async () => {
-    try {
-      const [categoriasRes, oferentesRes] = await Promise.all([
-        categoriasAPI.getAll(),
-        oferentesAPI.getAll()
-      ]);
-      
-      setCategorias(categoriasRes.categorias || []);
-      setOferentes(oferentesRes.oferentes || []);
-      
-      // Si el usuario es un oferente, preseleccionar su oferente
-      if (currentUser?.rol === 'oferente' && currentUser?.id_oferente) {
-        setFormData(prev => ({
-          ...prev,
-          id_oferente: currentUser.id_oferente
-        }));
-      }
-    } catch (err) {
-      console.error('Error fetching initial data:', err);
-      setError('Error al cargar datos iniciales');
-    }
-  };
-
-  const handleChange = (e) => {
+  // ---------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Limpiar error del campo cuando el usuario escribe
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setFormData(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+    fieldErrors[name] && setFieldErrors(p => ({ ...p, [name]: '' }));
   };
 
-  const handleImagenesChange = (e) => {
-    setImagenesInput(e.target.value);
-    // Convertir las URLs separadas por comas en un array
-    const urls = e.target.value
-      .split(',')
-      .map(url => url.trim())
-      .filter(url => url.length > 0);
-    
-    setFormData(prev => ({
-      ...prev,
-      imagenes: urls
-    }));
+  const handleimagenChange = e => {
+    setimagenInput(e.target.value);
+    const urls = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+    setFormData(p => ({ ...p, imagen: urls }));
   };
 
-  const validateForm = () => {
-    const errors = {};
-
-    if (!formData.nombre.trim()) {
-      errors.nombre = 'El nombre del producto es requerido';
-    } else if (formData.nombre.length < 3) {
-      errors.nombre = 'El nombre debe tener al menos 3 caracteres';
-    }
-
-    if (!formData.precio || formData.precio <= 0) {
-      errors.precio = 'El precio debe ser mayor a 0';
-    }
-
-    if (formData.inventario < 0) {
-      errors.inventario = 'El inventario no puede ser negativo';
-    }
-
-    if (!formData.id_categoria) {
-      errors.id_categoria = 'Debes seleccionar una categoría';
-    }
-
-    if (!formData.id_oferente) {
-      errors.id_oferente = 'Debes seleccionar un oferente';
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+  const validate = () => {
+    const err = {};
+    if (!formData.nombre.trim() || formData.nombre.length < 3) err.nombre = 'Nombre ≥ 3 caracteres';
+    if (!formData.precio || formData.precio <= 0) err.precio = 'Precio > 0';
+    if (formData.inventario < 0) err.inventario = 'Inventario ≥ 0';
+    if (!formData.id_categoria) err.id_categoria = 'Selecciona categoría';
+    if (!formData.id_oferente) err.id_oferente = 'Selecciona oferente';
+    setFieldErrors(err);
+    return Object.keys(err).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
-
-    if (!validateForm()) {
-      setError('Por favor corrige los errores en el formulario');
-      return;
-    }
+    if (!validate()) return setError('Corrige los errores');
 
     setLoading(true);
-
     try {
-      // Preparar datos para enviar
-      const dataToSend = {
+      await productosAPI.create({
         ...formData,
         precio: parseFloat(formData.precio),
         inventario: parseInt(formData.inventario)
-      };
-
-      await productosAPI.create(dataToSend);
-      
-      alert('✅ Producto creado exitosamente');
+      });
+      alert('Producto creado');
       navigate('/productos');
-    } catch (err) {
-      setError(err.message || 'Error al crear producto. Por favor intenta nuevamente.');
-      console.error('Error creating producto:', err);
+    } catch (er) {
+      setError(er.message || 'Error al crear');
     } finally {
       setLoading(false);
     }
@@ -315,12 +267,12 @@ function CrearProducto() {
             <h3 className="section-title">🖼️ Imágenes</h3>
             
             <div className="form-group">
-              <label htmlFor="imagenes">URLs de Imágenes</label>
+              <label htmlFor="imagen">URLs de Imágenes</label>
               <textarea
-                id="imagenes"
-                name="imagenes"
-                value={imagenesInput}
-                onChange={handleImagenesChange}
+                id="imagen"
+                name="imagen"
+                value={imagenInput}
+                onChange={handleimagenChange}
                 placeholder="Ingresa las URLs de las imágenes separadas por comas&#10;Ej: https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
                 rows="3"
               />
@@ -328,25 +280,25 @@ function CrearProducto() {
                 Separa múltiples URLs con comas. Las imágenes deben estar alojadas en línea.
               </span>
               
-              {formData.imagenes.length > 0 && (
-                <div className="image-preview">
-                  <p className="preview-title">Vista previa:</p>
-                  <div className="preview-grid">
-                    {formData.imagenes.map((url, index) => (
-                      <div key={index} className="preview-item">
-                        <img 
-                          src={url} 
-                          alt={`Imagen ${index + 1}`}
-                          onError={(e) => {
-                            e.target.src = '/images/placeholder.png';
-                            e.target.alt = 'Error al cargar imagen';
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {formData.imagen && formData.imagen.length > 0 && (
+  <div className="image-preview">
+    <p className="preview-title">Vista previa:</p>
+    <div className="preview-grid">
+      {formData.imagen.map((url, index) => (
+        <div key={index} className="preview-item">
+          <img
+            src={url}
+            alt={`Imagen ${index + 1}`}
+            onError={(e) => {
+              e.target.src = '/images/placeholder.png';
+              e.target.alt = 'Error al cargar imagen';
+            }}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+)}
             </div>
           </div>
 

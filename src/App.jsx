@@ -17,31 +17,148 @@ import CrearProducto from './pages/CrearProducto';
 import EditarProducto from './pages/EditarProducto';
 import CrearCategoria from './pages/CrearCategoria';
 import EditarCategoria from './pages/EditarCategoria';
-
+import OferenteDetail from './pages/OferenteDetail';
+import ErrorPage from './pages/ErrorPage';
+import RequireRole from "./components/RequireRole";
+import MiPerfil from "./pages/MiPerfil";
+import CatalogoViejo from './pages/catalogoviejo';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/categorias/crear" element={<CrearCategoria />} />
-<Route path="/categorias/editar/:id" element={<EditarCategoria />} />
+
+        <Route path="/viejo" element={<CatalogoViejo />} />
+        {/* Perfil: cualquier usuario */}
+        <Route
+          path="/perfil"
+          element={
+            <RequireRole allowed={["turista", "oferente", "admin"]}>
+              <MiPerfil />
+            </RequireRole>
+          }
+        />
+
+        {/* Página de error */}
+        <Route path="/error" element={<ErrorPage />} />
+
+        {/* Categorías - SOLO admin */}
+        <Route
+          path="/categorias/crear"
+          element={
+            <RequireRole allowed={["admin"]}>
+              <CrearCategoria />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/categorias/editar/:id"
+          element={
+            <RequireRole allowed={["admin"]}>
+              <EditarCategoria />
+            </RequireRole>
+          }
+        />
+
+        {/* Inicio y auth */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/usuarios/editar/:id" element={<EditarUsuario />} />
-        <Route path="/oferentes" element={<Oferentes />} />
-        <Route path="/oferentes/crear" element={<CrearOferente />} />
-        <Route path="/oferentes/editar/:id" element={<EditarOferente />} />
-        <Route path="/Servicios" element={<Servicios />} />
-        <Route path="/Servicios/crear" element={<CrearServicio />} />
-        <Route path="/Servicios/editar/:id" element={<EditarServicio />} />
-        <Route path="/gastronomia" element={<Catalogo />} />
-        <Route path="/artesanias" element={<Catalogo />} />
+
+        {/* Usuarios - SOLO admin */}
+        <Route
+          path="/usuarios"
+          element={
+            <RequireRole allowed={["admin"]}>
+              <Usuarios />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/usuarios/editar/:id"
+          element={
+            <RequireRole allowed={["admin"]}>
+              <EditarUsuario />
+            </RequireRole>
+          }
+        />
+
+        {/* Oferentes - SOLO admin */}
+        <Route
+          path="/oferentes"
+          element={
+              <Oferentes />
+          }
+        />
+        <Route
+          path="/oferentes/crear"
+          element={
+              <CrearOferente />
+          }
+        />
+        <Route
+          path="/oferentes/editar/:id"
+          element={
+            <RequireRole allowed={["admin"]}>
+              <EditarOferente />
+            </RequireRole>
+          }
+        />
+
+        {/* Servicios - SOLO admin */}
+        <Route
+          path="/servicios"
+          element={
+            <RequireRole allowed={["oferente", "admin"]}>
+              <Servicios />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/servicios/crear"
+          element={
+            <RequireRole allowed={["oferente", "admin"]}>
+              <CrearServicio />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/servicios/editar/:id"
+          element={
+            <RequireRole allowed={["oferente", "admin"]}>
+              <EditarServicio />
+            </RequireRole>
+          }
+        />
+
+        {/* Productos - SOLO admin*/}
+        <Route
+          path="/productos"
+          element={
+              <Productos />
+          }
+        />
+        <Route
+          path="/productos/crear"
+          element={    <CrearProducto />
+          }
+        />
+        <Route
+          path="/productos/editar/:id"
+          element={
+            <RequireRole allowed={["oferente", "admin"]}>
+              <EditarProducto />
+            </RequireRole>
+          }
+        />
+
+        {/* Público */}
+        <Route path="/catalogo" element={<Catalogo />} />
+        <Route path="/oferente/:id" element={<OferenteDetail />} />
         <Route path="/carrito" element={<Carrito />} />
-        <Route path="/productos" element={<Productos />} />
-        <Route path="/productos/crear" element={<CrearProducto />} />
-        <Route path="/productos/editar/:id" element={<EditarProducto />} />
+
+        <Route path="/catalogoviejo" element={<catalogoviejo />} />
+
       </Routes>
     </Router>
   );

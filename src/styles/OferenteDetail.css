@@ -1,0 +1,365 @@
+/* ==============================
+   RESTAURANT DETAIL PAGE
+============================== */
+.restaurant-detail-page {
+  background-color: #1a1a1a;
+  min-height: 100vh;
+  color: #fff;
+  padding-top: 60px;
+}
+
+/* ==============================
+   RESTAURANT HERO SECTION
+============================== */
+.restaurant-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6rem 4rem 4rem 4rem;
+  gap: 4rem;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+.restaurant-info-text {
+  flex: 1;
+  max-width: 380px;
+}
+
+.restaurant-info-text h1 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.restaurant-info-text p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #d1d1d1;
+  margin-bottom: 2rem;
+}
+
+.restaurant-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ==============================
+   CAROUSEL
+============================== */
+.restaurant-carousel {
+  flex: 1;
+  position: relative;
+  max-width: 550px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--accent);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.carousel-btn:hover {
+  background: #c9007a;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev {
+  left: -25px;
+}
+
+.carousel-btn.next {
+  right: -25px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: var(--accent);
+  width: 12px;
+  height: 12px;
+}
+
+/* ==============================
+   MENU SECTION
+============================== */
+.menu-section {
+  padding: 4rem 4rem;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+.menu-section h2 {
+  font-size: 2.5rem;
+  color: var(--accent);
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+}
+
+.menu-item {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.menu-item-content {
+  flex: 1;
+}
+
+.menu-item-content h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.menu-item-content p {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #d1d1d1;
+  margin-bottom: 1rem;
+}
+
+.menu-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.btn-add {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  background: #c9007a;
+}
+
+.menu-item-image {
+  width: 180px;
+  height: 140px;
+  border-radius: 30px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.menu-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==============================
+   RESTAURANT DETAILS SECTION
+============================== */
+.restaurant-details-section {
+  display: flex;
+  gap: 3rem;
+  padding: 4rem 4rem;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 60px;
+}
+
+.details-info {
+  flex: 0 0 300px;
+}
+
+.details-info h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.detail-item {
+  margin-bottom: 1.5rem;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.detail-item p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #d1d1d1;
+}
+
+.map-container {
+  flex: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  height: 300px;
+}
+
+.map-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==============================
+   EXPLORA SECTION
+============================== */
+.explora-section {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #111;
+}
+
+.explora-section h2 {
+  color: var(--accent);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.explora-section p {
+  color: #bbb;
+  font-size: 0.9rem;
+  max-width: 700px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.social-icons a {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+  transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.social-icons i {
+  font-size: 1rem;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 900px) {
+  .restaurant-detail-page {
+    padding-top: 60px;
+  }
+
+  .restaurant-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 5rem 2rem 4rem 2rem;
+  }
+
+  .restaurant-info-text {
+    max-width: 100%;
+  }
+
+  .restaurant-actions {
+    justify-content: center;
+  }
+
+  .restaurant-carousel {
+    max-width: 100%;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-details-section {
+    flex-direction: column;
+  }
+
+  .details-info {
+    flex: 1;
+  }
+}

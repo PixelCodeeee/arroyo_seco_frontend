@@ -10,8 +10,8 @@ function CrearOferente() {
     nombre_negocio: '',
     direccion: '',
     telefono: '',
-    descripcion: '',
     tipo: 'restaurante',
+    imagen: '',
     horario_apertura: '',
     horario_cierre: '',
     dias_disponibles: []
@@ -83,8 +83,8 @@ function CrearOferente() {
       errors.direccion = 'La dirección es requerida';
     }
 
-    if (formData.telefono && !/^\d{10}$/.test(formData.telefono.replace(/\s/g, ''))) {
-      errors.telefono = 'El teléfono debe tener 10 dígitos';
+    if (formData.telefono && !/^\d{10,13}$/.test(formData.telefono.replace(/\s/g, ''))) {
+      errors.telefono = 'El teléfono debe tener entre 10 y 13 dígitos';
     }
 
     if (formData.horario_apertura && formData.horario_cierre) {
@@ -109,16 +109,27 @@ function CrearOferente() {
     setLoading(true);
 
     try {
-      // Preparar datos para enviar
+      // Preparar horario_disponibilidad como objeto JSON
+      const horario_disponibilidad = {
+        dias: formData.dias_disponibles,
+        horario_apertura: formData.horario_apertura || null,
+        horario_cierre: formData.horario_cierre || null
+      };
+
+      // Preparar datos para enviar al backend
       const dataToSend = {
-        ...formData,
-        dias_disponibles: formData.dias_disponibles.join(',')
+        id_usuario: formData.id_usuario,
+        nombre_negocio: formData.nombre_negocio,
+        direccion: formData.direccion,
+        tipo: formData.tipo,
+        horario_disponibilidad: horario_disponibilidad,
+        imagen: formData.imagen || null,
+        telefono: formData.telefono || null
       };
 
       await oferentesAPI.create(dataToSend);
       
-      // Mostrar mensaje de éxito
-      alert('✅ Oferente creado exitosamente');
+      alert('✅ Oferente creado exitosamente (estado: pendiente)');
       navigate('/oferentes');
     } catch (err) {
       setError(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
@@ -222,19 +233,16 @@ function CrearOferente() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="descripcion">Descripción del Negocio</label>
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                value={formData.descripcion}
+              <label htmlFor="imagen">URL de Imagen</label>
+              <input
+                type="url"
+                id="imagen"
+                name="imagen"
+                value={formData.imagen}
                 onChange={handleChange}
-                placeholder="Describe tu negocio, especialidades, ambiente, etc."
-                rows="4"
-                maxLength="500"
+                placeholder="https://ejemplo.com/imagen.jpg"
               />
-              <span className="char-count">
-                {formData.descripcion.length}/500 caracteres
-              </span>
+              <small className="field-hint">Opcional: URL de la imagen del negocio</small>
             </div>
           </div>
 
@@ -271,11 +279,12 @@ function CrearOferente() {
                 onChange={handleChange}
                 placeholder="Ej: 4421234567"
                 className={fieldErrors.telefono ? 'error' : ''}
-                maxLength="10"
+                maxLength="13"
               />
               {fieldErrors.telefono && (
                 <span className="field-error">{fieldErrors.telefono}</span>
               )}
+              <small className="field-hint">10-13 dígitos</small>
             </div>
           </div>
 

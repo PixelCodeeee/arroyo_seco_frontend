@@ -1,0 +1,67 @@
+/* ==============================
+   FOOTER COMPONENT STYLES
+============================== */
+.footer {
+  margin-top: 20px;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #111;
+  border-top: 1px solid #333;
+}
+
+.footer h3 {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.footer p {
+  color: #bbb;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.footer-icons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.footer-icons i {
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #bbb;
+  transition: color 0.3s;
+}
+
+.footer-icons i:hover {
+  color: var(--accent);
+}
+
+.footer small {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* ==============================
+   RESPONSIVE FOOTER
+============================== */
+@media (max-width: 600px) {
+  .footer {
+    padding: 3rem 1.5rem;
+  }
+
+  .footer h3 {
+    font-size: 1.3rem;
+  }
+
+  .footer p {
+    font-size: 0.85rem;
+  }
+
+  .footer-icons i {
+    font-size: 1rem;
+  }
+}

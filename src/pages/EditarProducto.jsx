@@ -5,197 +5,102 @@ import { productosAPI, categoriasAPI, oferentesAPI } from '../services/api';
 import '../styles/CrearProducto.css';
 
 function EditarProducto() {
-  const navigate = useNavigate();
   const { id } = useParams();
-  
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    inventario: 0,
-    id_categoria: '',
-    id_oferente: '',
-    imagenes: [],
-    esta_disponible: true
+    nombre: '', descripcion: '', precio: '', inventario: 0,
+    id_categoria: '', id_oferente: '', imagen: [], esta_disponible: true
   });
-  
+
   const [categorias, setCategorias] = useState([]);
   const [oferentes, setOferentes] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [imagenesInput, setImagenesInput] = useState('');
 
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-
+  // ---------------------------------------------------------------
+  // LOAD PRODUCT + SELECTS
+  // ---------------------------------------------------------------
   useEffect(() => {
-    fetchInitialData();
+    (async () => {
+      try {
+        setFetching(true);
+        const [prodRes, catRes, ofeRes] = await Promise.all([
+          productosAPI.getById(id),          // GET /api/productos/detalle/:id
+          categoriasAPI.getAll(),
+          oferentesAPI.getAll()
+        ]);
+
+        const p = prodRes.producto;          // backend returns { producto: {...} }
+        setFormData({
+          nombre: p.nombre || '',
+          descripcion: p.descripcion || '',
+          precio: p.precio || '',
+          inventario: p.inventario || 0,
+          id_categoria: p.id_categoria || '',
+          id_oferente: p.id_oferente || '',
+          imagen: p.imagen || [],
+          esta_disponible: p.esta_disponible !== false
+        });
+        setImagenesInput((p.imagen || []).join(', '));
+
+        setCategorias(catRes.categorias || []);
+        setOferentes(ofeRes.oferentes || []);
+      } catch (e) {
+        setError('No se pudo cargar el producto');
+      } finally {
+        setFetching(false);
+      }
+    })();
   }, [id]);
 
-  const fetchInitialData = async () => {
+  // ---------------------------------------------------------------
+  // INVENTORY PATCH
+  // ---------------------------------------------------------------
+  const adjustInventory = async (delta) => {
     try {
-      setFetching(true);
-      
-      const [productoRes, categoriasRes, oferentesRes] = await Promise.all([
-        productosAPI.getById(id),
-        categoriasAPI.getAll(),
-        oferentesAPI.getAll()
-      ]);
-      
-      setCategorias(categoriasRes.categorias || []);
-      setOferentes(oferentesRes.oferentes || []);
-      
-      // Cargar datos del producto
-      const producto = productoRes.data || productoRes;
-      setFormData({
-        nombre: producto.nombre || '',
-        descripcion: producto.descripcion || '',
-        precio: producto.precio || '',
-        inventario: producto.inventario || 0,
-        id_categoria: producto.id_categoria || '',
-        id_oferente: producto.id_oferente || '',
-        imagenes: producto.imagenes || [],
-        esta_disponible: producto.esta_disponible !== false
-      });
-      
-      // Establecer las imágenes en el textarea
-      if (producto.imagenes && producto.imagenes.length > 0) {
-        setImagenesInput(producto.imagenes.join(', '));
-      }
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Error al cargar el producto');
-    } finally {
-      setFetching(false);
+      const nuevo = formData.inventario + delta;
+      if (nuevo < 0) throw new Error('Inventario no puede ser negativo');
+      await productosAPI.updateInventario(id, { cantidad: delta });
+      setFormData(p => ({ ...p, inventario: nuevo }));
+      alert('Inventario actualizado');
+    } catch (er) {
+      alert(er.message || 'Error');
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    // Limpiar error del campo cuando el usuario escribe
-    if (fieldErrors[name]) {
-      setFieldErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const handleImagenesChange = (e) => {
-    setImagenesInput(e.target.value);
-    // Convertir las URLs separadas por comas en un array
-    const urls = e.target.value
-      .split(',')
-      .map(url => url.trim())
-      .filter(url => url.length > 0);
-    
-    setFormData(prev => ({
-      ...prev,
-      imagenes: urls
-    }));
-  };
-
-  const validateForm = () => {
-    const errors = {};
-
-    if (!formData.nombre.trim()) {
-      errors.nombre = 'El nombre del producto es requerido';
-    } else if (formData.nombre.length < 3) {
-      errors.nombre = 'El nombre debe tener al menos 3 caracteres';
-    }
-
-    if (!formData.precio || formData.precio <= 0) {
-      errors.precio = 'El precio debe ser mayor a 0';
-    }
-
-    if (formData.inventario < 0) {
-      errors.inventario = 'El inventario no puede ser negativo';
-    }
-
-    if (!formData.id_categoria) {
-      errors.id_categoria = 'Debes seleccionar una categoría';
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
+  // ---------------------------------------------------------------
+  // SUBMIT UPDATE
+  // ---------------------------------------------------------------
+  const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
-
-    if (!validateForm()) {
-      setError('Por favor corrige los errores en el formulario');
-      return;
-    }
-
     setLoading(true);
-
     try {
-      // Preparar datos para enviar
-      const dataToSend = {
+      await productosAPI.update(id, {
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
         inventario: parseInt(formData.inventario),
         id_categoria: formData.id_categoria,
-        imagenes: formData.imagenes,
+        imagen: formData.imagen,
         esta_disponible: formData.esta_disponible
-      };
-
-      await productosAPI.update(id, dataToSend);
-      
-      alert('✅ Producto actualizado exitosamente');
+      });
+      alert('Producto actualizado');
       navigate('/productos');
-    } catch (err) {
-      setError(err.message || 'Error al actualizar producto. Por favor intenta nuevamente.');
-      console.error('Error updating producto:', err);
+    } catch (er) {
+      setError(er.message || 'Error al guardar');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateInventario = async (adjustment) => {
-    try {
-      const nuevoInventario = parseInt(formData.inventario) + adjustment;
-      
-      if (nuevoInventario < 0) {
-        alert('❌ El inventario no puede ser negativo');
-        return;
-      }
-      
-      await productosAPI.updateInventario(id, { cantidad: adjustment });
-      
-      setFormData(prev => ({
-        ...prev,
-        inventario: nuevoInventario
-      }));
-      
-      alert(`✅ Inventario ${adjustment > 0 ? 'aumentado' : 'disminuido'} exitosamente`);
-    } catch (err) {
-      alert(err.message || 'Error al actualizar inventario');
-    }
-  };
-
-  if (fetching) {
-    return (
-      <div className="crear-producto-container">
-        <div className="crear-producto-card">
-          <div className="loading">
-            <div className="spinner"></div>
-            <p>Cargando información del producto...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // ---------------------------------------------------------------
+  // RENDER (same UI, only field name "imagen")
+  // ---------------------------------------------------------------
+  if (fetching) return <div className="loading"><div className="spinner"></div><p>Cargando…</p></div>;
 
   return (
     <div className="crear-producto-container">
@@ -385,18 +290,15 @@ function EditarProducto() {
             <h3 className="section-title">🖼️ Imágenes</h3>
             
             <div className="form-group">
-              <label htmlFor="imagenes">URLs de Imágenes</label>
+              <label htmlFor="imagen">URLs de Imágen</label>
               <textarea
-                id="imagenes"
-                name="imagenes"
+                id="imagen"
+                name="imagen"
                 value={imagenesInput}
                 onChange={handleImagenesChange}
-                placeholder="Ingresa las URLs de las imágenes separadas por comas&#10;Ej: https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
+                placeholder="Ingresa las URLs de la imágen&#10;Ej: https://ejemplo.com/imagen1.jpg"
                 rows="3"
               />
-              <span className="form-hint">
-                Separa múltiples URLs con comas. Las imágenes deben estar alojadas en línea.
-              </span>
               
               {formData.imagenes.length > 0 && (
                 <div className="image-preview">

@@ -1,78 +1,9 @@
 /* ==============================
-   GLOBAL
+   HOME PAGE STYLES
 ============================== */
-body {
-  margin: 0;
-  font-family: 'Montserrat', sans-serif;
-  background-color: #1a1a1a;
-  color: #fff;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
 .home-page {
   overflow-x: hidden;
   background-color: #1a1a1a;
-}
-
-/* Accent color */
-:root {
-  --accent: #e3008c;
-}
-
-/* ==============================
-   NAVBAR
-============================== */
-.navbar {
-  width: 100%;
-  height: 60px;
-  background-color: #1a1a1a;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 2rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-links a {
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-  color: var(--accent);
-}
-
-.nav-icons {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.nav-icons i {
-  font-size: 1.2rem;
-}
-
-.perfil-link {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.perfil-link:hover {
-  color: var(--accent);
 }
 
 /* ==============================
@@ -126,7 +57,6 @@ a {
   background: rgba(255, 255, 255, 0.1);
 }
 
-
 /* ==============================
    TESORO SECTION
 ============================== */
@@ -173,20 +103,6 @@ a {
   background: url("/images/tesoro.jpg") center/cover no-repeat;
 }
 
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.6rem;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.btn-primary:hover {
-  background: #c9007a;
-}
-
 .scroll-icon {
   position: absolute;
   bottom: 1rem;
@@ -216,7 +132,6 @@ a {
   background-size: 60px;
 }
 
-
 .gastronomia-text {
   flex: 1;
   max-width: 480px;
@@ -232,25 +147,11 @@ a {
   color: var(--accent);
 }
 
-.btn-secondary {
-  background: #fff;
-  color: #1a1a1a;
-  border-radius: 20px;
-  padding: 0.6rem 1.6rem;
-  font-weight: 600;
-  transition: 0.3s;
-}
-
-.btn-secondary:hover {
-  background: var(--accent);
-  color: #fff;
-}
-
 /* ==============================
    ARTESANÍAS SECTION
 ============================== */
 .artesanias-section {
-    margin: auto;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -313,7 +214,6 @@ a {
   z-index: 1;
 }
 
-
 /* ==============================
    ARTESANÍAS IMAGES
 ============================== */
@@ -349,86 +249,6 @@ a {
   top: -150px;   /* shallower vertical offset */
   left: 230px;  /* smaller horizontal shift for balance */
   z-index: 1;
-}
-
-/* ==============================
-   cart
-============================== */
-.cart-button {
-  position: relative;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: inherit;
-  padding: 0.5rem;
-  transition: transform 0.2s;
-}
-
-.cart-button:hover {
-  transform: scale(1.1);
-}
-
-.cart-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #e74c3c;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-/* ==============================
-   FOOTER
-============================== */
-.footer {
-    margin-top: 20px;
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: #111;
-  border-top: 1px solid #333;
-}
-
-.footer h3 {
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.footer p {
-  color: #bbb;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.footer-icons {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.footer-icons i {
-  font-size: 1.1rem;
-  cursor: pointer;
-  color: #bbb;
-  transition: color 0.3s;
-}
-
-.footer-icons i:hover {
-  color: var(--accent);
-}
-
-.footer small {
-  display: block;
-  margin-top: 1rem;
-  font-size: 0.75rem;
-  color: #666;
 }
 
 /* ==============================

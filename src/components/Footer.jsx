@@ -1,21 +1,20 @@
-// src/components/Footer.jsx
 import React from "react";
-import "../styles/Home.css"; // o su propio Footer.css si prefieres separarlo
+import "../styles/Footer.css";
 
 function Footer() {
   return (
     <footer className="footer">
-      <h3>Explora Arroyo Seco</h3>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipiscing elit. Consectetur
-        adipiscing elit quisque faucibus.
-      </p>
+      <h3>Arroyo Seco</h3>
+      <p>Descubre la riqueza cultural y gastronómica de nuestro pueblo</p>
+      
       <div className="footer-icons">
-        <i className="ri-facebook-fill"></i>
-        <i className="ri-instagram-line"></i>
-        <i className="ri-twitter-fill"></i>
+        <i className="fab fa-facebook-f"></i>
+        <i className="fab fa-instagram"></i>
+        <i className="fab fa-twitter"></i>
+        <i className="fab fa-whatsapp"></i>
       </div>
-      <small>© 2025 UTEQ Ltd. All Rights Reserved.</small>
+      
+      <small>© 2025 Arroyo Seco. Todos los derechos reservados.</small>
     </footer>
   );
 }

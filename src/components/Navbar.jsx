@@ -1,44 +1,40 @@
 // src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/Home.css";
+import "../styles/Navbar.css";
 
 function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
-  // Check for session and cart items
+  // Load session + cart
   useEffect(() => {
-    const session = sessionStorage.getItem("userSession"); // adjust key if needed
-    setIsLoggedIn(!!session);
-    
-    // Get cart count from memory or state management
+    const storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
     updateCartCount();
 
-    // Escuchar evento de actualización del carrito
-    const handleCartUpdate = () => {
-      updateCartCount();
-    };
+    const handleCartUpdate = () => updateCartCount();
+    window.addEventListener("cartUpdated", handleCartUpdate);
 
-    window.addEventListener('cartUpdated', handleCartUpdate);
-
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate);
-    };
+    return () => window.removeEventListener("cartUpdated", handleCartUpdate);
   }, []);
 
   const updateCartCount = () => {
-    // This should connect to your cart state management
-    // For now, using a simple counter as example
     const cartItems = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
     setCartCount(cartItems.length);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem("userSession");
-    setIsLoggedIn(false);
-    navigate("/"); // redirect to home or login
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("currentUser");
+    sessionStorage.removeItem("cartItems");
+
+    setUser(null);
+    navigate("/");
   };
 
   const handleCartClick = () => {
@@ -51,26 +47,40 @@ function Navbar() {
         <Link to="/gastronomia">Gastronomía</Link>
         <Link to="/artesanias">Artesanías</Link>
         <Link to="/contacto">Contacto</Link>
+
+        {/* === ROLE-BASED OPTIONS === */}
+        {user?.rol === "oferente" && (
+          <Link to="/panel-oferente" className="nav-role-btn">
+            Panel Oferente
+          </Link>
+        )}
+
+        {user?.rol === "administrador" && (
+          <Link to="/admin" className="nav-role-btn">
+            Panel Admin
+          </Link>
+        )}
       </nav>
 
       <div className="nav-icons">
-        <button 
-          onClick={handleCartClick} 
+        {/* Cart button */}
+        <button
+          onClick={handleCartClick}
           className="cart-button"
           aria-label="Carrito de compras"
-          style={{ fontSize: '1.5rem' }}
+          style={{ fontSize: "1.5rem" }}
         >
           <i className="ri-shopping-cart-line"></i>
-          {cartCount > 0 && (
-            <span className="cart-badge">{cartCount}</span>
-          )}
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
 
-        {isLoggedIn ? (
+        {/* Session options */}
+        {user ? (
           <>
             <Link to="/perfil" className="perfil-link">
               Mi Perfil
             </Link>
+
             <button onClick={handleLogout} className="logout-btn">
               Cerrar sesión
             </button>
