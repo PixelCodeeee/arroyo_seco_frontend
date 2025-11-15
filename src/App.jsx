@@ -29,6 +29,7 @@ function App() {
       <Routes>
 
         <Route path="/viejo" element={<CatalogoViejo />} />
+        
         {/* Perfil: cualquier usuario */}
         <Route
           path="/perfil"
@@ -87,13 +88,13 @@ function App() {
         <Route
           path="/oferentes"
           element={
-              <Oferentes />
+            <Oferentes />
           }
         />
         <Route
           path="/oferentes/crear"
           element={
-              <CrearOferente />
+            <CrearOferente />
           }
         />
         <Route
@@ -135,12 +136,13 @@ function App() {
         <Route
           path="/productos"
           element={
-              <Productos />
+            <Productos />
           }
         />
         <Route
           path="/productos/crear"
-          element={    <CrearProducto />
+          element={
+            <CrearProducto />
           }
         />
         <Route
@@ -154,10 +156,23 @@ function App() {
 
         {/* Público */}
         <Route path="/catalogo" element={<Catalogo />} />
+        
+        {/* Rutas de categorías */}
+        <Route path="/gastronomia" element={<Catalogo />} />
+        <Route path="/artesanias" element={<Catalogo />} />
+        
+        {/* Panel oferente */}
+        <Route
+          path="/panel-oferente"
+          element={
+            <RequireRole allowed={["oferente", "admin"]}>
+              <Servicios />
+            </RequireRole>
+          }
+        />
+        
         <Route path="/oferente/:id" element={<OferenteDetail />} />
         <Route path="/carrito" element={<Carrito />} />
-
-        <Route path="/catalogoviejo" element={<catalogoviejo />} />
 
       </Routes>
     </Router>

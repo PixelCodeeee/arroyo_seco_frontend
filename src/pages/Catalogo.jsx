@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Star, ChevronLeft, ChevronRight, MapPin, Clock, Phone } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, MapPin, Clock, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { oferentesAPI } from "../services/api";
 import Navbar from "../components/Navbar";
@@ -13,18 +13,12 @@ function Catalogo() {
   const [oferentes, setOferentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [tipoFilter, setTipoFilter] = useState("todos"); // "todos", "restaurante", "artesanal"
+  const [tipoFilter, setTipoFilter] = useState("todos");
 
-  // Placeholder hero slides - you can later populate this with featured oferentes
+  // Hero slides con imágenes diferentes
   const heroSlides = [
-    {
-      id: 1,
-      images: ["/images/tesoro.jpg"]
-    },
-    {
-      id: 2,
-      images: ["/images/tesoro.jpg"]
-    }
+    { id: 1, image: "/images/tesoro.jpg", alt: "Arroyo Seco" },
+    { id: 2, image: "/images/taco.png", alt: "Gastronomía Local" }
   ];
 
   useEffect(() => {
@@ -34,7 +28,6 @@ function Catalogo() {
   const fetchOferentes = async () => {
     try {
       setLoading(true);
-      // Fetch only approved oferentes
       const response = await oferentesAPI.getAll({ estado: "aprobado" });
       setOferentes(response.oferentes || []);
       setError("");
@@ -46,16 +39,13 @@ function Catalogo() {
     }
   };
 
-  // Filter oferentes based on search query and tipo
   const getFilteredOferentes = () => {
     let filtered = oferentes;
 
-    // Filter by tipo
     if (tipoFilter !== "todos") {
       filtered = filtered.filter(o => o.tipo === tipoFilter);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(o => 
@@ -68,7 +58,6 @@ function Catalogo() {
     return filtered;
   };
 
-  // Separate oferentes by tipo
   const getRestaurantes = () => {
     return getFilteredOferentes().filter(o => o.tipo === "restaurante");
   };
@@ -135,7 +124,7 @@ function Catalogo() {
           <div className="card-info">
             <h3>{oferente.nombre_negocio}</h3>
             <p className="card-type">
-              {oferente.tipo === "restaurante" ? "🍽️ Gastronomía" : "🎨 Artesanía"}
+              {oferente.tipo === "restaurante" ? "Gastronomía" : "Artesanía"}
             </p>
           </div>
         </div>
@@ -196,32 +185,42 @@ function Catalogo() {
           
           <div className="hero-carousel-wrapper">
             <div className="hero-carousel">
-              <button className="hero-carousel-btn prev" onClick={handlePrevSlide}>
-                <ChevronLeft size={28} />
-              </button>
+              {heroSlides.length > 1 && (
+                <button className="hero-carousel-btn prev" onClick={handlePrevSlide}>
+                  <ChevronLeft size={28} />
+                </button>
+              )}
               
               <div className="hero-images-container">
-                {heroSlides[currentHeroSlide].images.map((img, idx) => (
-                  <div key={idx} className="hero-image-wrapper">
-                    <img src={img} alt={`Weekly selection ${idx + 1}`} />
-                  </div>
-                ))}
+                <div className="hero-image-wrapper">
+                  <img 
+                    src={heroSlides[currentHeroSlide].image} 
+                    alt={heroSlides[currentHeroSlide].alt}
+                    onError={(e) => {
+                      e.target.src = "/images/placeholder.png";
+                    }}
+                  />
+                </div>
               </div>
               
-              <button className="hero-carousel-btn next" onClick={handleNextSlide}>
-                <ChevronRight size={28} />
-              </button>
+              {heroSlides.length > 1 && (
+                <button className="hero-carousel-btn next" onClick={handleNextSlide}>
+                  <ChevronRight size={28} />
+                </button>
+              )}
             </div>
             
-            <div className="hero-dots">
-              {heroSlides.map((_, index) => (
-                <span
-                  key={index}
-                  className={`dot ${index === currentHeroSlide ? "active" : ""}`}
-                  onClick={() => setCurrentHeroSlide(index)}
-                />
-              ))}
-            </div>
+            {heroSlides.length > 1 && (
+              <div className="hero-dots">
+                {heroSlides.map((_, index) => (
+                  <span
+                    key={index}
+                    className={`dot ${index === currentHeroSlide ? "active" : ""}`}
+                    onClick={() => setCurrentHeroSlide(index)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -251,13 +250,13 @@ function Catalogo() {
             className={`filter-tab ${tipoFilter === "restaurante" ? "active" : ""}`}
             onClick={() => setTipoFilter("restaurante")}
           >
-            🍽️ Gastronomía ({oferentes.filter(o => o.tipo === "restaurante").length})
+            Gastronomía ({oferentes.filter(o => o.tipo === "restaurante").length})
           </button>
           <button 
             className={`filter-tab ${tipoFilter === "artesanal" ? "active" : ""}`}
             onClick={() => setTipoFilter("artesanal")}
           >
-            🎨 Artesanías ({oferentes.filter(o => o.tipo === "artesanal").length})
+            Artesanías ({oferentes.filter(o => o.tipo === "artesanal").length})
           </button>
         </div>
       </section>
@@ -306,7 +305,7 @@ function Catalogo() {
             <section className="Catalogo-section">
               <div className="Catalogo-content">
                 <div className="section-header">
-                  <h2>🍽️ Gastronomía</h2>
+                  <h2>Gastronomía</h2>
                   {showingAll && restaurantes.length > 4 && (
                     <button 
                       className="view-all"
@@ -329,7 +328,7 @@ function Catalogo() {
             <section className="Catalogo-section">
               <div className="Catalogo-content">
                 <div className="section-header">
-                  <h2>🎨 Artesanías</h2>
+                  <h2>Artesanías</h2>
                   {showingAll && artesanias.length > 2 && (
                     <button 
                       className="view-all"

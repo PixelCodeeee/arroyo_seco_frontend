@@ -5,66 +5,122 @@
   background-color: #1a1a1a;
   min-height: 100vh;
   color: #fff;
-  padding-top: 60px;
+  padding-top: 80px;
 }
 
 /* ==============================
-   RESTAURANT HERO SECTION
+   RESTAURANT HERO SECTION - CORREGIDO
 ============================== */
 .restaurant-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6rem 4rem 4rem 4rem;
-  gap: 4rem;
+  padding: 4rem 6rem;
+  gap: 6rem;
   background-image: url("/images/pattern.svg");
   background-repeat: repeat-y;
   background-position: center;
-  background-size: 60px;
+  background-size: 120px;
+  min-height: 600px;
+  position: relative;
 }
 
+.restaurant-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 26, 0.3);
+  pointer-events: none;
+}
+
+/* TEXTO A LA IZQUIERDA */
 .restaurant-info-text {
-  flex: 1;
-  max-width: 380px;
+  flex: 0 0 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .restaurant-info-text h1 {
-  font-size: 2.5rem;
+  font-size: 3rem;
   color: var(--accent);
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .restaurant-info-text p {
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.8;
   color: #d1d1d1;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .restaurant-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 1rem 2.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #c9007a;
+  box-shadow: 0 4px 15px rgba(227, 0, 140, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.btn-secondary:hover {
+  background: #fff;
+  color: #1a1a1a;
 }
 
 /* ==============================
-   CAROUSEL
+   CAROUSEL - IMAGEN GRANDE A LA DERECHA
 ============================== */
 .restaurant-carousel {
   flex: 1;
   position: relative;
-  max-width: 550px;
-  height: 420px;
+  max-width: 650px;
+  height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .carousel-image {
   width: 100%;
   height: 100%;
-  border-radius: 20px;
+  border-radius: 30px;
   overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .carousel-image img {
@@ -79,8 +135,8 @@
   transform: translateY(-50%);
   background: var(--accent);
   border: none;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -89,6 +145,7 @@
   color: #fff;
   transition: all 0.3s ease;
   z-index: 10;
+  box-shadow: 0 4px 15px rgba(227, 0, 140, 0.3);
 }
 
 .carousel-btn:hover {
@@ -97,25 +154,25 @@
 }
 
 .carousel-btn.prev {
-  left: -25px;
+  left: -30px;
 }
 
 .carousel-btn.next {
-  right: -25px;
+  right: -30px;
 }
 
 .carousel-dots {
   position: absolute;
-  bottom: -30px;
+  bottom: -40px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #666;
   cursor: pointer;
@@ -124,66 +181,98 @@
 
 .dot.active {
   background: var(--accent);
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 
 /* ==============================
    MENU SECTION
 ============================== */
 .menu-section {
-  padding: 4rem 4rem;
+  padding: 5rem 6rem;
   background-image: url("/images/pattern.svg");
   background-repeat: repeat-y;
   background-position: center;
-  background-size: 60px;
+  background-size: 120px;
+  position: relative;
+}
+
+.menu-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 26, 0.3);
+  pointer-events: none;
 }
 
 .menu-section h2 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   color: var(--accent);
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
   font-weight: 700;
+  position: relative;
+  z-index: 1;
 }
 
 .menu-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2.5rem;
+  gap: 10rem;
+  position: relative;
+  z-index: 1;
 }
 
+/* TARJETA DE MENU */
 .menu-item {
   display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+  gap: 2rem;
+  align-items: stretch;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  transition: transform 0.3s ease;
 }
 
+.menu-item:hover {
+  transform: translateY(-5px);
+}
+
+/* Contenido a la IZQUIERDA */
 .menu-item-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .menu-item-content h3 {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   margin-bottom: 0.75rem;
   font-weight: 600;
+  color: #fff;
 }
 
 .menu-item-content p {
-  font-size: 0.8rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: #d1d1d1;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  flex: 1;
 }
 
 .menu-item-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
 .price {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #fff;
 }
 
@@ -191,24 +280,29 @@
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 15px;
-  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  padding: 0.75rem 2.25rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .btn-add:hover {
   background: #c9007a;
+  box-shadow: 0 4px 15px rgba(227, 0, 140, 0.4);
+  transform: translateY(-2px);
 }
 
+/* Imagen a la DERECHA */
 .menu-item-image {
-  width: 180px;
-  height: 140px;
-  border-radius: 30px;
+  width: 240px;
+  height: 200px;
+  border-radius: 25px;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .menu-item-image img {
@@ -217,54 +311,85 @@
   object-fit: cover;
 }
 
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+}
+
 /* ==============================
    RESTAURANT DETAILS SECTION
 ============================== */
 .restaurant-details-section {
   display: flex;
-  gap: 3rem;
-  padding: 4rem 4rem;
+  gap: 4rem;
+  padding: 5rem 6rem;
   background-image: url("/images/pattern.svg");
   background-repeat: repeat-y;
   background-position: center;
-  background-size: 60px;
+  background-size: 120px;
+  position: relative;
+}
+
+.restaurant-details-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 26, 0.3);
+  pointer-events: none;
 }
 
 .details-info {
-  flex: 0 0 300px;
+  flex: 0 0 350px;
+  position: relative;
+  z-index: 1;
 }
 
 .details-info h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
   font-weight: 700;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 2px solid #333;
+  color: #fff;
 }
 
 .detail-item {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .detail-label {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--accent);
   font-weight: 600;
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .detail-item p {
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.7;
   color: #d1d1d1;
 }
 
 .map-container {
   flex: 1;
-  border-radius: 20px;
+  border-radius: 25px;
   overflow: hidden;
-  height: 300px;
+  height: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
 }
 
 .map-container img {
@@ -274,73 +399,98 @@
 }
 
 /* ==============================
-   EXPLORA SECTION
+   LOADING & ERROR STATES
 ============================== */
-.explora-section {
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: #111;
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 3rem;
 }
 
-.explora-section h2 {
-  color: var(--accent);
-  font-size: 2rem;
-  font-weight: 700;
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #333;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p,
+.error-container p {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: #999;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 1.1rem;
   margin-bottom: 1.5rem;
 }
 
-.explora-section p {
-  color: #bbb;
-  font-size: 0.9rem;
-  max-width: 700px;
-  margin: 0 auto 1.5rem;
-  line-height: 1.6;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.social-icons a {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #222;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #bbb;
-  transition: all 0.3s ease;
-}
-
-.social-icons a:hover {
+.btn-retry {
   background: var(--accent);
   color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
 }
 
-.social-icons i {
-  font-size: 1rem;
+.btn-retry:hover {
+  background: #c9007a;
+  transform: translateY(-2px);
 }
 
 /* ==============================
    RESPONSIVE
 ============================== */
-@media (max-width: 900px) {
-  .restaurant-detail-page {
-    padding-top: 60px;
+@media (max-width: 1200px) {
+  .restaurant-hero {
+    padding: 4rem 3rem;
+    gap: 4rem;
   }
 
+  .menu-section {
+    padding: 4rem 3rem;
+  }
+
+  .menu-grid {
+    gap: 8rem;
+  }
+
+  .restaurant-details-section {
+    padding: 4rem 3rem;
+  }
+}
+
+@media (max-width: 900px) {
   .restaurant-hero {
     flex-direction: column;
     text-align: center;
     padding: 5rem 2rem 4rem 2rem;
+    min-height: auto;
   }
 
   .restaurant-info-text {
+    flex: 1;
     max-width: 100%;
+  }
+
+  .restaurant-info-text h1 {
+    font-size: 2.5rem;
   }
 
   .restaurant-actions {
@@ -349,17 +499,96 @@
 
   .restaurant-carousel {
     max-width: 100%;
+    height: 400px;
+  }
+
+  .menu-section {
+    padding: 3rem 2rem;
   }
 
   .menu-grid {
     grid-template-columns: 1fr;
+    gap: 3rem;
   }
 
   .restaurant-details-section {
     flex-direction: column;
+    padding: 3rem 2rem;
   }
 
   .details-info {
     flex: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .restaurant-detail-page {
+    padding-top: 60px;
+  }
+
+  .restaurant-hero {
+    padding: 3rem 1.5rem;
+  }
+
+  .restaurant-info-text h1 {
+    font-size: 2rem;
+  }
+
+  .restaurant-info-text p {
+    font-size: 0.9rem;
+  }
+
+  .restaurant-carousel {
+    height: 300px;
+  }
+
+  .carousel-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .carousel-btn.prev {
+    left: -15px;
+  }
+
+  .carousel-btn.next {
+    right: -15px;
+  }
+
+  .menu-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .menu-section h2 {
+    font-size: 2rem;
+  }
+
+  .menu-item {
+    flex-direction: column;
+  }
+
+  .menu-item-image {
+    width: 100%;
+    height: 200px;
+    order: -1;
+  }
+
+  .menu-item-footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .restaurant-details-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .details-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .map-container {
+    height: 250px;
   }
 }

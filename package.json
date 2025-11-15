@@ -25,6 +25,18 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
-    "vite": "^7.1.7"
-  }
+    "vite": "^7.2.2"
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PixelCodeeee/arroyo_seco_frontend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PixelCodeeee/arroyo_seco_frontend/issues"
+  },
+  "homepage": "https://github.com/PixelCodeeee/arroyo_seco_frontend#readme"
 }

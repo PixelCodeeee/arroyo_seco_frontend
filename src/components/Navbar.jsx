@@ -8,7 +8,6 @@ function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
-  // Load session + cart
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
@@ -48,7 +47,6 @@ function Navbar() {
         <Link to="/artesanias">Artesanías</Link>
         <Link to="/contacto">Contacto</Link>
 
-        {/* === ROLE-BASED OPTIONS === */}
         {user?.rol === "oferente" && (
           <Link to="/panel-oferente" className="nav-role-btn">
             Panel Oferente
@@ -63,18 +61,15 @@ function Navbar() {
       </nav>
 
       <div className="nav-icons">
-        {/* Cart button */}
         <button
           onClick={handleCartClick}
           className="cart-button"
           aria-label="Carrito de compras"
-          style={{ fontSize: "1.5rem" }}
         >
           <i className="ri-shopping-cart-line"></i>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
 
-        {/* Session options */}
         {user ? (
           <>
             <Link to="/perfil" className="perfil-link">
