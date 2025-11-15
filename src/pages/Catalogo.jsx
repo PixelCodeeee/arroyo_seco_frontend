@@ -282,7 +282,7 @@ function Catalogo() {
       {/* Empty State */}
       {!loading && !error && oferentes.length === 0 && (
         <div className="empty-state">
-          <p>No hay oferentes disponibles en este momento.</p>
+          <p>en este momento no hay oferentes disponibles .</p>
         </div>
       )}
 
