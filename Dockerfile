@@ -9,7 +9,7 @@ RUN npm install
 # Copy the rest of your code and build the project
 COPY . .
 # Setting VITE_API_URL so the build has the correct proxy path
-ENV VITE_API_URL=https://api.arroyoseco.online
+ENV VITE_API_URL=https://api.arroyoseco.online/api
 RUN npm run build
 
 # STAGE 2: Serve with NGINX (Internal Docker NGINX)
