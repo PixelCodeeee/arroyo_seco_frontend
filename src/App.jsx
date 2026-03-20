@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
+import { Toaster } from "sonner";
+import { ThemeProvider } from "./context/ThemeProvider";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -23,6 +26,8 @@ import OferenteDetail from "./pages/OferenteDetail";
 import ErrorPage from "./pages/ErrorPage";
 import RequireRole from "./components/RequireRole";
 import MiPerfil from "./pages/MiPerfil";
+import SettingsModal from "./components/SettingsModal";
+import OfflineIndicator from "./components/OfflineIndicator";
 import Categorias from './pages/Categorias';
 import Ordenes from './pages/Ordenes';
 import Reservas from './pages/Reservas';
@@ -43,188 +48,195 @@ function App() {
 
   return (
     <PayPalScriptProvider options={initialOptions}>
-      <Router>
-        <Routes>
-          <Route path="/contacto" element={<Contact />} />
+      <ThemeProvider>
+        <OfflineIndicator />
+        <SettingsModal />
+        <Router>
+          <Toaster position="top-right" richColors />
+          <Routes>
+            <Route path="/contacto" element={<Contact />} />
 
-          <Route path="/reservas" element={<Reservas />} />
+            <Route path="/reservas" element={<Reservas />} />
 
-          <Route path="/ordenes" element={<Ordenes />} />
+            <Route path="/ordenes" element={<Ordenes />} />
 
-          <Route path="/recomendaciones" element={<Recomendaciones />} />
+            <Route path="/recomendaciones" element={<Recomendaciones />} />
 
-          <Route path="/categorias" element={<Categorias />} />
+            <Route path="/categorias" element={<Categorias />} />
 
-          <Route
-            path="/analiticas"
-            element={
-              <RequireRole allowed={["admin", "oferente"]}>
-                <Analiticas />
-              </RequireRole>
-            }
-          />
+            <Route
+              path="/analiticas"
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <Analiticas />
+                </RequireRole>
+              }
+            />
 
-          {/* Perfil: cualquier usuario */}
-          <Route
-            path="/perfil"
-            element={
-              <RequireRole allowed={["turista", "oferente", "admin"]}>
-                <MiPerfil />
-              </RequireRole>
-            }
-          />
+            {/* Perfil: cualquier usuario */}
+            <Route
+              path="/perfil"
+              element={
+                <RequireRole allowed={["turista", "oferente", "admin"]}>
+                  <MiPerfil />
+                </RequireRole>
+              }
+            />
 
-          {/* Página de error */}
-          <Route path="/error" element={<ErrorPage />} />
+            {/* Settings (Now a Modal, Route removed) */}
 
-          {/* Categorías - SOLO admin */}
-          <Route
-            path="/categorias/crear"
-            element={
-              <RequireRole allowed={["admin"]}>
-                <CrearCategoria />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/categorias/editar/:id"
-            element={
-              <RequireRole allowed={["admin"]}>
-                <EditarCategoria />
-              </RequireRole>
-            }
-          />
+            {/* Página de error */}
+            <Route path="/error" element={<ErrorPage />} />
 
-          {/* Inicio y auth */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+            {/* Categorías - SOLO admin */}
+            <Route
+              path="/categorias/crear"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <CrearCategoria />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/categorias/editar/:id"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <EditarCategoria />
+                </RequireRole>
+              }
+            />
 
-          {/* Usuarios - SOLO admin */}
-          <Route
-            path="/usuarios"
-            element={
-              <RequireRole allowed={["admin"]}>
-                <Usuarios />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/usuarios/editar/:id"
-            element={
-              <RequireRole allowed={["admin"]}>
-                <EditarUsuario />
-              </RequireRole>
-            }
-          />
+            {/* Inicio y auth */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Oferentes */}
-          <Route path="/oferentes" element={<Oferentes />} />
-          <Route path="/oferentes/crear" element={<CrearOferente />} />
-          <Route
-            path="/oferentes/editar/:id"
-            element={
-              <RequireRole allowed={["admin", "oferente"]}>
-                <EditarOferente />
-              </RequireRole>
-            }
-          />
+            {/* Usuarios - SOLO admin */}
+            <Route
+              path="/usuarios"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <Usuarios />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/usuarios/editar/:id"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <EditarUsuario />
+                </RequireRole>
+              }
+            />
 
-          {/* Servicios */}
-          <Route
-            path="/servicios"
-            element={
-              <RequireRole allowed={["oferente", "admin"]}>
-                <Servicios />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/servicios/crear"
-            element={
-              <RequireRole allowed={["oferente", "admin"]}>
-                <CrearServicio />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/servicios/editar/:id"
-            element={
-              <RequireRole allowed={["oferente", "admin"]}>
-                <EditarServicio />
-              </RequireRole>
-            }
-          />
+            {/* Oferentes */}
+            <Route path="/oferentes" element={<Oferentes />} />
+            <Route path="/oferentes/crear" element={<CrearOferente />} />
+            <Route
+              path="/oferentes/editar/:id"
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <EditarOferente />
+                </RequireRole>
+              }
+            />
 
-          {/* Productos */}
-          <Route path="/productos" element={<Productos />} />
-          <Route path="/productos/crear" element={<CrearProducto />} />
-          <Route
-            path="/productos/editar/:id"
-            element={
-              <RequireRole allowed={["oferente", "admin"]}>
-                <EditarProducto />
-              </RequireRole>
-            }
-          />
+            {/* Servicios */}
+            <Route
+              path="/servicios"
+              element={
+                <RequireRole allowed={["oferente", "admin"]}>
+                  <Servicios />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/servicios/crear"
+              element={
+                <RequireRole allowed={["oferente", "admin"]}>
+                  <CrearServicio />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/servicios/editar/:id"
+              element={
+                <RequireRole allowed={["oferente", "admin"]}>
+                  <EditarServicio />
+                </RequireRole>
+              }
+            />
 
-          {/* Público */}
-          <Route path="/catalogo" element={<Catalogo />} />
+            {/* Productos */}
+            <Route path="/productos" element={<Productos />} />
+            <Route path="/productos/crear" element={<CrearProducto />} />
+            <Route
+              path="/productos/editar/:id"
+              element={
+                <RequireRole allowed={["oferente", "admin"]}>
+                  <EditarProducto />
+                </RequireRole>
+              }
+            />
 
-          {/* Rutas de categorías */}
-          <Route path="/gastronomia" element={<Catalogo />} />
-          <Route path="/artesanias" element={<Catalogo />} />
+            {/* Público */}
+            <Route path="/catalogo" element={<Catalogo />} />
 
-          {/* Panel oferente */}
-          <Route
-            path="/panel-oferente"
-            element={
-              <RequireRole allowed={["oferente", "admin"]}>
-                <Servicios />
-              </RequireRole>
-            }
-          />
-          {/* Anuncios  */}
-          <Route
-            path="/anuncios"
-            element={
-              <RequireRole allowed={["admin", "oferente"]}>
-                <Anuncios />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/anuncios/crear"
-            element={
-              <RequireRole allowed={["admin", "oferente"]}>
-                <CrearAnuncio />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/anuncios/editar/:id"
-            element={
-              <RequireRole allowed={["admin", "oferente"]}>
-                <EditarAnuncio />
-              </RequireRole>
-            }
-          />
+            {/* Rutas de categorías */}
+            <Route path="/gastronomia" element={<Catalogo />} />
+            <Route path="/artesanias" element={<Catalogo />} />
 
-          <Route
-            path="/panel-admin"
-            element={
-              <RequireRole allowed={["admin"]}>
-                <Servicios />
-              </RequireRole>
-            }
-          />
-          {/* Anuncios públicos - todos pueden ver */}
-          <Route path="/anuncios-publicos" element={<AnunciosPublicos />} />
+            {/* Panel oferente */}
+            <Route
+              path="/panel-oferente"
+              element={
+                <RequireRole allowed={["oferente", "admin"]}>
+                  <Servicios />
+                </RequireRole>
+              }
+            />
+            {/* Anuncios  */}
+            <Route
+              path="/anuncios"
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <Anuncios />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/anuncios/crear"
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <CrearAnuncio />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/anuncios/editar/:id"
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <EditarAnuncio />
+                </RequireRole>
+              }
+            />
 
-          <Route path="/oferente/:id" element={<OferenteDetail />} />
-          <Route path="/carrito" element={<Carrito />} />
-        </Routes>
-      </Router>
+            <Route
+              path="/panel-admin"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <Servicios />
+                </RequireRole>
+              }
+            />
+            {/* Anuncios públicos - todos pueden ver */}
+            <Route path="/anuncios-publicos" element={<AnunciosPublicos />} />
+
+            <Route path="/oferente/:id" element={<OferenteDetail />} />
+            <Route path="/carrito" element={<Carrito />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
     </PayPalScriptProvider>
   );
 }

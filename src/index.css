@@ -1,7 +1,87 @@
+:root {
+  /* Default Theme (Dark) / Site Aesthetic */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #222222;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d1d1;
+  --text-muted: #bbbbbb;
+  --accent: #e3008c;
+  --accent-color: #e3008c;
+  --accent-hover: #c9007a;
+  --border-color: #333333;
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+  --offline-banner-height: 0px;
+
+  /* Additional layout aliases */
+  --dark-bg: var(--bg-primary);
+  --card-bg: var(--bg-secondary);
+  --footer-bg: var(--bg-primary);
+
+  /* Font Scaling Defaults */
+  --base-size: 1rem;
+}
+
+/* Light Theme */
+:root.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --accent: #e3008c;
+  --accent-color: #e3008c;
+  --accent-hover: #c9007a;
+  --border-color: #e5e7eb;
+
+  --dark-bg: var(--bg-primary);
+  --card-bg: var(--bg-secondary);
+  --footer-bg: #f3f4f6;
+}
+
+/* High Contrast Theme */
+:root.theme-hc {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --text-primary: #ffffff;
+  --text-secondary: #ffffff;
+  --text-muted: #ffffff;
+  --accent: #ffff00;
+  --accent-color: #ffff00;
+  --accent-hover: #ffcc00;
+  --border-color: #ffffff;
+
+  --dark-bg: var(--bg-primary);
+  --card-bg: var(--bg-secondary);
+  --footer-bg: var(--bg-primary);
+}
+
+/* Font Sizes */
+:root.font-small {
+  --base-size: 0.875rem;
+}
+
+:root.font-medium {
+  --base-size: 1rem;
+}
+
+:root.font-large {
+  --base-size: 1.125rem;
+}
+
+:root.font-xlarge {
+  --base-size: 1.25rem;
+}
+
+/* Global Resets */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  font-size: var(--base-size);
 }
 
 body {
@@ -10,8 +90,58 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--base-size);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dyslexia Accessible Font */
+:root.font-dyslexia body {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  line-height: 1.6;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* Hover Utils tied to Variables */
+.hover-bg-secondary:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Modal Animations */
+@keyframes popFromSettings {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translate(40px, -40px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+.settings-modal-animate {
+  animation: popFromSettings 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeBackdrop {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+  }
+
+  100% {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+  }
+}
+
+.settings-backdrop {
+  animation: fadeBackdrop 0.3s ease-out forwards;
 }

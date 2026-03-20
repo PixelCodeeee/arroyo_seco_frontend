@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Menu, X } from "lucide-react";
+import { useTheme } from "../context/ThemeProvider";
 import "../styles/Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isSettingsOpen, setIsSettingsOpen } = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,50 +47,68 @@ function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   return (
     <header className="navbar">
-      <nav className="nav-links">
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle Menu"
+      >
+        {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+      </button>
+
+      <nav className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
         <Link to="/" className={isActive("/") ? "active" : ""}>
-          Inicio
+          {t('nav.home', 'Inicio')}
         </Link>
 
         {/* Fixed: Added missing </Link> */}
         <Link to="/anuncios-publicos" className={isActive("/anuncios-publicos") ? "active" : ""}>
-          Eventos
+          {t('nav.events', 'Eventos')}
         </Link>
 
         <Link to="/gastronomia" className={isActive("/gastronomia") ? "active" : ""}>
-          Gastronomía
+          {t('nav.gastronomy', 'Gastronomía')}
         </Link>
 
         <Link to="/artesanias" className={isActive("/artesanias") ? "active" : ""}>
-          Artesanías
+          {t('nav.handicrafts', 'Artesanías')}
         </Link>
 
         {/* Fixed: Added missing </Link> */}
         <Link to="/recomendaciones" className={isActive("/recomendaciones") ? "active" : ""}>
-          Recomendaciones
+          {t('nav.recommendations', 'Recomendaciones')}
         </Link>
 
         <Link to="/contacto" className={isActive("/contacto") ? "active" : ""}>
-          Contacto
+          {t('nav.contact', 'Contacto')}
         </Link>
 
         {user?.rol === "oferente" && (
           <Link to="/panel-oferente" className={`nav-role-btn ${isActive("/panel-oferente") ? "active" : ""}`}>
-            Panel Oferente
+            {t('nav.oferente_panel', 'Panel Oferente')}
           </Link>
         )}
 
         {user?.rol === "admin" && (
           /* Fixed: Removed nested/duplicate Link logic here */
           <Link to="/panel-admin" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
-            Panel Admin
+            {t('nav.admin_panel', 'Panel Admin')}
           </Link>
         )}
       </nav>
 
       <div className="nav-icons">
+
+        <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="cart-button" aria-label="Ajustes">
+          <i className="ri-settings-3-line"></i>
+        </button>
+
         <button onClick={handleCartClick} className="cart-button" aria-label="Carrito de compras">
           <i className="ri-shopping-cart-line"></i>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -93,19 +117,19 @@ function Navbar() {
         {user ? (
           <div className="user-controls">
             <Link to="/perfil" className={`perfil-link ${isActive("/perfil") ? "active" : ""}`}>
-              Mi Perfil
+              {t('nav.profile', 'Mi Perfil')}
             </Link>
             <button onClick={handleLogout} className="logout-btn">
-              Cerrar sesión
+              {t('nav.logout', 'Cerrar sesión')}
             </button>
           </div>
         ) : (
           <div className="auth-links">
-            <Link to="/login" className={`perfil-link ${isActive("/login") ? "active" : ""}`}>
-              Iniciar sesión
+            <Link to="/login" className={`btn-login ${isActive("/login") ? "active" : ""}`}>
+              {t('nav.login', 'Iniciar sesión')}
             </Link>
-            <Link to="/register" className={`perfil-link ${isActive("/register") ? "active" : ""}`}>
-              Regístrate
+            <Link to="/register" className={`btn-register ${isActive("/register") ? "active" : ""}`}>
+              {t('nav.register', 'Regístrate')}
             </Link>
           </div>
         )}
