@@ -1,17 +1,239 @@
+/* ==============================
+   PLUS JAKARTA SANS - GOOGLE FONTS
+============================== */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+/* ==============================
+   RESET
+============================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ==============================
+   VARIABLES — TEMA OSCURO (default)
+============================== */
+:root,
+[data-theme="dark"] {
+  /* Fondos */
+  --bg-primary:       #1a1a1a;
+  --bg-secondary:     #222222;
+  --bg-tertiary:      #2a2a2a;
+  --bg-card:          #222222;
+
+  /* Textos */
+  --text-primary:     #ffffff;
+  --text-secondary:   #cccccc;
+  --text-muted:       #999999;
+  --text-faint:       #666666;
+
+  /* Bordes */
+  --border-color:     #333333;
+  --border-subtle:    rgba(255, 255, 255, 0.08);
+
+  /* Acento magenta (igual en ambos temas) */
+  --accent:           #e3008c;
+  --accent-hover:     #ff1a9d;
+  --accent-soft:      rgba(227, 0, 140, 0.15);
+  --accent-glow:      rgba(227, 0, 140, 0.25);
+
+  /* Amber (Home) */
+  --amber:            #f59e0b;
+  --amber-soft:       rgba(245, 158, 11, 0.15);
+
+  /* Estados */
+  --success:          #4CAF50;
+  --warning:          #FFC107;
+  --info:             #2196F3;
+  --danger:           #f44336;
+
+  /* Navbar */
+  --dark-bg:          rgba(26, 26, 26, 0.95);
+
+  /* Sombras */
+  --shadow-sm:        0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:        0 4px 15px rgba(0, 0, 0, 0.4);
+  --shadow-lg:        0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-accent:    0 5px 20px rgba(227, 0, 140, 0.25);
+
+  /* Sidebar (mantiene su propio estilo) */
+  --sidebar-bg:       #1e293b;
+  --sidebar-bg-end:   #0f172a;
+}
+
+/* ==============================
+   VARIABLES — TEMA CLARO
+============================== */
+[data-theme="light"] {
+  /* Fondos */
+  --bg-primary:       #f5f5f5;
+  --bg-secondary:     #ffffff;
+  --bg-tertiary:      #ebebeb;
+  --bg-card:          #ffffff;
+
+  /* Textos */
+  --text-primary:     #111111;
+  --text-secondary:   #333333;
+  --text-muted:       #666666;
+  --text-faint:       #999999;
+
+  /* Bordes */
+  --border-color:     #dddddd;
+  --border-subtle:    rgba(0, 0, 0, 0.08);
+
+  /* Acento (mismo) */
+  --accent:           #e3008c;
+  --accent-hover:     #c4007a;
+  --accent-soft:      rgba(227, 0, 140, 0.1);
+  --accent-glow:      rgba(227, 0, 140, 0.15);
+
+  /* Amber */
+  --amber:            #d97706;
+  --amber-soft:       rgba(217, 119, 6, 0.1);
+
+  /* Estados */
+  --success:          #2e7d32;
+  --warning:          #f57f17;
+  --info:             #1565c0;
+  --danger:           #c62828;
+
+  /* Navbar */
+  --dark-bg:          rgba(255, 255, 255, 0.95);
+
+  /* Sombras */
+  --shadow-sm:        0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md:        0 4px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg:        0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-accent:    0 5px 20px rgba(227, 0, 140, 0.15);
+
+  /* Sidebar */
+  --sidebar-bg:       #1e293b;
+  --sidebar-bg-end:   #0f172a;
+}
+
+/* ==============================
+   BASE GLOBAL
+============================== */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* ==============================
+   TIPOGRAFÍA GLOBAL
+============================== */
+h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.2; }
+h2 { font-size: clamp(1.4rem, 3vw, 2rem);   font-weight: 700; line-height: 1.3; }
+h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; line-height: 1.4; }
+h4 { font-size: 1.1rem; font-weight: 600; }
+h5 { font-size: 1rem;   font-weight: 600; }
+h6 { font-size: 0.9rem; font-weight: 600; }
+
+p  { font-size: 1rem; line-height: 1.7; color: var(--text-secondary); }
+
+small { font-size: 0.82rem; }
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* ==============================
+   UTILIDADES GLOBALES
+============================== */
+.text-accent  { color: var(--accent); }
+.text-muted   { color: var(--text-muted); }
+.text-primary { color: var(--text-primary); }
+
+.bg-card      { background-color: var(--bg-card); }
+.bg-primary   { background-color: var(--bg-primary); }
+
+/* Transición suave al cambiar tema en todos los elementos */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease;
+}
+
+/* Excluir transiciones en elementos que no deben animar */
+button, a, input, select, textarea {
+  transition: background-color 0.2s ease, color 0.2s ease,
+              border-color 0.2s ease, transform 0.2s ease,
+              box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+/* ==============================
+   SCROLLBAR GLOBAL
+============================== */
+::-webkit-scrollbar       { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ==============================
+   TAMAÑOS DE FUENTE
+   Agregar al final de index.css
+============================== */
+
+/* Normal (default — igual que ahora) */
+[data-fontsize="normal"] {
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.85rem;
+  --fs-base: 1rem;
+  --fs-md:   1.1rem;
+  --fs-lg:   1.25rem;
+  --fs-xl:   1.5rem;
+  --fs-2xl:  1.8rem;
+  --fs-3xl:  2rem;
+  --fs-hero: clamp(2.5rem, 8vw, 5.5rem);
+}
+
+/* Grande */
+[data-fontsize="large"] {
+  --fs-xs:   0.85rem;
+  --fs-sm:   0.95rem;
+  --fs-base: 1.1rem;
+  --fs-md:   1.2rem;
+  --fs-lg:   1.4rem;
+  --fs-xl:   1.65rem;
+  --fs-2xl:  2rem;
+  --fs-3xl:  2.3rem;
+  --fs-hero: clamp(2.8rem, 9vw, 6rem);
+}
+
+/* Extra grande */
+[data-fontsize="xlarge"] {
+  --fs-xs:   0.95rem;
+  --fs-sm:   1.05rem;
+  --fs-base: 1.2rem;
+  --fs-md:   1.35rem;
+  --fs-lg:   1.6rem;
+  --fs-xl:   1.85rem;
+  --fs-2xl:  2.25rem;
+  --fs-3xl:  2.6rem;
+  --fs-hero: clamp(3rem, 10vw, 6.5rem);
+}
+
+/* Aplicar al body globalmente */
+body {
+  font-size: var(--fs-base, 1rem);
 }

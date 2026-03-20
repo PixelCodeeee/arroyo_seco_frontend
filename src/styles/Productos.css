@@ -1,22 +1,20 @@
-/* src/styles/Productos.css */
-
 /* ==============================
    PRODUCTOS CONTAINER
 ============================== */
 .productos-container {
   min-height: 100vh;
-  background-color: #1a1a1a;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* ==============================
    PRODUCTOS HEADER
 ============================== */
 .productos-header {
-  background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-bottom: 2px solid var(--accent);
   padding: 2rem 3rem;
-  box-shadow: 0 4px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
 }
 
 .header-content {
@@ -33,7 +31,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  color: #fff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -60,6 +58,7 @@
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -75,21 +74,21 @@
 }
 
 .btn-primary:hover {
-  background-color: #c9007a;
-  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow-accent);
   transform: translateY(-2px);
 }
 
 .btn-outline {
   background-color: transparent;
-  border: 2px solid #444;
-  color: #ccc;
+  border: 2px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .btn-outline:hover {
   border-color: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(227, 0, 140, 0.3);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* ==============================
@@ -131,17 +130,17 @@
 }
 
 .stat-card {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
   text-align: center;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
   border-color: var(--accent);
 }
 
@@ -159,7 +158,7 @@
 
 .stat-label {
   font-size: 0.9rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* ==============================
@@ -186,45 +185,49 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.2rem;
+  color: var(--text-muted);
 }
 
 .search-input {
   width: 100%;
   padding: 0.8rem 1rem 0.8rem 3rem;
-  background-color: #222;
-  border: 1px solid #333;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 25px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.95rem;
+  font-family: inherit;
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(227, 0, 140, 0.3);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 .filter-buttons {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .filter-btn {
   padding: 0.6rem 1.2rem;
   background-color: transparent;
-  border: 1px solid #444;
-  color: #999;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .filter-btn:hover {
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .filter-btn.active {
@@ -237,11 +240,11 @@
    TABLE
 ============================== */
 .productos-table-container {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
   overflow-x: auto;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .productos-table {
@@ -250,7 +253,7 @@
 }
 
 .productos-table thead {
-  background-color: #1a1a1a;
+  background-color: var(--bg-primary);
 }
 
 .productos-table th {
@@ -261,21 +264,21 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .productos-table tbody tr {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
 }
 
 .productos-table tbody tr:hover {
-  background-color: rgba(227, 0, 140, 0.05);
+  background-color: var(--accent-soft);
 }
 
 .productos-table td {
   padding: 1rem;
-  color: #ccc;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -285,7 +288,7 @@
   height: 60px;
   overflow: hidden;
   border-radius: 10px;
-  background-color: #1a1a1a;
+  background-color: var(--bg-primary);
 }
 
 .producto-imagen img {
@@ -301,35 +304,36 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: #666;
-  background-color: #1a1a1a;
+  color: var(--text-faint);
+  background-color: var(--bg-primary);
 }
 
-/* Columna de nombre */
+/* Nombre */
 .producto-nombre {
   max-width: 250px;
 }
 
 .producto-nombre strong {
   display: block;
-  color: #fff;
+  color: var(--text-primary);
   margin-bottom: 0.2rem;
 }
 
 .producto-nombre small {
-  color: #888;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
 /* Precio */
 .precio {
   font-weight: 600;
-  color: #4CAF50;
+  color: var(--success);
 }
 
 /* Inventario */
 .inventario {
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .inventario.agotado {
@@ -383,7 +387,7 @@
   padding: 0.4rem 0.6rem;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -395,12 +399,37 @@
   transform: scale(1.2);
 }
 
-.btn-edit:hover {
-  color: #4CAF50;
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.btn-delete:hover {
-  color: #ff6b6b;
+.btn-action:disabled:hover {
+  transform: none;
+}
+
+.btn-edit:hover   { color: var(--success); }
+.btn-delete:hover { color: #ff6b6b; }
+
+/* Filter select */
+.filter-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 200px;
+}
+
+.filter-select:hover,
+.filter-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 /* ==============================
@@ -409,7 +438,7 @@
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: #666;
+  color: var(--text-faint);
 }
 
 .empty-icon {
@@ -421,6 +450,7 @@
 .empty-state p {
   font-size: 1.1rem;
   margin: 0;
+  color: var(--text-faint);
 }
 
 /* ==============================
@@ -432,11 +462,11 @@
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .spinner {
-  border: 3px solid #333;
+  border: 3px solid var(--border-color);
   border-top: 3px solid var(--accent);
   border-radius: 50%;
   width: 40px;
@@ -446,7 +476,7 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
@@ -454,9 +484,7 @@
    RESPONSIVE
 ============================== */
 @media (max-width: 768px) {
-  .productos-header {
-    padding: 1.5rem 1rem;
-  }
+  .productos-header { padding: 1.5rem 1rem; }
 
   .header-content {
     flex-direction: column;
@@ -468,9 +496,7 @@
     justify-content: flex-start;
   }
 
-  .productos-content {
-    padding: 1.5rem 1rem;
-  }
+  .productos-content { padding: 1.5rem 1rem; }
 
   .productos-stats {
     grid-template-columns: repeat(2, 1fr);
@@ -482,105 +508,31 @@
     align-items: stretch;
   }
 
-  .search-box {
-    max-width: 100%;
-  }
-
-  .filter-buttons {
-    justify-content: center;
-  }
+  .search-box { max-width: 100%; }
+  .filter-buttons { justify-content: center; }
 
   .productos-table-container {
     padding: 0.5rem;
     border-radius: 10px;
   }
 
-  .productos-table {
-    font-size: 0.85rem;
-  }
+  .productos-table { font-size: 0.85rem; }
 
   .productos-table th,
-  .productos-table td {
-    padding: 0.5rem;
-  }
+  .productos-table td { padding: 0.5rem; }
 
-  /* Ocultar algunas columnas en móvil */
   .productos-table th:nth-child(7),
-  .productos-table td:nth-child(7) {
-    display: none;
-  }
+  .productos-table td:nth-child(7) { display: none; }
 }
 
 @media (max-width: 480px) {
-  .productos-stats {
-    grid-template-columns: 1fr;
-  }
+  .productos-stats { grid-template-columns: 1fr; }
 
   .btn {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
-  
-  /* Más columnas ocultas en móviles pequeños */
+
   .productos-table th:nth-child(4),
-  .productos-table td:nth-child(4) {
-    display: none;
-  }
-
-  /* Add to Productos.css */
-
-.categorias-content {
-  padding: 2rem;
-}
-
-.categorias-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.categorias-header h2 {
-  font-size: 1.5rem;
-  color: #333;
-  margin: 0;
-}
-
-.filter-select {
-  padding: 0.5rem 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s;
-  min-width: 200px;
-}
-
-.filter-select:hover {
-  border-color: #667eea;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.badge-gastronomica {
-  background: linear-gradient(135deg, #ff6b6b, #ff8787);
-}
-
-.badge-artesanal {
-  background: linear-gradient(135deg, #4ecdc4, #44a3aa);
-}
-
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-action:disabled:hover {
-  transform: none;
-}
+  .productos-table td:nth-child(4) { display: none; }
 }

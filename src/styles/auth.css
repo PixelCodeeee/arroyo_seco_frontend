@@ -1,18 +1,4 @@
 /* ==============================
-   GLOBAL STYLE (matches Home)
-============================== */
-body {
-  margin: 0;
-  font-family: 'Montserrat', sans-serif;
-  background-color: #1a1a1a;
-  color: #fff;
-}
-
-:root {
-  --accent: #e3008c;
-}
-
-/* ==============================
    AUTH CONTAINER
 ============================== */
 .auth-container {
@@ -20,11 +6,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #1a1a1a;
+  background-color: var(--bg-primary);
   background-image: url("/images/pattern.svg");
   background-repeat: repeat-y;
   background-position: center;
-  background-size: 120px!important;
+  background-size: 120px !important;
   padding: 2rem;
 }
 
@@ -32,9 +18,9 @@ body {
    AUTH CARD
 ============================== */
 .auth-card {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 25px;
-  box-shadow: 0 0 25px rgba(227, 0, 140, 0.15);
+  box-shadow: 0 0 25px var(--accent-glow);
   padding: 3rem 3.5rem;
   width: 100%;
   max-width: 450px;
@@ -43,14 +29,8 @@ body {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ==============================
@@ -60,7 +40,7 @@ body {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .subtitle {
@@ -87,18 +67,19 @@ body {
   display: block;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--text-secondary);
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
   padding: 0.8rem 1rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  background-color: #111;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.95rem;
+  font-family: inherit;
   transition: all 0.3s ease;
 }
 
@@ -106,13 +87,13 @@ body {
 .form-group select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(227, 0, 140, 0.4);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 /* Form Hints */
 .form-hint {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted);
   margin-top: 0.3rem;
   display: block;
 }
@@ -128,7 +109,7 @@ body {
   gap: 0.6rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--text-secondary);
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -150,13 +131,14 @@ body {
   padding: 0.9rem 2rem;
   font-size: 1rem;
   font-weight: 600;
+  font-family: inherit;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #c9007a;
-  box-shadow: 0 0 12px rgba(227, 0, 140, 0.4);
+  background-color: var(--accent-hover);
+  box-shadow: 0 0 12px var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -173,6 +155,7 @@ body {
   padding: 0.8rem 2rem;
   font-size: 1rem;
   font-weight: 600;
+  font-family: inherit;
   transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
@@ -182,7 +165,7 @@ body {
 .btn-outline:hover {
   background-color: var(--accent);
   color: #fff;
-  box-shadow: 0 0 12px rgba(227, 0, 140, 0.4);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 /* Form Actions */
@@ -215,12 +198,12 @@ body {
 .loading {
   text-align: center;
   padding: 3rem;
-  color: #888;
+  color: var(--text-muted);
   font-size: 1rem;
 }
 
 /* ==============================
-   FORM HEADER (for edit page)
+   FORM HEADER
 ============================== */
 .form-header {
   margin-bottom: 2rem;
@@ -237,7 +220,7 @@ body {
 }
 
 .back-link:hover {
-  color: #c9007a;
+  color: var(--accent-hover);
 }
 
 /* ==============================
@@ -246,7 +229,7 @@ body {
 .auth-footer {
   margin-top: 2rem;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--text-secondary);
 }
 
 .auth-footer .link {
@@ -257,7 +240,7 @@ body {
 }
 
 .auth-footer .link:hover {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* ==============================
@@ -279,4 +262,4 @@ body {
   .form-actions {
     flex-direction: column;
   }
-} 
+}

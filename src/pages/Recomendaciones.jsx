@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Users,
   ShoppingCart,
+  MapPin,
 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -193,7 +194,8 @@ function Recomendaciones() {
                           : item.nombre_producto}
                       </h3>
                       <p className="rec-card-negocio">
-                        📍 {item.nombre_negocio}
+                        <MapPin size={14} color="#e3008c" />{" "}
+                        {item.nombre_negocio}
                       </p>
 
                       <div className="rec-card-info">

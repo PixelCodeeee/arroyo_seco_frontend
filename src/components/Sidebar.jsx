@@ -1,6 +1,39 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import "../styles/Sidebar.css";
+
+function FontSizeToggle({ collapsed }) {
+  const { fontSize, cycleFontSize } = useTheme();
+  const labels = { normal: "Normal", large: "Grande", xlarge: "Extra" };
+  const nextLabel = { normal: "Grande", large: "Extra grande", xlarge: "Normal" };
+
+  return (
+    <button
+      className="sidebar-fontsize-btn"
+      onClick={cycleFontSize}
+      title={`Tamaño ${labels[fontSize]} → click para ${nextLabel[fontSize]}`}
+    >
+      <span className="sidebar-fontsize-icon">
+        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <polyline points="4 7 4 4 20 4 20 7" />
+          <line x1="9" y1="20" x2="15" y2="20" />
+          <line x1="12" y1="4"  x2="12" y2="20" />
+        </svg>
+      </span>
+      {!collapsed && (
+        <span className="sidebar-fontsize-label">
+          Texto: {labels[fontSize]}
+          <span className="sidebar-fontsize-dots">
+            <span className={fontSize === "normal" ? "sdot active" : "sdot"} />
+            <span className={fontSize === "large"  ? "sdot active" : "sdot"} />
+            <span className={fontSize === "xlarge" ? "sdot active" : "sdot"} />
+          </span>
+        </span>
+      )}
+    </button>
+  );
+}
 
 function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const location = useLocation();
@@ -17,15 +50,12 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
     }
   };
 
-  // Helper to check if route is active
   const isActive = (path) => {
     return (
       location.pathname === path || location.pathname.startsWith(path + "/")
     );
   };
 
-  // Menu items configuration
-  // Menu items configuration
   const menuItems = [
     {
       id: "home",
@@ -98,7 +128,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       badge: "Nuevo",
     },
     {
-      id: "categorias",
+      id: "categorias-admin",
       label: "Categorías",
       icon: "🏷️",
       path: "/categorias",
@@ -111,7 +141,6 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
     },
   ];
 
-  // Filter menu items based on user role
   const visibleMenuItems = menuItems.filter((item) => {
     if (!item.roles) return true;
     return item.roles.includes(currentUser?.rol);
@@ -156,7 +185,6 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       <nav className="sidebar-nav">
         <ul className="nav-list">
           {visibleMenuItems.map((item) => {
-            // Render divider
             if (item.type === "divider") {
               return (
                 <li key={item.id} className="nav-divider">
@@ -165,7 +193,6 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
               );
             }
 
-            // Render menu item
             return (
               <li key={item.id} className="nav-item">
                 <Link
@@ -192,6 +219,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
 
       {/* Sidebar Footer */}
       <div className="sidebar-footer">
+        <FontSizeToggle collapsed={isCollapsed} />
         <button
           className="logout-button"
           onClick={handleLogout}
