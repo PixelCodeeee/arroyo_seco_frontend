@@ -1,0 +1,424 @@
+/* ==============================
+   CATÁLOGO – EXACTO AL MOCKUP 2025
+============================== */
+.Catalogo-page {
+  background-color: #0f0f0f;
+  color: #fff;
+  min-height: 100vh;
+  padding-top: 90px;
+  overflow-x: hidden;
+}
+
+/* ====== PATRÓN VERTICAL ROSA/AMARILLO (a la izquierda como en el mockup) ====== */
+.Catalogo-hero,
+.search-section,
+.Catalogo-section {
+ padding: 5rem 2rem;
+  position: relative;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: 40% center !important;
+  background-size: 120px;
+  gap: 4rem;
+}
+
+.hero-carousel.modern {
+  position: relative;
+}
+
+.Catalogo-hero::before,
+.search-section::before,
+.Catalogo-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ====== HERO */
+.Catalogo-hero {
+  padding: 6rem 0 4rem;
+}
+
+.hero-container {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 0 5rem;
+  display: flex;
+  align-items: center;
+  gap: 6rem;
+}
+
+.hero-text h1 {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 900;
+  color: #e3008c;
+  margin-bottom: 1.5rem;
+  line-height: 1;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #cccccc;
+  max-width: 480px;
+}
+
+/* CARRUSEL MODERNO (redondeado grande + sombra) */
+
+
+.hero-images-container {
+  height: 250px !important;     /* más grande y consistente */
+  width: 100%;
+  max-width: 880px;
+  border-radius: 60px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0 0 0 / 0.8);
+  border: 8px solid rgba(227, 0, 140, 0.15);
+  background: #111;
+}
+
+.hero-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.hero-carousel-btn:hover {
+  background: #e3008c;
+  transform: translateY(-50%) scale(1.15);
+}
+
+.hero-carousel-btn.prev { left: 20px; }
+.hero-carousel-btn.next { right: 20px; }
+
+/* SEARCH BAR */
+.search-section {
+  padding: 4rem 0;
+}
+
+.search-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 5rem;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1.4rem 5rem 1.4rem 2.5rem;
+  border-radius: 50px;
+  border: none;
+  background: white;
+  font-size: 1.1rem;
+  color: #000;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.search-icon {
+  position: absolute;
+  right: 6.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 1.4rem;
+}
+
+/* SECCIONES */
+.Catalogo-section {
+  padding: 6rem 0;
+}
+
+.Catalogo-content {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 0 5rem;
+}
+
+.section-header {
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-header h2 {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: #e3008c;
+}
+
+/* GRID MODERNO – 2 columnas desktop, 1 móvil */
+.cards-grid.modern {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4rem 3rem;
+}
+
+/* CARTA EXACTA AL MOCKUP */
+.Catalogo-card {
+  background: #1a1a1a;
+  border-radius: 36px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
+.Catalogo-card:hover {
+  transform: translateY(-16px);
+  box-shadow: 0 30px 60px rgba(255, 77, 141, 0.25);
+}
+
+.card-image-wrapper {
+  height: 260px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.Catalogo-card:hover img {
+  transform: scale(1.12);
+}
+
+/* Badge de oferta */
+.offer-badge {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  background: #ff6b35;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 5;
+}
+
+/* Rating */
+.card-rating {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  backdrop-filter: blur(8px);
+}
+
+.card-content {
+  padding: 1.8rem;
+}
+
+.card-header h3 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.card-type {
+  color: #e3008c;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+}
+
+.detail-item svg {
+  color: #e3008c;
+}
+
+.btn-detail {
+  margin-top: 1.8rem;
+  width: 100%;
+  padding: 1rem;
+  background: #e3008c;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-detail:hover {
+  background: #ff3366;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 77, 141, 0.4);
+}
+
+/* ====== RESPONSIVE MÓVIL (perfecto como el mockup) ====== */
+@media (max-width: 1024px) {
+  .hero-container, .Catalogo-content { padding: 0 3rem; }
+  .hero-images-container {
+  height: 160px !important;     /* más grande y consistente */
+  width: 100%;
+  max-width: 850px;
+  border-radius: 60px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0 0 0 / 0.8);
+  border: 8px solid rgba(227, 0, 140, 0.15);
+  background: #111;
+}
+
+.search-container{
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2.5rem!important;
+}
+
+.search-icon {
+  position: absolute!important;
+  right: 2.5rem!important;
+  top: 50%!important;
+  transform: translateY(-50%)!important;
+  color: #999;
+  font-size: 1rem!important;
+}
+
+.Catalogo-hero,
+.search-section,
+.Catalogo-section {
+   padding: 5rem 2rem;
+  position: relative;
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: 30% center !important;
+  background-size: 80px;
+  gap: 4rem;
+}
+
+}
+
+@media (max-width: 768px) {
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+    padding: 0 2rem;
+    gap: 3rem;
+  }
+  .hero-text h1 { font-size: 2.8rem; }
+  .hero-images-container { height: 340px; border-radius: 36px; }
+
+  .cards-grid.modern {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .card-image-wrapper { height: 240px; }
+}
+
+@media (max-width: 480px) {
+  .hero-container, .search-container, .Catalogo-content { padding: 0 1.5rem; }
+  .hero-images-container { height: 300px; border-radius: 30px; }
+  .search-input { padding: 1.2rem 4.5rem 1.2rem 2rem; }
+  .section-header h2 { font-size: 2.4rem; }
+  .card-image-wrapper { height: 220px; }
+}
+
+/* ====== FILTROS / TABS – ESTILO PREMIUM 2025 ====== */
+.filter-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  background: transparent;
+  border: 2px solid rgba(227, 0, 140, 0.3);  /* borde rosa sutil */
+  color: #cccccc;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  min-width: 160px;
+}
+
+.filter-tab:hover {
+  border-color: #e3008c;
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(227, 0, 140, 0.25);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #e3008c, #ff4da6);
+  border-color: #e3008c;
+  color: white;
+  box-shadow: 0 12px 35px rgba(227, 0, 140, 0.4);
+  transform: translateY(-4px);
+}
+
+/* Efecto brillo al activo */
+.filter-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.7s;
+}
+
+.filter-tab.active:hover::before {
+  left: 100%;
+}
+
+/* Responsive móvil */
+@media (max-width: 640px) {
+  .filter-tabs {
+    gap: 1rem;
+  }
+  .filter-tab {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    min-width: 140px;
+  }
+}

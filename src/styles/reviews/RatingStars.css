@@ -1,0 +1,42 @@
+/* src/styles/reviews/RatingStars.css */
+.rating-stars {
+    display: inline-flex;
+    gap: 0.2rem;
+    cursor: pointer;
+}
+
+.rating-stars.readonly {
+    cursor: default;
+}
+
+.star {
+    font-size: 1.5rem;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.star.filled {
+    color: #ffc107;
+}
+
+/* Tamaños */
+.rating-stars.small .star {
+    font-size: 1rem;
+}
+
+.rating-stars.medium .star {
+    font-size: 1.5rem;
+}
+
+.rating-stars.large .star {
+    font-size: 2rem;
+}
+
+/* Hover effect solo cuando no es readonly */
+.rating-stars:not(.readonly) .star:hover {
+    transform: scale(1.1);
+}
+
+.rating-stars:not(.readonly) .star:hover ~ .star {
+    color: #ddd;
+}

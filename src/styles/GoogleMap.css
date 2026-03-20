@@ -1,0 +1,189 @@
+/* ==============================
+   GOOGLE MAP COMPONENT
+============================== */
+.google-map-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  position: relative;
+  border-radius: 25px;
+  overflow: hidden;
+  background-color: #2a2a2a;
+}
+
+/* ==============================
+   LOADING STATE
+============================== */
+.map-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+  background-color: #2a2a2a;
+  border-radius: 25px;
+  gap: 1rem;
+}
+
+.map-loading p {
+  color: #999;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.spinner-icon {
+  color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==============================
+   FALLBACK STATE
+============================== */
+.map-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  position: relative;
+  border-radius: 25px;
+  overflow: hidden;
+  background-color: #2a2a2a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.map-fallback img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.map-fallback-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(26, 26, 26, 0.95);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: 85%;
+  backdrop-filter: blur(10px);
+}
+
+.map-fallback-overlay svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.map-fallback-overlay strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  color: #fff;
+}
+
+.map-fallback-overlay small {
+  display: block;
+  font-size: 0.85rem;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+/* ==============================
+   ADDRESS OVERLAY (for Google Maps)
+============================== */
+.map-address-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(26, 26, 26, 0.95);
+  color: #fff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 90%;
+  backdrop-filter: blur(10px);
+}
+
+.map-address-overlay svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.map-address-overlay span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 768px) {
+  .google-map-wrapper {
+    min-height: 300px;
+  }
+
+  .map-loading {
+    min-height: 300px;
+  }
+
+  .map-fallback {
+    min-height: 300px;
+  }
+
+  .map-address-overlay,
+  .map-fallback-overlay {
+    bottom: 10px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    max-width: 95%;
+  }
+
+  .map-fallback-overlay strong {
+    font-size: 0.9rem;
+  }
+
+  .map-fallback-overlay small {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .google-map-wrapper {
+    min-height: 250px;
+  }
+
+  .map-loading {
+    min-height: 250px;
+  }
+
+  .map-fallback {
+    min-height: 250px;
+  }
+
+  .map-address-overlay,
+  .map-fallback-overlay {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,126 @@
+/* ============================== 
+   RESERVA DETAIL MODAL 
+============================== */
+.reserva-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Reutilizar estilos base de OrdenDetailModal.css */
+.reserva-estado-section {
+  background: linear-gradient(135deg, #2a2a2a 0%, #222 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #333;
+}
+
+/* Tiempo Restante */
+.tiempo-restante {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.tiempo-icon {
+  font-size: 1.2rem;
+}
+
+/* Cancel Action */
+.cancel-action {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.cancel-warning {
+  color: #ff9800;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #d32f2f;
+}
+
+/* Servicio Card */
+.servicio-card {
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+}
+
+.servicio-details h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.servicio-details .oferente {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Notas Box */
+.notas-box {
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+
+.notas-box p {
+  margin: 0;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+/* Info Section */
+.info-section {
+  background: linear-gradient(135deg, #1a3a52 0%, #1a2a3a 100%);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #2a4a5a;
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #b3d9ff;
+}
+
+.info-list li {
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reserva-modal {
+    max-width: 95%;
+    margin: 1rem;
+  }
+
+  .estado-buttons {
+    flex-direction: column;
+  }
+
+  .estado-buttons .btn {
+    width: 100%;
+  }
+}

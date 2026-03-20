@@ -1,0 +1,377 @@
+/* ==============================
+   GLOBAL VARIABLES
+============================== */
+:root {
+  --accent: #e3008c;
+  --bg-dark: #1a1a1a;
+  --bg-card: #222;
+  --text-primary: #fff;
+  --text-secondary: #ccc;
+  --text-muted: #888;
+  --border: #333;
+}
+
+/* ==============================
+   USUARIOS CONTAINER
+============================== */
+.usuarios-container {
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  background-image: url("/images/pattern.svg");
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 80px;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ==============================
+   HEADER
+============================== */
+.usuarios-header {
+  background-color: var(--bg-card);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  padding: 2rem 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.usuarios-header .header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.usuarios-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.welcome-text {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ==============================
+   BUTTONS
+============================== */
+.btn {
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.btn-primary:hover {
+  background-color: #c9007a;
+  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.btn-outline:hover {
+  background-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+}
+
+/* ==============================
+   CONTENT
+============================== */
+.usuarios-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============================
+   STATS CARDS
+============================== */
+.usuarios-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background-color: var(--bg-card);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(227, 0, 140, 0.2);
+  border-color: var(--accent);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==============================
+   TABLE CONTAINER
+============================== */
+.usuarios-table-container {
+  background-color: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* ==============================
+   TABLE
+============================== */
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.usuarios-table thead {
+  background-color: rgba(227, 0, 140, 0.1);
+}
+
+.usuarios-table th {
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  border-bottom: 2px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.usuarios-table td {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.usuarios-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.usuarios-table tbody tr:hover {
+  background-color: rgba(227, 0, 140, 0.05);
+}
+
+.usuarios-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==============================
+   BADGES
+============================== */
+.badge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-turista {
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #4da6ff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.badge-oferente {
+  background-color: rgba(138, 43, 226, 0.15);
+  color: #9d6cda;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.badge-admin {
+  background-color: rgba(227, 0, 140, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(227, 0, 140, 0.3);
+}
+
+/* ==============================
+   STATUS
+============================== */
+.status {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status.active {
+  background-color: rgba(40, 167, 69, 0.15);
+  color: #5cb85c;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status.inactive {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #d9534f;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* ==============================
+   ACTIONS
+============================== */
+.actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn-action {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-edit {
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #4da6ff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.btn-edit:hover {
+  background-color: rgba(0, 123, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #d9534f;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete:hover {
+  background-color: rgba(220, 53, 69, 0.3);
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ==============================
+   LOADING & ERROR
+============================== */
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background-color: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #d9534f;
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 1024px) {
+  .usuarios-table-container {
+    overflow-x: auto;
+  }
+
+  .usuarios-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .usuarios-header .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+  }
+
+  .usuarios-content {
+    padding: 2rem 1rem;
+  }
+
+  .usuarios-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}

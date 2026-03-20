@@ -1,0 +1,247 @@
+/* ==============================
+   NAVBAR - CENTERED LINKS STYLE
+============================== */
+
+.navbar {
+  width: 100%;
+  height: 70px;
+  background-color: var(--dark-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 2.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* ------------------------------
+   LINKS CENTRADOS
+------------------------------ */
+.nav-links {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-links a {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.25s ease, transform 0.25s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------
+   RIGHT SIDE ICONS & BUTTONS
+------------------------------ */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+/* session links */
+.perfil-link {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color 0.25s ease, opacity 0.25s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.perfil-link:hover {
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+/* logout button */
+.logout-btn {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.25s ease, opacity 0.25s ease;
+  padding: 0;
+}
+
+.logout-btn:hover {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* ------------------------------
+   CART BUTTON
+------------------------------ */
+.cart-button {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  padding: 0.4rem;
+  transition: transform 0.2s ease, color 0.25s ease;
+}
+
+.cart-button:hover {
+  transform: scale(1.15);
+  color: var(--accent);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  background-color: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  box-shadow: 0 0 6px rgba(227, 0, 140, 0.55);
+}
+
+/* ------------------------------
+   ROLE BUTTON (ADMIN / OFERENTE)
+------------------------------ */
+.nav-role-btn {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.25s ease, transform 0.25s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-role-btn:hover {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+@media (max-width: 1100px) {
+  .navbar {
+    padding: 0 2rem;
+  }
+
+  .nav-links {
+    gap: 1.8rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+  }
+
+  .nav-icons {
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    padding: 1rem 1.2rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    position: static;
+    transform: none;
+    order: 2;
+  }
+
+  .nav-icons {
+    order: 3;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+  }
+
+  .perfil-link,
+  .logout-btn {
+    font-size: 0.8rem;
+  }
+
+  .nav-role-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.8rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .nav-links {
+    gap: 0.8rem;
+  }
+
+  .nav-icons {
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+/* ESTILO PARA ENLACE ACTIVO EN NAVBAR */
+.nav-links a.active,
+.nav-icons a.active,
+.nav-role-btn.active {
+  color: var(--accent) !important;
+  font-weight: 700;
+}
+.nav-icons .perfil-link[href="/login"],
+.nav-icons .perfil-link[href="/register"] {
+  color: white !important;
+}
+
+.nav-icons .perfil-link[href="/login"]:hover,
+.nav-icons .perfil-link[href="/register"]:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
