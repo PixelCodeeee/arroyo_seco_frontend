@@ -19,12 +19,9 @@ function Navbar() {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-
     updateCartCount();
-
     const handleCartUpdate = () => updateCartCount();
     window.addEventListener("cartUpdated", handleCartUpdate);
-
     return () => window.removeEventListener("cartUpdated", handleCartUpdate);
   }, [location]); // Re-run check on route change to keep user state fresh
 
@@ -41,10 +38,7 @@ function Navbar() {
     navigate("/");
   };
 
-  const handleCartClick = () => {
-    navigate("/carrito");
-  };
-
+  const handleCartClick = () => navigate("/carrito");
   const isActive = (path) => location.pathname === path;
 
   // Close menu when route changes
@@ -94,7 +88,6 @@ function Navbar() {
             {t('nav.oferente_panel', 'Panel Oferente')}
           </Link>
         )}
-
         {user?.rol === "admin" && (
           /* Fixed: Removed nested/duplicate Link logic here */
           <Link to="/panel-admin" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
@@ -133,6 +126,52 @@ function Navbar() {
             </Link>
           </div>
         )}
+
+        {/* Contraste */}
+        <div className="lang-wrapper">
+          <button className="lang-btn" onClick={() => { setShowContrast(!showContrast); setShowLang(false); }}>
+            🔆
+          </button>
+          {showContrast && (
+            <div className="lang-dropdown contrast-panel">
+              <p>Contraste</p>
+              <input
+                type="range"
+                min="100"
+                max="200"
+                value={contrast}
+                onChange={(e) => handleContrastChange(e.target.value)}
+              />
+              <span>{contrast}%</span>
+              <button className="reset-contrast" onClick={() => handleContrastChange(100)}>
+                Resetear
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Idioma */}
+        <div className="lang-wrapper">
+          <button className="lang-btn" onClick={() => { setShowLang(!showLang); setShowContrast(false); }}>
+            Idioma
+          </button>
+          {showLang && (
+            <div className="lang-dropdown">
+              <div onClick={() => handleLangChange('es')}>🇲🇽 Español</div>
+              <div onClick={() => handleLangChange('en')}>🇺🇸 English</div>
+              <div onClick={() => handleLangChange('fr')}>🇫🇷 Français</div>
+              <div onClick={() => handleLangChange('de')}>🇩🇪 Deutsch</div>
+              <div onClick={() => handleLangChange('pt')}>🇧🇷 Português</div>
+              <div onClick={() => handleLangChange('ja')}>🇯🇵 日本語</div>
+              <div onClick={() => handleLangChange('ru')}>🇷🇺 Русский</div>
+              <div onClick={() => handleLangChange('ar')}>🇸🇦 العربية</div>
+              <div onClick={() => handleLangChange('it')}>🇮🇹 Italiano</div>
+              <div onClick={() => handleLangChange('zh-CN')}>🇨🇳 中文</div>
+            </div>
+          )}
+          <div id="google_translate_element" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', top: 0 }}></div>
+        </div>
+
       </div>
     </header>
   );
