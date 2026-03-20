@@ -1,5 +1,7 @@
 # Arroyo Seco Frontend - Progressive Web App (PWA)
 
+This is a test of github actions for the backend repository.
+
 Este repositorio contiene la implementación del **Frontend (Fase 2)** del proyecto Arroyo Seco. Es una **Progressive Web App (PWA)** construida con **React** y **Vite**, diseñada para interactuar con la nueva arquitectura de microservicios del backend.
 
 ## 🏗️ Arquitectura y Tecnologías

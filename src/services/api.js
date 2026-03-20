@@ -796,7 +796,7 @@ export const productosAPI = {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   }),
-  getCategorias: (tipo) => apiRequest('/categorias'),
+  getCategorias: () => apiRequest('/categorias'),
   crearCategoria: (data) => apiRequest('/categorias', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -1076,6 +1076,42 @@ export const mercadopagoAPI = {
   getEstado: () =>
     apiRequest('/paypal/mp/estado', {
       method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
+};
+/* ======================================================
+   ANNOUNCEMENTS API
+====================================================== */
+export const announcementsAPI = {
+  getAll: () =>
+    apiRequest('/announcements'),
+
+  getById: (id) =>
+    apiRequest(`/announcements/${id}`),
+
+  create: (data) =>
+    apiRequest('/announcements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
+
+  update: (id, data) =>
+    apiRequest(`/announcements/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
+
+  delete: (id) =>
+    apiRequest(`/announcements/${id}`, {
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },

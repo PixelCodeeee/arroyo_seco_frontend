@@ -452,13 +452,12 @@
 // export default Oferentes;
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { oferentesAPI, mercadopagoAPI } from '../services/api';
+import { Link } from 'react-router-dom';
+import { oferentesAPI } from '../services/api';
 import Layout from '../components/Layout';
 import '../styles/Usuarios.css';
 
 function Oferentes() {
-  const navigate = useNavigate();
   const [oferentes, setOferentes] = useState([]);
   const [filteredOferentes, setFilteredOferentes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -661,13 +660,15 @@ function Oferentes() {
 
   const canEditOferente = (oferente) => {
     if (!isOferente) return true;
+
+    // Oferentes can only edit their own
     return oferente.id_usuario === currentUser?.id_usuario;
   };
 
   const getEstadoBadgeClass = (estado) => {
-    switch(estado) {
-      case 'aprobado':   return 'badge-success';
-      case 'pendiente':  return 'badge-warning';
+    switch (estado) {
+      case 'aprobado': return 'badge-success';
+      case 'pendiente': return 'badge-warning';
       case 'suspendido': return 'badge-danger';
       default:           return 'badge-default';
     }

@@ -26,7 +26,7 @@ function CrearServicio() {
     try {
       const res = await oferentesAPI.getAll({ tipo: 'restaurante' });
       setOferentes(res.oferentes || res); // depende de cómo devuelvas
-    } catch (err) {
+    } catch {
       setError('No se pudieron cargar los restaurantes');
     }
   };
@@ -45,15 +45,15 @@ function CrearServicio() {
     setLoading(true);
 
     try {
-const dataToSend = {
-  id_oferente: parseInt(formData.id_oferente),
-  nombre: formData.nombre.trim(),
-  descripcion: formData.descripcion.trim() || null,
-  rango_precio: formData.rango_precio.trim() || null,
-  capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
-  estatus: formData.estatus ? 1 : 0,
-  imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
-};
+      const dataToSend = {
+        id_oferente: parseInt(formData.id_oferente),
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim() || null,
+        rango_precio: formData.rango_precio.trim() || null,
+        capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
+        estatus: formData.estatus ? 1 : 0,
+        imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
+      };
 
       await serviciosAPI.create(dataToSend);
       alert('Servicio creado exitosamente');

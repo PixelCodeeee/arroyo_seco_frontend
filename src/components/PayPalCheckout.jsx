@@ -8,16 +8,16 @@
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState('');
 
-//   const createOrder = async (data, actions) => {
-//     try {
-//       setLoading(true);
-//       setError('');
-      
-//       const cart = getCart();
-      
-//       if (!cart || !cart.items || cart.items.length === 0) {
-//         throw new Error('El carrito está vacío');
-//       }
+  const createOrder = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const cart = getCart();
+
+      if (!cart || !cart.items || cart.items.length === 0) {
+        throw new Error('El carrito está vacío');
+      }
 
 //       // Validar que el usuario esté autenticado
 //       const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -32,9 +32,9 @@
 
 //       console.log('📦 Creating PayPal order:', orderData);
 
-//       const response = await paypalAPI.createOrder(orderData);
-      
-//       console.log('✅ Order created:', response.orderID);
+      const response = await paypalAPI.createOrder(orderData);
+
+      console.log('✅ Order created:', response.orderID);
 
 //       return response.orderID;
 
@@ -181,19 +181,12 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
       setError('Tu pago está pendiente de confirmación.');
     }
 
-    // Limpiar query params de la URL
-    if (status) {
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, []);
-
-  // Confirmar el pago con el backend después del redirect
-  const handleReturnFromMP = async (payment_id) => {
+  const onApprove = async (data) => {
     try {
       setLoading(true);
       setError('');
 
-      const cart        = getCart();
+      const cart = getCart();
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
       if (!currentUser) {
@@ -218,6 +211,8 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
 
       if (response.success) {
         clearCart();
+
+        // Llamar callback de éxito con toda la info
         onSuccess?.({
           ...response,
           pedido:      response.pedido,
@@ -302,6 +297,22 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
           💳 Pagar con MercadoPago
         </button>
       )}
+
+      <PayPalButtons
+        style={{
+          layout: 'vertical',
+          color: 'gold',
+          shape: 'rect',
+          label: 'pay',
+          height: 45
+        }}
+        createOrder={createOrder}
+        onApprove={onApprove}
+        onCancel={onCancel}
+        onError={onErrorHandler}
+        disabled={loading}
+        forceReRender={[amount]}
+      />
 
       <div className="paypal-info">
         <p>
