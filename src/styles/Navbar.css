@@ -245,3 +245,103 @@
 .nav-icons .perfil-link[href="/register"]:hover {
   color: rgba(255, 255, 255, 0.8) !important;
 }
+/* Google Translate */
+.goog-te-gadget img,
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+.goog-te-combo {
+  display: none !important;
+}
+
+.lang-wrapper {
+  position: relative;
+}
+
+.lang-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.lang-btn:hover {
+  color: var(--accent);
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 9999;
+  min-width: 160px;
+}
+
+.lang-dropdown div {
+  padding: 8px 14px;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lang-dropdown div:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent);
+}
+/* Contraste panel */
+.contrast-panel {
+  padding: 12px 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.contrast-panel p {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.contrast-panel input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.contrast-panel span {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.reset-contrast {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.reset-contrast:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
