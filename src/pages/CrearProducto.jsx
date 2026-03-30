@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
+import { useOfflineForm } from '../hooks/useOfflineForm';
 import '../styles/CrearProducto.css';
 
 function CrearProducto() {
   const navigate = useNavigate();
+  const { submitForm, offlineMsg } = useOfflineForm();
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   const [formData, setFormData] = useState({
@@ -103,14 +105,18 @@ useEffect(() => {
     setLoading(true);
 
     try {
-      await productosAPI.create({
-        ...formData,
-        precio: parseFloat(formData.precio),
-        inventario: parseInt(formData.inventario),
+      const { savedOffline } = await submitForm({
+        endpoint: '/productos',
+        method: 'POST',
+        data: {
+          ...formData,
+          precio: parseFloat(formData.precio),
+          inventario: parseInt(formData.inventario),
+        },
+        onSuccess: () => navigate('/productos'),
       });
 
-      alert('Producto creado');
-      navigate('/productos');
+      if (!savedOffline) navigate('/productos');
     } catch (er) {
       setError(er.message || 'Error al crear');
     } finally {
@@ -143,6 +149,20 @@ useEffect(() => {
           </div>
         )}
 
+        {offlineMsg && (
+          <div style={{
+            padding: '10px 16px',
+            marginBottom: '12px',
+            borderRadius: '8px',
+            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
+            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
+            border: '1px solid',
+            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
+            fontSize: '14px'
+          }}>
+            {offlineMsg.text}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="producto-form">
           {/* Información Básica */}
           <div className="form-section">
