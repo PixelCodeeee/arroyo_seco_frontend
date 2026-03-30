@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oferentesAPI, usuariosAPI } from '../services/api';
+import { useOfflineForm } from '../hooks/useOfflineForm';
 import '../styles/crearOferente.css';
 
 function CrearOferente() {
   const navigate = useNavigate();
+  const { submitForm, offlineMsg } = useOfflineForm();
   const [formData, setFormData] = useState({
     id_usuario: '',
     nombre_negocio: '',
@@ -138,14 +140,12 @@ function CrearOferente() {
     setLoading(true);
 
     try {
-      // Preparar horario_disponibilidad como objeto JSON
       const horario_disponibilidad = {
         dias: formData.dias_disponibles,
         horario_apertura: formData.horario_apertura || null,
         horario_cierre: formData.horario_cierre || null
       };
 
-      // Preparar datos para enviar al backend
       const dataToSend = {
         id_usuario: formData.id_usuario,
         nombre_negocio: formData.nombre_negocio,
@@ -156,13 +156,16 @@ function CrearOferente() {
         telefono: formData.telefono || null
       };
 
-      await oferentesAPI.create(dataToSend);
-      
-      alert('✅ Oferente creado exitosamente (estado: pendiente)');
-      navigate('/oferentes');
+      const { savedOffline } = await submitForm({
+        endpoint: '/oferentes',
+        method: 'POST',
+        data: dataToSend,
+        onSuccess: () => navigate('/oferentes'),
+      });
+
+      if (!savedOffline) navigate('/oferentes');
     } catch (err) {
       setError(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
-      console.error('Error creating oferente:', err);
     } finally {
       setLoading(false);
     }
@@ -190,6 +193,20 @@ function CrearOferente() {
           </div>
         )}
 
+        {offlineMsg && (
+          <div style={{
+            padding: '10px 16px',
+            marginBottom: '12px',
+            borderRadius: '8px',
+            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
+            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
+            border: '1px solid',
+            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
+            fontSize: '14px'
+          }}>
+            {offlineMsg.text}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="oferente-form">
           {/* Usuario Oferente */}
           <div className="form-section">

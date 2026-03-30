@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { serviciosAPI, oferentesAPI } from '../services/api';
+import { useOfflineForm } from '../hooks/useOfflineForm';
 import '../styles/auth.css';
 
 function CrearServicio() {
   const navigate = useNavigate();
+  const { submitForm, offlineMsg } = useOfflineForm();
   const [formData, setFormData] = useState({
     id_oferente: '',
     nombre: '',
@@ -26,7 +28,7 @@ function CrearServicio() {
     try {
       const res = await oferentesAPI.getAll({ tipo: 'restaurante' });
       setOferentes(res.oferentes || res); // depende de cómo devuelvas
-    } catch (err) {
+    } catch {
       setError('No se pudieron cargar los restaurantes');
     }
   };
@@ -45,19 +47,24 @@ function CrearServicio() {
     setLoading(true);
 
     try {
-const dataToSend = {
-  id_oferente: parseInt(formData.id_oferente),
-  nombre: formData.nombre.trim(),
-  descripcion: formData.descripcion.trim() || null,
-  rango_precio: formData.rango_precio.trim() || null,
-  capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
-  estatus: formData.estatus ? 1 : 0,
-  imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
-};
+      const dataToSend = {
+        id_oferente: parseInt(formData.id_oferente),
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim() || null,
+        rango_precio: formData.rango_precio.trim() || null,
+        capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
+        estatus: formData.estatus ? 1 : 0,
+        imagenes: formData.imagenes.length > 0 ? formData.imagenes : null
+      };
 
-      await serviciosAPI.create(dataToSend);
-      alert('Servicio creado exitosamente');
-      navigate('/servicios');
+      const { savedOffline } = await submitForm({
+        endpoint: '/servicios',
+        method: 'POST',
+        data: dataToSend,
+        onSuccess: () => navigate('/servicios'),
+      });
+
+      if (!savedOffline) navigate('/servicios');
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Error desconocido';
       setError(msg);
@@ -75,6 +82,20 @@ const dataToSend = {
 
         {error && <div className="error-banner">{error}</div>}
 
+        {offlineMsg && (
+          <div style={{
+            padding: '10px 16px',
+            marginBottom: '12px',
+            borderRadius: '8px',
+            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
+            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
+            border: '1px solid',
+            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
+            fontSize: '14px'
+          }}>
+            {offlineMsg.text}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="auth-form">
 
           <div className="form-group">

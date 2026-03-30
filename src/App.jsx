@@ -33,10 +33,10 @@ import AnunciosPublicos from './pages/AnunciosPublicos';
 import CrearAnuncio from './pages/CrearAnuncio';
 import EditarAnuncio from './pages/EditarAnuncio';
 
-import Categorias from "./pages/Categorias";
-import Ordenes from "./pages/Ordenes";
-import Reservas from "./pages/Reservas";
-import Contact from "./pages/Contacto";
+// import Categorias from "./pages/Categorias";
+// import Ordenes from "./pages/Ordenes";
+// import Reservas from "./pages/Reservas";
+// import Contact from "./pages/Contacto";
 import Recomendaciones from "./pages/Recomendaciones";
 import Analiticas from "./pages/Analiticas";
 
