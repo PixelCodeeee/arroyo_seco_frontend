@@ -8,13 +8,13 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const createOrder = async (data, actions) => {
+  const createOrder = async () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const cart = getCart();
-      
+
       if (!cart || !cart.items || cart.items.length === 0) {
         throw new Error('El carrito está vacío');
       }
@@ -33,7 +33,7 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
       console.log('📦 Creating PayPal order:', orderData);
 
       const response = await paypalAPI.createOrder(orderData);
-      
+
       console.log('✅ Order created:', response.orderID);
 
       return response.orderID;
@@ -47,11 +47,11 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
     }
   };
 
-  const onApprove = async (data, actions) => {
+  const onApprove = async (data) => {
     try {
       setLoading(true);
       setError('');
-      
+
       const cart = getCart();
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
@@ -74,7 +74,7 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
       if (response.success) {
         // Limpiar carrito solo si el pago fue exitoso Y se guardó el pedido
         clearCart();
-        
+
         // Llamar callback de éxito con toda la info
         onSuccess?.({
           ...response,
@@ -112,7 +112,7 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
 
   return (
     <div className="paypal-checkout-container">
-      
+
       {error && (
         <div className="paypal-error">
           <span>⚠️</span>
@@ -127,9 +127,9 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
           <small>Por favor no cierres esta ventana</small>
         </div>
       )}
-      
+
       <PayPalButtons
-        style={{ 
+        style={{
           layout: 'vertical',
           color: 'gold',
           shape: 'rect',

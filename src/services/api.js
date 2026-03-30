@@ -254,7 +254,7 @@ export const productosAPI = {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   }),
-  getCategorias: (tipo) => apiRequest('/categorias'),
+  getCategorias: () => apiRequest('/categorias'),
   crearCategoria: (data) => apiRequest('/categorias', {
     method: 'POST',
     body: JSON.stringify(data),

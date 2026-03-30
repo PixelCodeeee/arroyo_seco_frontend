@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
 
@@ -110,12 +110,12 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       roles: ["admin", "oferente"],
     },
     {
-  id: 'anuncios',
-  label: 'Anuncios',
-  icon: '📢',
-  path: '/anuncios',
-  roles: ['admin', 'oferente']
-},
+      id: 'anuncios',
+      label: 'Anuncios',
+      icon: '📢',
+      path: '/anuncios',
+      roles: ['admin', 'oferente']
+    },
   ];
 
   // Filter menu items based on user role

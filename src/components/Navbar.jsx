@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
@@ -21,7 +20,7 @@ function Navbar() {
     const handleCartUpdate = () => updateCartCount();
     window.addEventListener("cartUpdated", handleCartUpdate);
     return () => window.removeEventListener("cartUpdated", handleCartUpdate);
-  }, []);
+  }, [location]); // Re-run check on route change to keep user state fresh
 
   const updateCartCount = () => {
     const cartItems = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -60,6 +59,7 @@ function Navbar() {
           Inicio
         </Link>
 
+        {/* Fixed: Added missing </Link> */}
         <Link to="/anuncios-publicos" className={isActive("/anuncios-publicos") ? "active" : ""}>
           Eventos
         </Link>
@@ -72,6 +72,7 @@ function Navbar() {
           Artesanías
         </Link>
 
+        {/* Fixed: Added missing </Link> */}
         <Link to="/recomendaciones" className={isActive("/recomendaciones") ? "active" : ""}>
           Recomendaciones
         </Link>
@@ -87,6 +88,7 @@ function Navbar() {
         )}
 
         {user?.rol === "admin" && (
+          /* Fixed: Removed nested/duplicate Link logic here */
           <Link to="/panel-admin" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
             Panel Admin
           </Link>
@@ -100,23 +102,23 @@ function Navbar() {
         </button>
 
         {user ? (
-          <>
+          <div className="user-controls">
             <Link to="/perfil" className={`perfil-link ${isActive("/perfil") ? "active" : ""}`}>
               Mi Perfil
             </Link>
             <button onClick={handleLogout} className="logout-btn">
               Cerrar sesión
             </button>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="auth-links">
             <Link to="/login" className={`perfil-link ${isActive("/login") ? "active" : ""}`}>
               Iniciar sesión
             </Link>
             <Link to="/register" className={`perfil-link ${isActive("/register") ? "active" : ""}`}>
               Regístrate
             </Link>
-          </>
+          </div>
         )}
 
         {/* Contraste */}

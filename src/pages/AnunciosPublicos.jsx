@@ -16,7 +16,7 @@ function AnunciosPublicos() {
     try {
       const data = await announcementsAPI.getAll();
       setAnuncios(data || []);
-    } catch (err) {
+    } catch {
       console.error('Error al cargar anuncios');
     } finally {
       setLoading(false);

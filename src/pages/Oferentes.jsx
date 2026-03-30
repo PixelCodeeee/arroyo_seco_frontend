@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
 import Layout from '../components/Layout';
 import '../styles/Usuarios.css';
 
 function Oferentes() {
-  const navigate = useNavigate();
   const [oferentes, setOferentes] = useState([]);
   const [filteredOferentes, setFilteredOferentes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +30,7 @@ function Oferentes() {
       // Get current user from localStorage
       const userData = JSON.parse(localStorage.getItem('currentUser') || 'null');
       setCurrentUser(userData);
-      
+
       if (userData && userData.rol === 'oferente') {
         setIsOferente(true);
         // Fetch only this user's oferente profile
@@ -63,7 +62,7 @@ function Oferentes() {
     try {
       setLoading(true);
       const oferente = await oferentesAPI.getByUserId(userId);
-      
+
       if (oferente) {
         // User has an oferente profile
         setHasOferenteProfile(true);
@@ -80,7 +79,7 @@ function Oferentes() {
       setHasOferenteProfile(false);
       setOferentes([]);
       setFilteredOferentes([]);
-      
+
       if (err.message && !err.message.includes('404')) {
         setError(err.message);
       }
@@ -161,13 +160,13 @@ function Oferentes() {
   const canEditOferente = (oferente) => {
     // Admins can edit any oferente
     if (!isOferente) return true;
-    
+
     // Oferentes can only edit their own
     return oferente.id_usuario === currentUser?.id_usuario;
   };
 
   const getEstadoBadgeClass = (estado) => {
-    switch(estado) {
+    switch (estado) {
       case 'aprobado': return 'badge-success';
       case 'pendiente': return 'badge-warning';
       case 'suspendido': return 'badge-danger';
@@ -304,7 +303,7 @@ function Oferentes() {
                   </div>
 
                   {(filters.estado || filters.tipo) && (
-                    <button 
+                    <button
                       onClick={clearFilters}
                       className="btn btn-secondary btn-sm"
                     >

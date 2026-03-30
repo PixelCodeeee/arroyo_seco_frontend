@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { announcementsAPI } from '../services/api';
 import Layout from '../components/Layout';
 import '../styles/Usuarios.css';
 
 function Anuncios() {
-  const navigate = useNavigate();
   const [anuncios, setAnuncios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,9 +17,11 @@ function Anuncios() {
   const fetchAnuncios = async () => {
     try {
       setLoading(true);
+      setError('');
       const data = await announcementsAPI.getAll();
       setAnuncios(data || []);
     } catch (err) {
+      console.error(err);
       setError('Error al cargar anuncios');
     } finally {
       setLoading(false);
@@ -33,7 +34,7 @@ function Anuncios() {
       await announcementsAPI.delete(id);
       alert('Anuncio eliminado');
       fetchAnuncios();
-    } catch (err) {
+    } catch {
       alert('Error al eliminar');
     }
   };
@@ -66,6 +67,8 @@ function Anuncios() {
             </Link>
           </div>
         </header>
+
+        {error && <div className="error-message">{error}</div>}
 
         <div className="usuarios-content">
           <div className="usuarios-stats">

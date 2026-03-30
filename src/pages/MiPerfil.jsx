@@ -6,7 +6,7 @@ import "../styles/MiPerfil.css";
 
 function MiPerfil() {
   const [activeTab, setActiveTab] = useState("perfil");
-  const [avatar, setAvatar] = useState(null);
+  const [avatar] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({

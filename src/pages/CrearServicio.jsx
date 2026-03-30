@@ -54,17 +54,12 @@ function CrearServicio() {
         rango_precio: formData.rango_precio.trim() || null,
         capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
         estatus: formData.estatus ? 1 : 0,
-        imagenes: formData.imagenes.length > 0 ? formData.imagenes : null
+        imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
       };
 
-      const { savedOffline } = await submitForm({
-        endpoint: '/servicios',
-        method: 'POST',
-        data: dataToSend,
-        onSuccess: () => navigate('/servicios'),
-      });
-
-      if (!savedOffline) navigate('/servicios');
+      await serviciosAPI.create(dataToSend);
+      alert('Servicio creado exitosamente');
+      navigate('/servicios');
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Error desconocido';
       setError(msg);

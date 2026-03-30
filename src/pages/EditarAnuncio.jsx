@@ -32,7 +32,7 @@ function EditarAnuncio() {
         event_date: data.event_date ? data.event_date.substring(0, 10) : '',
         is_active: data.is_active === 1 || data.is_active === true
       });
-    } catch (err) {
+    } catch {
       setError('Error al cargar el anuncio');
     } finally {
       setLoadingData(false);
