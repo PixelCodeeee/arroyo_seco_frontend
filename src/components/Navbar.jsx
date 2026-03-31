@@ -88,6 +88,7 @@ function Navbar() {
             {t('nav.oferente_panel', 'Panel Oferente')}
           </Link>
         )}
+
         {user?.rol === "admin" && (
           /* Fixed: Removed nested/duplicate Link logic here */
           <Link to="/panel-admin" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
