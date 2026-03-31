@@ -270,3 +270,39 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(227, 0, 140, 0.4);
 }
+
+/* ==============================
+   GOOGLE TRANSLATE OVERRIDES
+============================== */
+iframe.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -10000px !important;
+  height: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+  z-index: -10 !important;
+}
+
+body, html {
+  top: 0 !important;
+  margin-top: 0 !important;
+  position: relative !important; /* Forces normal position avoiding shifting */
+}
+
+.goog-tooltip {
+  display: none !important;
+}
+
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

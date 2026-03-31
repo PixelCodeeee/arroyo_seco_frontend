@@ -7,7 +7,7 @@ import '../styles/SettingsModal.css';
 
 const SettingsModal = () => {
     const { t, i18n } = useTranslation();
-    const { theme, setTheme, fontSize, setFontSize, dyslexiaFont, setDyslexiaFont, isSettingsOpen, setIsSettingsOpen } = useTheme();
+    const { theme, setTheme, fontSize, setFontSize, dyslexiaFont, setDyslexiaFont, isSettingsOpen, setIsSettingsOpen, contrast, setContrast } = useTheme();
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -22,9 +22,19 @@ const SettingsModal = () => {
     if (!isSettingsOpen) return null;
 
     const handleLanguageChange = (lng) => {
-        i18n.changeLanguage(lng);
+        try {
+            i18n.changeLanguage(lng);
+        } catch(e) {}
+        
         localStorage.setItem('app_language', lng);
-        toast.success(lng === 'en' ? 'Language set to English' : 'Idioma configurado a Español');
+        toast.success(lng === 'en' ? 'Changing language...' : 'Cambiando idioma...', { duration: 1500 });
+        
+        // Native Google Translate trigger
+        const selectField = document.querySelector('.goog-te-combo');
+        if (selectField) {
+            selectField.value = lng;
+            selectField.dispatchEvent(new Event('change'));
+        }
     };
 
     const handleThemeChange = (newTheme) => {
@@ -65,29 +75,37 @@ const SettingsModal = () => {
                                 <p>Select your preferred language</p>
                             </div>
                         </div>
-                        <div className="setting-actions">
-                            <button
-                                onClick={() => handleLanguageChange('es')}
-                                className="setting-btn"
-                                style={{
-                                    backgroundColor: i18n.language.startsWith('es') ? 'var(--accent)' : 'transparent',
-                                    color: i18n.language.startsWith('es') ? '#fff' : '#ccc',
-                                    borderColor: i18n.language.startsWith('es') ? 'var(--accent)' : '#444'
-                                }}
-                            >
-                                ES
-                            </button>
-                            <button
-                                onClick={() => handleLanguageChange('en')}
-                                className="setting-btn"
-                                style={{
-                                    backgroundColor: i18n.language.startsWith('en') ? 'var(--accent)' : 'transparent',
-                                    color: i18n.language.startsWith('en') ? '#fff' : '#ccc',
-                                    borderColor: i18n.language.startsWith('en') ? 'var(--accent)' : '#444'
-                                }}
-                            >
-                                EN
-                            </button>
+                        <div className="setting-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', maxWidth: '300px' }}>
+                            {[
+                              { code: 'es', label: '🇲🇽 ES' },
+                              { code: 'en', label: '🇺🇸 EN' },
+                              { code: 'fr', label: '🇫🇷 FR' },
+                              { code: 'de', label: '🇩🇪 DE' },
+                              { code: 'pt', label: '🇧🇷 PT' },
+                              { code: 'ja', label: '🇯🇵 JA' },
+                              { code: 'ru', label: '🇷🇺 RU' },
+                              { code: 'ar', label: '🇸🇦 AR' },
+                              { code: 'it', label: '🇮🇹 IT' },
+                              { code: 'zh-CN', label: '🇨🇳 ZH' }
+                            ].map(lang => {
+                                const currentLang = i18n.language || localStorage.getItem('app_language') || 'es';
+                                const isActive = currentLang.startsWith(lang.code);
+                                return (
+                                <button
+                                    key={lang.code}
+                                    onClick={() => handleLanguageChange(lang.code)}
+                                    className="setting-btn"
+                                    style={{
+                                        padding: '4px 8px',
+                                        fontSize: '0.85rem',
+                                        backgroundColor: isActive ? 'var(--accent)' : 'transparent',
+                                        color: isActive ? '#fff' : '#ccc',
+                                        borderColor: isActive ? 'var(--accent)' : '#444'
+                                    }}
+                                >
+                                    {lang.label}
+                                </button>
+                            )})}
                         </div>
                     </div>
 
@@ -139,6 +157,39 @@ const SettingsModal = () => {
                             >
                                 <Eye />
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Setting Item: Contrast */}
+                    <div className="setting-item">
+                        <div className="setting-info">
+                            <div className="setting-icon-wrapper">
+                                <Sun className="setting-icon" />
+                            </div>
+                            <div className="setting-text">
+                                <h2>{t('settings.contrast', 'Contraste')}</h2>
+                                <p>Ajustar el contraste de la interfaz</p>
+                            </div>
+                        </div>
+                        <div className="setting-actions" style={{ flexDirection: 'column', alignItems: 'flex-start', width: '150px' }}>
+                            <input
+                                type="range"
+                                min="100"
+                                max="200"
+                                value={contrast}
+                                onChange={(e) => setContrast(Number(e.target.value))}
+                                style={{ width: '100%', marginBottom: '8px' }}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                <span style={{ fontSize: '0.9rem', color: '#ccc' }}>{contrast}%</span>
+                                <button 
+                                    className="setting-btn" 
+                                    style={{ padding: '2px 8px', fontSize: '0.8rem' }} 
+                                    onClick={() => setContrast(100)}
+                                >
+                                    Resetear
+                                </button>
+                            </div>
                         </div>
                     </div>
 

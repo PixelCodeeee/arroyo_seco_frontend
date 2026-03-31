@@ -15,6 +15,7 @@ export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => localStorage.getItem('app_theme') || 'dark');
     const [fontSize, setFontSize] = useState(() => localStorage.getItem('app_fontSize') || 'medium');
     const [dyslexiaFont, setDyslexiaFont] = useState(() => localStorage.getItem('app_dyslexiaFont') === 'true');
+    const [contrast, setContrast] = useState(() => localStorage.getItem('app_contrast') ? Number(localStorage.getItem('app_contrast')) : 100);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     useEffect(() => {
@@ -39,7 +40,11 @@ export const ThemeProvider = ({ children }) => {
         }
         localStorage.setItem('app_dyslexiaFont', dyslexiaFont.toString());
 
-    }, [theme, fontSize, dyslexiaFont]);
+        // Apply contrast
+        document.body.style.filter = `contrast(${contrast}%)`;
+        localStorage.setItem('app_contrast', contrast.toString());
+
+    }, [theme, fontSize, dyslexiaFont, contrast]);
 
     const value = {
         theme,
@@ -48,6 +53,8 @@ export const ThemeProvider = ({ children }) => {
         setFontSize,
         dyslexiaFont,
         setDyslexiaFont,
+        contrast,
+        setContrast,
         isSettingsOpen,
         setIsSettingsOpen
     };
