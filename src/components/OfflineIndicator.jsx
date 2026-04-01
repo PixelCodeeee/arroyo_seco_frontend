@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff } from 'lucide-react';
+import { toast } from 'sonner';
 
 const OfflineIndicator = () => {
     const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -8,6 +9,7 @@ const OfflineIndicator = () => {
         const handleOnline = () => {
             setIsOffline(false);
             document.documentElement.style.setProperty('--offline-banner-height', '0px');
+            toast.success('Conexión restaurada. Estás en línea nuevamente.');
         };
         const handleOffline = () => {
             setIsOffline(true);

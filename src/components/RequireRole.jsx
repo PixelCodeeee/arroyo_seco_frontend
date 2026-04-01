@@ -10,19 +10,7 @@ function RequireRole({ allowed = [], children }) {
 
   // Not logged in
   if (!user) {
-    return (
-      <Navigate
-        to="/error"
-        replace
-        state={{
-          error: {
-            code: "401",
-            title: "No has iniciado sesión",
-            message: "Para acceder a esta sección es necesario iniciar sesión."
-          }
-        }}
-      />
-    );
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
   const role = user.rol;

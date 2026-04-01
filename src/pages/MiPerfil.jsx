@@ -2,9 +2,12 @@
 // src/components/MiPerfil.jsx
 import React, { useState, useEffect } from "react";
 import { usuariosAPI } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
+import { toast } from "sonner";
 import "../styles/MiPerfil.css";
 
 function MiPerfil() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("perfil");
   const [avatar] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +17,12 @@ function MiPerfil() {
     correo: "",
     telefono: "",
     direccion: "",
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    contrasenaActual: "",
+    nuevaContrasena: "",
+    confirmarContrasena: "",
   });
 
   useEffect(() => {
@@ -34,13 +43,35 @@ function MiPerfil() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handlePasswordChange = (e) => {
+    setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await usuariosAPI.actualizarPerfil(formData);
-      alert("Perfil actualizado correctamente");
+      toast.success("Perfil actualizado correctamente");
     } catch {
-      alert("Error al actualizar perfil");
+      toast.error("Error al actualizar perfil");
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (passwordData.nuevaContrasena !== passwordData.confirmarContrasena) {
+      return toast.error("Las contraseñas no coinciden");
+    }
+    
+    try {
+      await usuariosAPI.updatePassword(user.id_usuario, {
+         contrasenaActual: passwordData.contrasenaActual,
+         nuevaContrasena: passwordData.nuevaContrasena
+      });
+      toast.success("Contraseña actualizada correctamente");
+      setPasswordData({ contrasenaActual: "", nuevaContrasena: "", confirmarContrasena: "" });
+    } catch (err) {
+      toast.error(err.message || "Error al actualizar contraseña");
     }
   };
 
@@ -133,25 +164,29 @@ function MiPerfil() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Teléfono</label>
-                <input
-                  type="text"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Dirección</label>
-                <input
-                  type="text"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                />
-              </div>
+              {user?.rol === "oferente" && (
+                <>
+                  <div className="form-group">
+                    <label>Teléfono</label>
+                    <input
+                      type="text"
+                      name="telefono"
+                      value={formData.telefono || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+    
+                  <div className="form-group">
+                    <label>Dirección</label>
+                    <input
+                      type="text"
+                      name="direccion"
+                      value={formData.direccion || ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </>
+              )}
 
               <button className="btn-primary save-btn">Guardar Cambios</button>
             </form>
@@ -162,7 +197,41 @@ function MiPerfil() {
         {activeTab === "password" && (
           <div className="card">
             <h2>Cambiar Contraseña</h2>
-            <p className="coming">(Aquí puedes agregar el formulario de contraseña)</p>
+            <form className="perfil-form" onSubmit={handlePasswordSubmit}>
+              <div className="form-group">
+                <label>Contraseña Actual</label>
+                <input
+                  type="password"
+                  name="contrasenaActual"
+                  value={passwordData.contrasenaActual}
+                  onChange={handlePasswordChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Nueva Contraseña</label>
+                <input
+                  type="password"
+                  name="nuevaContrasena"
+                  value={passwordData.nuevaContrasena}
+                  onChange={handlePasswordChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Confirmar Nueva Contraseña</label>
+                <input
+                  type="password"
+                  name="confirmarContrasena"
+                  value={passwordData.confirmarContrasena}
+                  onChange={handlePasswordChange}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-primary save-btn">
+                Actualizar Contraseña
+              </button>
+            </form>
           </div>
         )}
 

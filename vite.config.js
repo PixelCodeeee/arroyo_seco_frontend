@@ -13,6 +13,37 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      workbox: {
+        runtimeCaching: [
+          {
+            // Match API routes
+            urlPattern: /^https?:\/\/.*\/(api|usuarios|pedidos|productos|oferentes|servicios).*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 24 * 60 * 60 // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            // Cache images using CacheFirst
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 7 * 24 * 60 * 60 // 1 week
+              }
+            }
+          }
+        ]
+      },
       manifest: {
         name: 'Arroyo Seco',
         short_name: 'ArroyoSeco',

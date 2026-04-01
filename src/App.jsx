@@ -12,6 +12,7 @@ import EditarUsuario from "./pages/EditarUsuario";
 import Oferentes from "./pages/Oferentes";
 import CrearOferente from "./pages/CrearOferente";
 import EditarOferente from "./pages/EditarOferente";
+import RecuperarPassword from "./pages/RecuperarPassword";
 import Servicios from "./pages/Servicios";
 import CrearServicio from "./pages/CrearServicio";
 import EditarServicio from "./pages/EditarServicio";
@@ -28,6 +29,7 @@ import RequireRole from "./components/RequireRole";
 import MiPerfil from "./pages/MiPerfil";
 import SettingsModal from "./components/SettingsModal";
 import OfflineIndicator from "./components/OfflineIndicator";
+import ScrollToTop from "./components/ScrollToTop";
 import Categorias from './pages/Categorias';
 import Ordenes from './pages/Ordenes';
 import Reservas from './pages/Reservas';
@@ -38,6 +40,7 @@ import CrearAnuncio from './pages/CrearAnuncio';
 import EditarAnuncio from './pages/EditarAnuncio';
 import Recomendaciones from "./pages/Recomendaciones";
 import Analiticas from "./pages/Analiticas";
+import InstallPrompt from "./components/InstallPrompt";
 
 function App() {
   const initialOptions = {
@@ -49,9 +52,11 @@ function App() {
   return (
     <PayPalScriptProvider options={initialOptions}>
       <ThemeProvider>
+        <InstallPrompt />
         <OfflineIndicator />
         <SettingsModal />
         <Router>
+          <ScrollToTop />
           <Toaster position="top-right" richColors />
           <Routes>
             <Route path="/contacto" element={<Contact />} />
@@ -110,6 +115,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
 
             {/* Usuarios - SOLO admin */}
             <Route
@@ -234,6 +240,9 @@ function App() {
 
             <Route path="/oferente/:id" element={<OferenteDetail />} />
             <Route path="/carrito" element={<Carrito />} />
+            
+            {/* Catch-all route for robust 404 rendering */}
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
         </Router>
       </ThemeProvider>

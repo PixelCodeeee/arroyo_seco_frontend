@@ -545,6 +545,8 @@
 
 
 
+import { saveToQueue } from '../utils/offlineQueue';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Generic API request handler with full logging
@@ -603,7 +605,30 @@ const apiRequest = async (endpoint, options = {}) => {
     );
     console.groupEnd();
 
-    // Optional: send error to external logging service here
+    // Offline Interceptor
+    const isOfflineError = error instanceof TypeError || !navigator.onLine;
+
+    if (isOfflineError && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+      console.warn('📡 Red desconectada: Saltando error y guardando petición en cola offline para', endpoint);
+      
+      let parsedBody = null;
+      if (options.body) {
+        try {
+          parsedBody = JSON.parse(options.body);
+        } catch (_) {
+          parsedBody = options.body;
+        }
+      }
+      
+      // Save to IndexedDB
+      await saveToQueue(endpoint, method, parsedBody);
+
+      return { 
+        _offlineQueued: true, 
+        message: 'Guardado localmente para sincronizar luego' 
+      };
+    }
+
     throw error;
   }
 };
@@ -668,6 +693,83 @@ export const usuariosAPI = {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
+
+  forgotPassword: (data) =>
+    apiRequest('/usuarios/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  resetPassword: (data) =>
+    apiRequest('/usuarios/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updatePassword: (id, data) =>
+    apiRequest(`/usuarios/${id}/password`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }),
+
+  getPerfil: async () => {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) throw new Error('No autenticado');
+    const user = JSON.parse(userStr);
+    
+    const userData = await apiRequest(`/usuarios/${user.id_usuario}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    
+    if (user.rol === 'oferente') {
+      try {
+         const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+         const oferenteData = Array.isArray(response) ? response[0] : response;
+         if (oferenteData) {
+            return { ...userData, telefono: oferenteData.telefono || "", direccion: oferenteData.direccion || "" };
+         }
+      } catch (err) {
+         console.warn("Could not fetch oferente profile data", err);
+      }
+    }
+    return userData;
+  },
+
+  actualizarPerfil: async (dataToUpdate) => {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) throw new Error('No autenticado');
+    const user = JSON.parse(userStr);
+    
+    const userData = { nombre: dataToUpdate.nombre, correo: dataToUpdate.correo };
+    
+    await apiRequest(`/usuarios/${user.id_usuario}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    
+    if (user.rol === 'oferente' && (dataToUpdate.telefono !== undefined || dataToUpdate.direccion !== undefined)) {
+       try {
+           const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+           const oferente = Array.isArray(response) ? response[0] : response;
+           if (oferente && oferente.id_oferente) {
+               await apiRequest(`/oferentes/${oferente.id_oferente}`, {
+                   method: 'PUT',
+                   body: JSON.stringify({ 
+                       telefono: dataToUpdate.telefono, 
+                       direccion: dataToUpdate.direccion 
+                   }),
+                   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+               });
+           }
+       } catch (err) {
+           console.error("Failed to update oferente profile", err);
+       }
+    }
+    return true;
+  }
 };
 
 /* ======================================================

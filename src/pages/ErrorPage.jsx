@@ -5,11 +5,11 @@ import "../styles/ErrorPage.css";
 function ErrorPage() {
   const location = useLocation();
 
-  // Default error data
+  // Default error data assumes 404 unless routed via custom throw
   const error = location.state?.error || {
-    title: "Oops!",
-    message: "Something went wrong.",
-    code: "ERROR"
+    title: "404 - Página no encontrada",
+    message: "La URL que intentaste visitar no existe, fue movida o no tienes autorización.",
+    code: "404"
   };
 
   return (
