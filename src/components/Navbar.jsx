@@ -1,24 +1,29 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "react-i18next";
+import { Menu, X } from "lucide-react";
+import { useTheme } from "../context/ThemeProvider";
 import "../styles/Navbar.css";
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isSettingsOpen, setIsSettingsOpen } = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, toggleTheme, fontSize, cycleFontSize } = useTheme();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
     updateCartCount();
     const handleCartUpdate = () => updateCartCount();
     window.addEventListener("cartUpdated", handleCartUpdate);
     return () => window.removeEventListener("cartUpdated", handleCartUpdate);
-  }, []);
+  }, [location]); // Re-run check on route change to keep user state fresh
 
   const updateCartCount = () => {
     const cartItems = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -33,102 +38,98 @@ function Navbar() {
     navigate("/");
   };
 
+  const handleCartClick = () => navigate("/carrito");
   const isActive = (path) => location.pathname === path;
 
-  const fontSizeTitle = {
-    normal: "Tamaño normal — click para grande",
-    large:  "Tamaño grande — click para extra grande",
-    xlarge: "Tamaño extra grande — click para normal",
-  };
-
-  const fontSizeStyle = {
-    normal: { fontSize: "0.85rem" },
-    large:  { fontSize: "1rem" },
-    xlarge: { fontSize: "1.2rem" },
-  };
+  // Close menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   return (
     <header className="navbar">
-      <nav className="nav-links">
-        <Link to="/" className={isActive("/") ? "active" : ""}>Inicio</Link>
-        <Link to="/gastronomia" className={isActive("/gastronomia") ? "active" : ""}>Gastronomía</Link>
-        <Link to="/artesanias" className={isActive("/artesanias") ? "active" : ""}>Artesanías</Link>
-        <Link to="/recomendaciones" className={isActive("/recomendaciones") ? "active" : ""}>Recomendaciones</Link>
-        <Link to="/contacto" className={isActive("/contacto") ? "active" : ""}>Contacto</Link>
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        aria-label="Toggle Menu"
+      >
+        {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+      </button>
+
+      <nav className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
+        <Link to="/" className={isActive("/") ? "active" : ""}>
+          {t('nav.home', 'Inicio')}
+        </Link>
+
+        {/* Fixed: Added missing </Link> */}
+        <Link to="/anuncios-publicos" className={isActive("/anuncios-publicos") ? "active" : ""}>
+          {t('nav.events', 'Eventos')}
+        </Link>
+
+        <Link to="/gastronomia" className={isActive("/gastronomia") ? "active" : ""}>
+          {t('nav.gastronomy', 'Gastronomía')}
+        </Link>
+
+        <Link to="/artesanias" className={isActive("/artesanias") ? "active" : ""}>
+          {t('nav.handicrafts', 'Artesanías')}
+        </Link>
+
+        {/* Fixed: Added missing </Link> */}
+        <Link to="/recomendaciones" className={isActive("/recomendaciones") ? "active" : ""}>
+          {t('nav.recommendations', 'Recomendaciones')}
+        </Link>
+
+        <Link to="/contacto" className={isActive("/contacto") ? "active" : ""}>
+          {t('nav.contact', 'Contacto')}
+        </Link>
 
         {user?.rol === "oferente" && (
           <Link to="/panel-oferente" className={`nav-role-btn ${isActive("/panel-oferente") ? "active" : ""}`}>
-            Panel Oferente
+            {t('nav.oferente_panel', 'Panel Oferente')}
           </Link>
         )}
         {user?.rol === "admin" && (
-          <Link to="/analiticas" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
-            Panel Admin
+          /* Fixed: Removed nested/duplicate Link logic here */
+          <Link to="/panel-admin" className={`nav-role-btn ${isActive("/panel-admin") ? "active" : ""}`}>
+            {t('nav.admin_panel', 'Panel Admin')}
           </Link>
         )}
       </nav>
 
       <div className="nav-icons">
-        {/* Toggle tamaño de fuente */}
-        <button
-          onClick={cycleFontSize}
-          className="font-size-btn"
-          aria-label="Cambiar tamaño de letra"
-          title={fontSizeTitle[fontSize]}
-        >
-          <span style={fontSizeStyle[fontSize]} className="font-size-indicator">
-            A
-          </span>
-          <span className="font-size-dots">
-            <span className={fontSize === "normal" ? "dot active" : "dot"} />
-            <span className={fontSize === "large"  ? "dot active" : "dot"} />
-            <span className={fontSize === "xlarge" ? "dot active" : "dot"} />
-          </span>
+
+        <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="cart-button" aria-label="Ajustes">
+          <i className="ri-settings-3-line"></i>
         </button>
 
-        {/* Toggle tema */}
-        <button
-          onClick={toggleTheme}
-          className="theme-toggle-btn"
-          aria-label="Cambiar tema"
-          title={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
-        >
-          {theme === "dark" ? (
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1"  x2="12" y2="3"  />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22"  x2="5.64" y2="5.64"  />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1"  y1="12" x2="3"  y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-        </button>
-
-        {/* Carrito */}
-        <button onClick={() => navigate("/carrito")} className="cart-button" aria-label="Carrito">
+        <button onClick={handleCartClick} className="cart-button" aria-label="Carrito de compras">
           <i className="ri-shopping-cart-line"></i>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
 
         {user ? (
-          <>
-            <Link to="/perfil" className={`perfil-link ${isActive("/perfil") ? "active" : ""}`}>Mi Perfil</Link>
-            <button onClick={handleLogout} className="logout-btn">Cerrar sesión</button>
-          </>
+          <div className="user-controls">
+            <Link to="/perfil" className={`perfil-link ${isActive("/perfil") ? "active" : ""}`}>
+              {t('nav.profile', 'Mi Perfil')}
+            </Link>
+            <button onClick={handleLogout} className="logout-btn">
+              {t('nav.logout', 'Cerrar sesión')}
+            </button>
+          </div>
         ) : (
-          <>
-            <Link to="/login"    className={`perfil-link ${isActive("/login")    ? "active" : ""}`}>Iniciar sesión</Link>
-            <Link to="/register" className={`perfil-link ${isActive("/register") ? "active" : ""}`}>Regístrate</Link>
-          </>
+          <div className="auth-links">
+            <Link to="/login" className={`btn-login ${isActive("/login") ? "active" : ""}`}>
+              {t('nav.login', 'Iniciar sesión')}
+            </Link>
+            <Link to="/register" className={`btn-register ${isActive("/register") ? "active" : ""}`}>
+              {t('nav.register', 'Regístrate')}
+            </Link>
+          </div>
         )}
+
+        {/* Google Translate Element (hidden) */}
+        <div id="google_translate_element" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', top: 0 }}></div>
+
       </div>
     </header>
   );

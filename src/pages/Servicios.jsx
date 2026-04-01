@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { serviciosAPI, oferentesAPI } from '../services/api';
+import { Link } from 'react-router-dom';
+import { serviciosAPI } from '../services/api';
 import Layout from '../components/Layout';
 import '../styles/Usuarios.css';
 
 function Servicios() {
-  const navigate = useNavigate();
   const [servicios, setServicios] = useState([]);
   const [stats, setStats] = useState({ total: 0, disponibles: 0, no_disponibles: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   // Cargar datos
@@ -17,17 +17,19 @@ function Servicios() {
   }, []);
 
   const fetchServicios = async () => {
-  try {
-    setLoading(true);
-    const data = await serviciosAPI.getAll(); // ← devuelve { servicios, stats, total }
-    setServicios(data.servicios || []);
-    setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
-  } catch (err) {
-    setError('Error al cargar servicios');
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await serviciosAPI.getAll(); // ← devuelve { servicios, stats, total }
+      setServicios(data.servicios || []);
+      setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
+    } catch (err) {
+      console.error(err);
+      setError('Error al cargar servicios');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Seguro que deseas eliminar este servicio?')) return;
@@ -70,6 +72,8 @@ function Servicios() {
             </Link>
           </div>
         </header>
+
+        {error && <div className="error-message">{error}</div>}
 
         {/* Estadísticas */}
         <div className="usuarios-content">
@@ -121,10 +125,10 @@ function Servicios() {
                       <td>{s.rango_precio || '—'}</td>
                       <td>{s.capacidad ? `${s.capacidad} pers.` : '—'}</td>
                       <td>
-  <span className={`status ${s.estatus === 1 ? 'active' : 'inactive'}`}>
-    {s.estatus === 1 ? 'Disponible' : 'No Disponible'}
-  </span>
-</td>
+                        <span className={`status ${s.estatus === 1 ? 'active' : 'inactive'}`}>
+                          {s.estatus === 1 ? 'Disponible' : 'No Disponible'}
+                        </span>
+                      </td>
                       <td className="actions">
                         <Link
                           to={`/servicios/editar/${s.id_servicio}`}

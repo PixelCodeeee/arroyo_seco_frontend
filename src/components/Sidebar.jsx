@@ -139,6 +139,13 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       type: "divider",
       roles: ["admin", "oferente"],
     },
+    {
+      id: 'anuncios',
+      label: 'Anuncios',
+      icon: '📢',
+      path: '/anuncios',
+      roles: ['admin', 'oferente']
+    },
   ];
 
   const visibleMenuItems = menuItems.filter((item) => {
