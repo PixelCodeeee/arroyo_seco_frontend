@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 /* ==============================
-   RESET
+   RESET */
 :root {
   /* Default Theme (Dark) / Site Aesthetic */
   --bg-primary: #1a1a1a;
@@ -133,7 +133,7 @@
 }
 
 /* ==============================
-   VARIABLES — TEMA CLARO
+   VARIABLES — TEMA CLARO */
 [data-theme="light"] {
   /* Fondos */
   --bg-primary:       #f5f5f5;
@@ -182,10 +182,12 @@
 }
 
 /* ==============================
-   BASE GLOBAL
+   BASE GLOBAL */
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+}
+
 html {
   font-size: var(--base-size);
 }
@@ -235,7 +237,7 @@ a {
 }
 
 /* ==============================
-   UTILIDADES GLOBALES
+   UTILIDADES GLOBALES */
 .text-accent  { color: var(--accent); }
 .text-muted   { color: var(--text-muted); }
 .text-primary { color: var(--text-primary); }
@@ -258,7 +260,7 @@ button, a, input, select, textarea {
 }
 
 /* ==============================
-   SCROLLBAR GLOBAL
+   SCROLLBAR GLOBAL */
 ::-webkit-scrollbar       { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
@@ -266,7 +268,7 @@ button, a, input, select, textarea {
 
 /* ==============================
    TAMAÑOS DE FUENTE
-   Agregar al final de index.css
+   Agregar al final de index.css */
 
 /* Normal (default — igual que ahora) */
 [data-fontsize="normal"] {
@@ -310,6 +312,8 @@ button, a, input, select, textarea {
 /* Aplicar al body globalmente */
 body {
   font-size: var(--fs-base, 1rem);
+}
+
 /* Hover Utils tied to Variables */
 .hover-bg-secondary:hover {
   background-color: var(--bg-secondary);

@@ -5,6 +5,7 @@ import { startAutoSync } from './utils/offlineQueue';
 
 import './index.css';
 import App from './App.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 registerSW({
   onOfflineReady() {
