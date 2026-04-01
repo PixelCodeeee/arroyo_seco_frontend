@@ -59,7 +59,7 @@ function GoogleMapComponent({ ubicacion, nombreNegocio }) {
     return (
       <div className="google-map-wrapper map-fallback">
         <img
-          src="/images/pan.png"
+          src="/images/pan.jpeg"
           alt="Mapa de ubicación"
           onError={(e) => (e.target.style.display = 'none')}
         />

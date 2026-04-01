@@ -82,12 +82,6 @@
   background-position: 38% center !important;
   background-size: 120px;
   gap: 4rem;
-}
-
-/* Contenedor flexible base */
-.tesoro-section,
-.gastronomia-section,
-.artesanias-section {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -109,6 +103,7 @@
   font-size: clamp(2rem, 5vw, 3rem);
   margin-bottom: 1.5rem;
   line-height: 1.2;
+  color: var(--text-primary);
 }
 
 .tesoro-text span,
@@ -134,8 +129,8 @@
   min-height: 500px;
   max-height: 700px;
   border-radius: 24px;
-  background: url("/images/tesoro.jpg") center/cover no-repeat;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  background: url("/images/tesoro.jpeg") center/cover no-repeat;
+  box-shadow: var(--shadow-lg);
 }
 
 .scroll-icon {
@@ -160,7 +155,7 @@
 .gastronomia-imgs img {
   border-radius: 20px;
   object-fit: cover;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   transition: transform 0.4s ease;
 }
 
@@ -198,7 +193,7 @@
 .artesanias-imgs img {
   border-radius: 20px;
   object-fit: cover;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-lg);
   transition: transform 0.4s ease;
 }
 
@@ -218,14 +213,13 @@
   z-index: 1;
 }
 
-/* Hover sutil en imágenes */
 .gastronomia-imgs:hover img:first-child,
 .artesanias-imgs:hover img:first-child {
   transform: translateY(-10px);
 }
 
 /* ==============================
-   RESPONSIVE - TABLET & MOBILE
+   RESPONSIVE
 ============================== */
 @media (max-width: 1024px) {
 
@@ -300,6 +294,7 @@
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
     transition: transform 0.4s ease;
   }
+}
 
   .artesanias-imgs img:first-child {
     width: 85% !important;
