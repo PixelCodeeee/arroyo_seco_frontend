@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Ban } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
@@ -167,7 +168,7 @@ function EditarOferente() {
       };
 
       await oferentesAPI.update(id, dataToSend);
-      alert('✅ Oferente actualizado exitosamente');
+      alert(' Oferente actualizado exitosamente');
       navigate('/oferentes');
     } catch (err) {
       setError(err.message || 'Error al actualizar oferente');
@@ -193,7 +194,7 @@ function EditarOferente() {
           </div>
 
           <div className="alert alert-error">
-            <span className="alert-icon">🚫</span>
+            <span className="alert-icon"><Ban size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
             <div>
               <strong>No tienes permiso para editar este oferente</strong>
               <p>Solo puedes editar tu propio perfil de oferente.</p>
@@ -245,14 +246,14 @@ function EditarOferente() {
 
         {error && !isAuthorized && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
 
         {error && isAuthorized && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -293,8 +294,8 @@ function EditarOferente() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="restaurante">🍽️ Restaurante</option>
-                  <option value="artesanal">🎨 Artesanal</option>
+                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Restaurante</option>
+                  <option value="artesanal"><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</option>
                 </select>
               </div>
             </div>

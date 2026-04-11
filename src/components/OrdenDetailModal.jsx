@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { X, Package, Clock, CheckCircle, Truck, User, ShoppingBag, DollarSign } from 'lucide-react';
 import "../styles/OrdenDetailModal.css";
 
 function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEstado }) {
@@ -46,11 +46,11 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content orden-modal" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Header */}
         <div className="modal-header">
           <div>
-            <h2>📦 Detalle del Pedido #{pedido.id_pedido}</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Package size={24} /> Detalle del Pedido #{pedido.id_pedido}</h2>
             <p className="modal-subtitle">
               {formatDate(pedido.fecha_creacion)}
             </p>
@@ -62,15 +62,15 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
         {/* Content */}
         <div className="modal-body">
-          
+
           {/* Estado */}
           <div className="orden-estado-section">
             <div className="estado-info">
               <label>Estado actual:</label>
               <span className={`badge badge-large ${getEstadoBadgeClass(pedido.estado)}`}>
-                {pedido.estado === "pendiente" && "⏳ Pendiente"}
-                {pedido.estado === "pagado" && "✅ Pagado"}
-                {pedido.estado === "enviado" && "🚚 Enviado"}
+                {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
+                {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
+                {pedido.estado === "enviado" && <><Truck size={16} /> Enviado</>}
               </span>
             </div>
 
@@ -85,8 +85,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                         onEstadoChange(pedido.id_pedido, "pendiente");
                         onClose();
                       }}
-                    >
-                      ⏳ Marcar Pendiente
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> Marcar Pendiente
                     </button>
                   )}
                   {pedido.estado !== "pagado" && (
@@ -96,8 +95,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                         onEstadoChange(pedido.id_pedido, "pagado");
                         onClose();
                       }}
-                    >
-                      ✅ Marcar Pagado
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Pagado
                     </button>
                   )}
                   {pedido.estado !== "enviado" && (
@@ -107,8 +105,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                         onEstadoChange(pedido.id_pedido, "enviado");
                         onClose();
                       }}
-                    >
-                      🚚 Marcar Enviado
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Truck size={14} /> Marcar Enviado
                     </button>
                   )}
                 </div>
@@ -118,7 +115,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
           {/* Información del Cliente */}
           <div className="orden-section">
-            <h3>👤 Información del Cliente</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><User size={20} /> Información del Cliente</h3>
             <div className="info-grid">
               <div className="info-item">
                 <label>Nombre:</label>
@@ -128,16 +125,12 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                 <label>Email:</label>
                 <span>{pedido.email_usuario || "N/A"}</span>
               </div>
-              <div className="info-item">
-                <label>Teléfono:</label>
-                <span>{pedido.telefono_usuario || "N/A"}</span>
-              </div>
             </div>
           </div>
 
           {/* Items del Pedido */}
           <div className="orden-section">
-            <h3>🛍️ Productos Ordenados</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ShoppingBag size={20} /> Productos Ordenados</h3>
             <div className="items-list">
               {pedido.items && pedido.items.length > 0 ? (
                 pedido.items.map((item, index) => (
@@ -161,9 +154,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                               ? "none"
                               : "flex",
                         }}
-                      >
-                        📦
-                      </div>
+                      ><Package size={32} color="#999" /></div>
                     </div>
 
                     <div className="item-info">
@@ -202,7 +193,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
           {/* Resumen */}
           <div className="orden-section orden-summary">
-            <h3>💰 Resumen del Pedido</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><DollarSign size={20} /> Resumen del Pedido</h3>
             <div className="summary-grid">
               <div className="summary-row">
                 <span>Subtotal:</span>

@@ -114,8 +114,8 @@ function Donut({ data, total }) {
 
 /* ── Principal ── */
 function Analiticas() {
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [pedidosStats, setPedidosStats] = useState(null);
   const [reservasStats, setReservasStats] = useState(null);
   const [usuariosStats, setUsuariosStats] = useState(null);
@@ -139,7 +139,7 @@ function Analiticas() {
         setUsuariosStats(usr);
         setTopProductos(prods.productos || []);
         setTopServicios(servs.servicios || []);
-      } catch  {
+      } catch {
         setError("No se pudieron cargar las analíticas. Verifica tu sesión.");
       } finally {
         setLoading(false);
@@ -180,27 +180,27 @@ function Analiticas() {
   }
 
   const pedidosDonut = [
-    { label: "Pendientes",  value: pedidosStats?.pendientes  || 0, color: "#FFC107" },
-    { label: "Pagados",     value: pedidosStats?.pagados     || 0, color: "#4CAF50" },
-    { label: "Enviados",    value: pedidosStats?.enviados    || 0, color: "#2196F3" },
+    { label: "Pendientes", value: pedidosStats?.pendientes || 0, color: "#FFC107" },
+    { label: "Pagados", value: pedidosStats?.pagados || 0, color: "#4CAF50" },
+    { label: "Enviados", value: pedidosStats?.enviados || 0, color: "#2196F3" },
     { label: "Completados", value: pedidosStats?.completados || 0, color: "#e3008c" },
   ];
   const totalPedidosDonut = pedidosDonut.reduce((a, b) => a + b.value, 0);
 
   const reservasDonut = [
-    { label: "Pendientes",  value: reservasStats?.pendientes  || 0, color: "#FFC107" },
+    { label: "Pendientes", value: reservasStats?.pendientes || 0, color: "#FFC107" },
     { label: "Confirmadas", value: reservasStats?.confirmadas || 0, color: "#4CAF50" },
-    { label: "Canceladas",  value: reservasStats?.canceladas  || 0, color: "#f44336" },
+    { label: "Canceladas", value: reservasStats?.canceladas || 0, color: "#f44336" },
   ];
   const totalReservasDonut = reservasDonut.reduce((a, b) => a + b.value, 0);
 
-  const maxRegistros  = Math.max(...(usuariosStats?.registrosPorMes?.map(m => m.total) || [1]));
+  const maxRegistros = Math.max(...(usuariosStats?.registrosPorMes?.map(m => m.total) || [1]));
   const maxReservasMes = Math.max(...(reservasStats?.reservasPorMes?.map(m => m.total_reservas) || [1]));
-  const maxVentasMes  = Math.max(...(pedidosStats?.ventasPorMes?.map(m => m.ingresos || 1) || [1]));
-  const maxUsuarios   = Math.max(
-    usuariosStats?.stats?.turistas  || 1,
+  const maxVentasMes = Math.max(...(pedidosStats?.ventasPorMes?.map(m => m.ingresos || 1) || [1]));
+  const maxUsuarios = Math.max(
+    usuariosStats?.stats?.turistas || 1,
     usuariosStats?.stats?.oferentes || 1,
-    usuariosStats?.stats?.admins    || 1
+    usuariosStats?.stats?.admins || 1
   );
 
   return (
@@ -330,10 +330,10 @@ function Analiticas() {
             <div className="section-title">{Icons.user} Distribución de Usuarios</div>
             <div className="bar-chart-an">
               {[
-                { label: "Turistas",  value: usuariosStats?.stats?.turistas  || 0 },
+                { label: "Turistas", value: usuariosStats?.stats?.turistas || 0 },
                 { label: "Oferentes", value: usuariosStats?.stats?.oferentes || 0 },
-                { label: "Admins",    value: usuariosStats?.stats?.admins    || 0 },
-                { label: "Activos",   value: usuariosStats?.stats?.activos   || 0 },
+                { label: "Admins", value: usuariosStats?.stats?.admins || 0 },
+                { label: "Activos", value: usuariosStats?.stats?.activos || 0 },
               ].map((item, i) => (
                 <div className="bar-item-an" key={i}>
                   <span className="bar-label-an">{item.label}</span>

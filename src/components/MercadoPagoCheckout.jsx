@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { paypalAPI } from '../services/api';
+import { paypalAPI } from '../services/api'; // keeping api object the same, as per previous implementation, but maybe backend is updated
 import { getCart, clearCart } from '../utils/cartUtils';
-import '../styles/PayPalCheckout.css';
+import { AlertCircle, Lock, CreditCard } from 'lucide-react';
+import '../styles/MercadoPagoCheckout.css';
 
-function PayPalCheckout({ amount, onSuccess, onError }) {
+function MercadoPagoCheckout({ amount, onSuccess, onError }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState('');
 
@@ -21,7 +22,7 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
     } else if (status === 'pending') {
       setError('Tu pago está pendiente de confirmación.');
     }
-  }, []); // <--- Fixed missing closing for useEffect
+  }, []); 
 
   const handleReturnFromMP = async (payment_id) => {
     try {
@@ -49,6 +50,7 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
         id_usuario: currentUser.id_usuario
       };
 
+      // api object uses paypalAPI for MP, keeping the existing method ref
       const response = await paypalAPI.captureOrder(captureData);
 
       if (response.success) {
@@ -115,17 +117,17 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
   };
 
   return (
-    <div className="paypal-checkout-container">
+    <div className="mercadopago-checkout-container">
 
       {error && (
-        <div className="paypal-error">
-          <span>⚠️</span>
+        <div className="mercadopago-error">
+          <AlertCircle size={20} />
           <span>{error}</span>
         </div>
       )}
 
       {loading ? (
-        <div className="paypal-loading">
+        <div className="mercadopago-loading">
           <div className="spinner"></div>
           <p>Procesando pago...</p>
           <small>Por favor no cierres esta ventana</small>
@@ -136,13 +138,13 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
           onClick={iniciarPago}
           disabled={loading}
         >
-          💳 Pagar con MercadoPago
+          <CreditCard size={20} /> Pagar con MercadoPago
         </button>
       )}
 
-      <div className="paypal-info">
-        <p>
-          <strong>🔒 Pago seguro con MercadoPago</strong>
+      <div className="mercadopago-info">
+        <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Lock size={16} /> <strong>Pago seguro con MercadoPago</strong>
         </p>
         <small>Serás redirigido a MercadoPago para completar tu pago</small>
       </div>
@@ -151,4 +153,4 @@ function PayPalCheckout({ amount, onSuccess, onError }) {
   );
 }
 
-export default PayPalCheckout;
+export default MercadoPagoCheckout;

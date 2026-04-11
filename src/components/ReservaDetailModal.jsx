@@ -1,78 +1,47 @@
 import React from "react";
-import { X } from "lucide-react";
+import {
+  X, Utensils, Clock, CheckCircle, XCircle,
+  AlertCircle, CalendarDays, User, Clipboard, Info
+} from 'lucide-react';
 import "../styles/ReservaDetailModal.css";
+import {
+  formatDate,
+  formatTime,
+  getEstadoBadgeClass,
+  canCancelReserva,
+  getTiempoRestanteLabel,
+} from "../utils/Reservautils";
 
-function ReservaDetailModal({ 
-  reserva, 
-  isOpen, 
-  onClose, 
-  onEstadoChange, 
+function ReservaDetailModal({
+  reserva,
+  isOpen,
+  onClose,
+  onEstadoChange,
   onCancelar,
   canChangeEstado,
-  isTurista 
+  isTurista
 }) {
   if (!isOpen || !reserva) return null;
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-MX", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+  // Derive from shared utils — fecha/hora are now correctly parsed
+  const cancelable = canCancelReserva(reserva);
+  const tiempoRestante = getTiempoRestanteLabel(reserva.fecha, reserva.hora);
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "N/A";
-    return timeString.substring(0, 5); // HH:MM
-  };
-
-  const getEstadoBadgeClass = (estado) => {
-    switch (estado) {
-      case "pendiente":
-        return "badge-warning";
-      case "confirmada":
-        return "badge-success";
-      case "cancelada":
-        return "badge-danger";
-      default:
-        return "badge-secondary";
-    }
-  };
-
-  const canCancel = () => {
-    if (reserva.estado === "cancelada") return false;
-    
-    const fechaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
-    const ahora = new Date();
-    const horasRestantes = (fechaReserva - ahora) / (1000 * 60 * 60);
-    
-    return horasRestantes >= 24;
-  };
-
-  const getHorasRestantes = () => {
-    const fechaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
-    const ahora = new Date();
-    const horasRestantes = (fechaReserva - ahora) / (1000 * 60 * 60);
-    
-    if (horasRestantes < 0) return "La reserva ya pasó";
-    if (horasRestantes < 24) return `Faltan ${Math.round(horasRestantes)} horas (no cancelable)`;
-    if (horasRestantes < 48) return `Faltan ${Math.round(horasRestantes)} horas`;
-    
-    const diasRestantes = Math.floor(horasRestantes / 24);
-    return `Faltan ${diasRestantes} días`;
+  const handleEstado = (nuevoEstado) => {
+    onEstadoChange(reserva.id_reserva, nuevoEstado);
+    onClose();
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content reserva-modal" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Header */}
         <div className="modal-header">
           <div>
-            <h2>🍽️ Detalle de Reserva #{reserva.id_reserva}</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Utensils size={24} /> Detalle de Reserva #{reserva.id_reserva}
+            </h2>
             <p className="modal-subtitle">
               {formatDate(reserva.fecha)} a las {formatTime(reserva.hora)}
             </p>
@@ -84,25 +53,27 @@ function ReservaDetailModal({
 
         {/* Content */}
         <div className="modal-body">
-          
+
           {/* Estado */}
           <div className="reserva-estado-section">
             <div className="estado-info">
               <label>Estado actual:</label>
               <span className={`badge badge-large ${getEstadoBadgeClass(reserva.estado)}`}>
-                {reserva.estado === "pendiente" && "⏳ Pendiente"}
-                {reserva.estado === "confirmada" && "✅ Confirmada"}
-                {reserva.estado === "cancelada" && "❌ Cancelada"}
+                {reserva.estado === "pendiente" && <><Clock size={16} />        Pendiente</>}
+                {reserva.estado === "confirmada" && <><CheckCircle size={16} />  Confirmada</>}
+                {reserva.estado === "cancelada" && <><XCircle size={16} />      Cancelada</>}
               </span>
             </div>
 
+            {/* Time remaining — only shown when not cancelled */}
             {reserva.estado !== "cancelada" && (
               <div className="tiempo-restante">
-                <span className="tiempo-icon">⏰</span>
-                <span>{getHorasRestantes()}</span>
+                <Clock size={16} className="tiempo-icon" />
+                <span>{tiempoRestante}</span>
               </div>
             )}
 
+            {/* Admin / oferente status controls */}
             {canChangeEstado && (
               <div className="estado-actions">
                 <label>Cambiar estado:</label>
@@ -110,53 +81,46 @@ function ReservaDetailModal({
                   {reserva.estado !== "pendiente" && (
                     <button
                       className="btn btn-sm btn-warning"
-                      onClick={() => {
-                        onEstadoChange(reserva.id_reserva, "pendiente");
-                        onClose();
-                      }}
+                      onClick={() => handleEstado("pendiente")}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
-                      ⏳ Marcar Pendiente
+                      <Clock size={14} /> Marcar Pendiente
                     </button>
                   )}
                   {reserva.estado !== "confirmada" && (
                     <button
                       className="btn btn-sm btn-success"
-                      onClick={() => {
-                        onEstadoChange(reserva.id_reserva, "confirmada");
-                        onClose();
-                      }}
+                      onClick={() => handleEstado("confirmada")}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
-                      ✅ Confirmar Reserva
+                      <CheckCircle size={14} /> Confirmar Reserva
                     </button>
                   )}
                   {reserva.estado !== "cancelada" && (
                     <button
                       className="btn btn-sm btn-danger"
-                      onClick={() => {
-                        onEstadoChange(reserva.id_reserva, "cancelada");
-                        onClose();
-                      }}
+                      onClick={() => handleEstado("cancelada")}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
-                      ❌ Cancelar Reserva
+                      <XCircle size={14} /> Cancelar Reserva
                     </button>
                   )}
                 </div>
               </div>
             )}
 
-            {isTurista && canCancel() && reserva.estado !== "cancelada" && (
+            {/* Turista cancel button */}
+            {isTurista && cancelable && reserva.estado !== "cancelada" && (
               <div className="cancel-action">
                 <button
                   className="btn btn-danger"
-                  onClick={() => {
-                    onCancelar(reserva);
-                    onClose();
-                  }}
+                  onClick={() => { onCancelar(reserva); onClose(); }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                 >
-                  ❌ Cancelar mi Reserva
+                  <XCircle size={14} /> Cancelar mi Reserva
                 </button>
                 <small className="cancel-warning">
-                  ⚠️ Puedes cancelar hasta 24 horas antes de la reserva
+                  <AlertCircle size={14} /> Puedes cancelar hasta 24 horas antes de la reserva
                 </small>
               </div>
             )}
@@ -164,13 +128,15 @@ function ReservaDetailModal({
 
           {/* Información del Servicio */}
           <div className="reserva-section">
-            <h3>🍽️ Información del Servicio</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Utensils size={20} /> Información del Servicio
+            </h3>
             <div className="servicio-card">
               <div className="servicio-details">
-                <h4>{reserva.nombre_servicio || "N/A"}</h4>
-                {reserva.nombre_oferente && (
+                <h4>{reserva.servicio?.nombre || "N/A"}</h4>
+                {reserva.servicio?.oferente?.nombre && (
                   <p className="oferente">
-                    <strong>Establecimiento:</strong> {reserva.nombre_oferente}
+                    <strong>Establecimiento:</strong> {reserva.servicio.oferente.nombre}
                   </p>
                 )}
               </div>
@@ -179,7 +145,9 @@ function ReservaDetailModal({
 
           {/* Detalles de la Reserva */}
           <div className="reserva-section">
-            <h3>📅 Detalles de la Reserva</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CalendarDays size={20} /> Detalles de la Reserva
+            </h3>
             <div className="info-grid">
               <div className="info-item">
                 <label>Fecha:</label>
@@ -191,29 +159,25 @@ function ReservaDetailModal({
               </div>
               <div className="info-item">
                 <label>Número de Personas:</label>
-                <span>
-                  <strong>{reserva.numero_personas} comensales</strong>
-                </span>
+                <span><strong>{reserva.numero_personas} comensales</strong></span>
               </div>
             </div>
           </div>
 
-          {/* Información del Cliente */}
+          {/* Información del Cliente (non-turista only) */}
           {!isTurista && (
             <div className="reserva-section">
-              <h3>👤 Información del Cliente</h3>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <User size={20} /> Información del Cliente
+              </h3>
               <div className="info-grid">
                 <div className="info-item">
                   <label>Nombre:</label>
-                  <span>{reserva.nombre_usuario || "N/A"}</span>
+                  <span>{reserva.usuario?.nombre || "N/A"}</span>
                 </div>
                 <div className="info-item">
                   <label>Email:</label>
-                  <span>{reserva.email_usuario || "N/A"}</span>
-                </div>
-                <div className="info-item">
-                  <label>Teléfono:</label>
-                  <span>{reserva.telefono_usuario || "N/A"}</span>
+                  <span>{reserva.usuario?.correo || "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -222,7 +186,9 @@ function ReservaDetailModal({
           {/* Notas Adicionales */}
           {reserva.notas && (
             <div className="reserva-section">
-              <h3>📝 Notas Adicionales</h3>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Clipboard size={20} /> Notas Adicionales
+              </h3>
               <div className="notas-box">
                 <p>{reserva.notas}</p>
               </div>
@@ -231,7 +197,9 @@ function ReservaDetailModal({
 
           {/* Información Importante */}
           <div className="reserva-section info-section">
-            <h3>ℹ️ Información Importante</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Info size={20} /> Información Importante
+            </h3>
             <ul className="info-list">
               <li>Por favor llega 10 minutos antes de tu hora de reserva</li>
               <li>Las cancelaciones deben hacerse con mínimo 24 horas de anticipación</li>
@@ -244,9 +212,7 @@ function ReservaDetailModal({
 
         {/* Footer */}
         <div className="modal-footer">
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cerrar
-          </button>
+          <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
         </div>
       </div>
     </div>

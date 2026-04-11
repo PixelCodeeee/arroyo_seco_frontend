@@ -1,10 +1,10 @@
-.paypal-checkout-container {
+.mercadopago-checkout-container {
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
 }
 
-.paypal-error {
+.mercadopago-error {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -17,7 +17,7 @@
   margin-bottom: 16px;
 }
 
-.paypal-loading {
+.mercadopago-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,11 +29,11 @@
   margin-bottom: 20px;
 }
 
-.paypal-loading .spinner {
+.mercadopago-loading .spinner {
   width: 40px;
   height: 40px;
   border: 4px solid #e9ecef;
-  border-top: 4px solid #0070ba;
+  border-top: 4px solid #009ee3; /* MercadoPago Blue */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -42,19 +42,19 @@
   to { transform: rotate(360deg); }
 }
 
-.paypal-loading p {
+.mercadopago-loading p {
   margin: 0;
   font-weight: 600;
   color: #495057;
 }
 
-.paypal-loading small {
+.mercadopago-loading small {
   margin: 0;
   color: #6c757d;
   font-size: 13px;
 }
 
-.paypal-info {
+.mercadopago-info {
   text-align: center;
   margin-top: 16px;
   padding: 12px;
@@ -62,20 +62,46 @@
   border-radius: 8px;
 }
 
-.paypal-info p {
+.mercadopago-info p {
   margin: 0 0 4px 0;
   color: #004080;
   font-size: 14px;
 }
 
-.paypal-info small {
+.mercadopago-info small {
   color: #6c757d;
   font-size: 12px;
 }
 
+.mp-pay-btn {
+  background-color: #009ee3; /* MercadoPago Blue */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.mp-pay-btn:hover {
+  background-color: #0088cc;
+}
+
+.mp-pay-btn:disabled {
+  background-color: #a1dcf5;
+  cursor: not-allowed;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
-  .paypal-checkout-container {
+  .mercadopago-checkout-container {
     max-width: 100%;
   }
 }

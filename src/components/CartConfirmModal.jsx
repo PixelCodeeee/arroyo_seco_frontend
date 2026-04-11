@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, ShoppingCart, AlertTriangle } from 'lucide-react';
 import '../styles/ReservaModal.css'; // Reuse modal styles
 
 function CartConfirmModal({ isOpen, onClose, onConfirm, currentOferente, newOferente }) {
@@ -11,7 +11,7 @@ function CartConfirmModal({ isOpen, onClose, onConfirm, currentOferente, newOfer
         
         <div className="modal-header">
           <div>
-            <h2>🛒 Cambiar de Oferente</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ShoppingCart size={24} /> Cambiar de Oferente</h2>
           </div>
           <button className="modal-close" onClick={onClose}>
             <X size={24} />
@@ -20,7 +20,7 @@ function CartConfirmModal({ isOpen, onClose, onConfirm, currentOferente, newOfer
         
         <div className="modal-body">
           <div className="alert alert-error" style={{ marginBottom: '20px' }}>
-            <span>⚠️</span>
+            <span><AlertTriangle size={20} /></span>
             <span>Tu carrito contiene productos de otro oferente</span>
           </div>
 

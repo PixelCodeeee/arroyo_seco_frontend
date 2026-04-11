@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Trash2, Edit } from 'lucide-react';
 // src/components/Categorias.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -160,7 +161,7 @@ function Categorias() {
                     <td><strong>{cat.nombre}</strong></td>
                     <td>
                       <span className={`badge badge-${cat.tipo}`}>
-                        {cat.tipo === 'gastronomica' ? '🍽️ Gastronómica' : '🎨 Artesanal'}
+                        {cat.tipo === 'gastronomica' ? <><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Gastronómica</> : <><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</>}
                       </span>
                     </td>
                     {isAdmin && (
@@ -170,7 +171,7 @@ function Categorias() {
                           className="btn-action btn-edit"
                           title="Editar"
                         >
-                          ✏️
+                          <Edit size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
                         </Link>
 
                         <button
@@ -178,7 +179,7 @@ function Categorias() {
                           className="btn-action btn-delete"
                           title="Eliminar"
                         >
-                          🗑️
+                          <Trash2 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
                         </button>
                       </td>
                     )}

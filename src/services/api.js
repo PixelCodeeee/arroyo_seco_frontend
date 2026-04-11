@@ -610,7 +610,7 @@ const apiRequest = async (endpoint, options = {}) => {
 
     if (isOfflineError && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
       console.warn('📡 Red desconectada: Saltando error y guardando petición en cola offline para', endpoint);
-      
+
       let parsedBody = null;
       if (options.body) {
         try {
@@ -619,13 +619,13 @@ const apiRequest = async (endpoint, options = {}) => {
           parsedBody = options.body;
         }
       }
-      
+
       // Save to IndexedDB
       await saveToQueue(endpoint, method, parsedBody);
 
-      return { 
-        _offlineQueued: true, 
-        message: 'Guardado localmente para sincronizar luego' 
+      return {
+        _offlineQueued: true,
+        message: 'Guardado localmente para sincronizar luego'
       };
     }
 
@@ -717,21 +717,21 @@ export const usuariosAPI = {
     const userStr = localStorage.getItem('currentUser');
     if (!userStr) throw new Error('No autenticado');
     const user = JSON.parse(userStr);
-    
+
     const userData = await apiRequest(`/usuarios/${user.id_usuario}`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-    
+
     if (user.rol === 'oferente') {
       try {
-         const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
-         const oferenteData = Array.isArray(response) ? response[0] : response;
-         if (oferenteData) {
-            return { ...userData, telefono: oferenteData.telefono || "", direccion: oferenteData.direccion || "" };
-         }
+        const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+        const oferenteData = Array.isArray(response) ? response[0] : response;
+        if (oferenteData) {
+          return { ...userData, telefono: oferenteData.telefono || "", direccion: oferenteData.direccion || "" };
+        }
       } catch (err) {
-         console.warn("Could not fetch oferente profile data", err);
+        console.warn("Could not fetch oferente profile data", err);
       }
     }
     return userData;
@@ -741,32 +741,32 @@ export const usuariosAPI = {
     const userStr = localStorage.getItem('currentUser');
     if (!userStr) throw new Error('No autenticado');
     const user = JSON.parse(userStr);
-    
+
     const userData = { nombre: dataToUpdate.nombre, correo: dataToUpdate.correo };
-    
+
     await apiRequest(`/usuarios/${user.id_usuario}`, {
       method: 'PUT',
       body: JSON.stringify(userData),
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-    
+
     if (user.rol === 'oferente' && (dataToUpdate.telefono !== undefined || dataToUpdate.direccion !== undefined)) {
-       try {
-           const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
-           const oferente = Array.isArray(response) ? response[0] : response;
-           if (oferente && oferente.id_oferente) {
-               await apiRequest(`/oferentes/${oferente.id_oferente}`, {
-                   method: 'PUT',
-                   body: JSON.stringify({ 
-                       telefono: dataToUpdate.telefono, 
-                       direccion: dataToUpdate.direccion 
-                   }),
-                   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-               });
-           }
-       } catch (err) {
-           console.error("Failed to update oferente profile", err);
-       }
+      try {
+        const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+        const oferente = Array.isArray(response) ? response[0] : response;
+        if (oferente && oferente.id_oferente) {
+          await apiRequest(`/oferentes/${oferente.id_oferente}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              telefono: dataToUpdate.telefono,
+              direccion: dataToUpdate.direccion
+            }),
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+        }
+      } catch (err) {
+        console.error("Failed to update oferente profile", err);
+      }
     }
     return true;
   }
@@ -1089,7 +1089,7 @@ export const reservasAPI = {
 
   checkDisponibilidad: (id_servicio, fecha, hora) => {
     const params = new URLSearchParams({ id_servicio, fecha, hora });
-    return apiRequest(`/reservas/check/disponibilidad?${params.toString()}`, {
+    return apiRequest(`/reservas/disponibilidad?${params.toString()}`, {
       method: 'GET',
     });
   },

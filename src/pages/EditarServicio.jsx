@@ -11,7 +11,7 @@ function EditarServicio() {
     descripcion: '',
     rango_precio: '',
     capacidad: '',
-    esta_disponible: true
+    estatus: true
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -30,7 +30,7 @@ function EditarServicio() {
         descripcion: servicio.descripcion || '',
         rango_precio: servicio.rango_precio || '',
         capacidad: servicio.capacidad || '',
-        esta_disponible: servicio.esta_disponible
+        estatus: servicio.estatus
       });
     } catch (err) {
       setError(err.message || 'Error al cargar servicio');
@@ -150,8 +150,8 @@ function EditarServicio() {
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                name="esta_disponible"
-                checked={formData.esta_disponible}
+                name="estatus"
+                checked={formData.estatus}
                 onChange={handleChange}
               />
               <span>Servicio disponible</span>
@@ -159,15 +159,15 @@ function EditarServicio() {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => navigate('/servicios')}
               className="btn-secondary"
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="btn-primary"
             >

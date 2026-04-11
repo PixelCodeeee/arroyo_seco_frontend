@@ -1,6 +1,22 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import {
+  Home,
+  Store,
+  Package,
+  BellRing,
+  Tag,
+  ClipboardList,
+  CalendarDays,
+  Users,
+  BarChart2,
+  Megaphone,
+  LogOut,
+  Menu,
+  X,
+  Type,
+} from "lucide-react";
 import "../styles/Sidebar.css";
 
 function FontSizeToggle({ collapsed }) {
@@ -15,18 +31,14 @@ function FontSizeToggle({ collapsed }) {
       title={`Tamaño ${labels[fontSize]} → click para ${nextLabel[fontSize]}`}
     >
       <span className="sidebar-fontsize-icon">
-        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <polyline points="4 7 4 4 20 4 20 7" />
-          <line x1="9" y1="20" x2="15" y2="20" />
-          <line x1="12" y1="4"  x2="12" y2="20" />
-        </svg>
+        <Type size={16} />
       </span>
       {!collapsed && (
         <span className="sidebar-fontsize-label">
           Texto: {labels[fontSize]}
           <span className="sidebar-fontsize-dots">
             <span className={fontSize === "normal" ? "sdot active" : "sdot"} />
-            <span className={fontSize === "large"  ? "sdot active" : "sdot"} />
+            <span className={fontSize === "large" ? "sdot active" : "sdot"} />
             <span className={fontSize === "xlarge" ? "sdot active" : "sdot"} />
           </span>
         </span>
@@ -50,101 +62,89 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
     }
   };
 
-  const isActive = (path) => {
-    return (
-      location.pathname === path || location.pathname.startsWith(path + "/")
-    );
-  };
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
   const menuItems = [
     {
       id: "home",
       label: "Inicio",
-      icon: "🏠",
+      icon: <Home size={20} />,
       path: "/",
       roles: ["admin", "oferente", "turista"],
     },
     {
       id: "oferentes",
       label: isOferente ? "Mi Perfil" : "Oferentes",
-      icon: "🏪",
+      icon: <Store size={20} />,
       path: "/oferentes",
       roles: ["admin", "oferente"],
     },
     {
       id: "productos",
       label: "Productos",
-      icon: "📦",
+      icon: <Package size={20} />,
       path: "/productos",
       roles: ["admin", "oferente"],
     },
     {
       id: "servicios",
       label: "Servicios",
-      icon: "🛎️",
+      icon: <BellRing size={20} />,
       path: "/servicios",
       roles: ["admin", "oferente"],
     },
     {
       id: "categorias",
       label: "Categorías",
-      icon: "🏷️",
+      icon: <Tag size={20} />,
       path: "/categorias",
-      roles: ["oferente", "admin"],
+      roles: ["admin", "oferente"], // unified — no duplicate needed
     },
     {
       id: "ordenes",
       label: "Órdenes",
-      icon: "📋",
+      icon: <ClipboardList size={20} />,
       path: "/ordenes",
       roles: ["admin", "oferente"],
     },
     {
       id: "reservas",
       label: "Reservas",
-      icon: "📅",
+      icon: <CalendarDays size={20} />,
       path: "/reservas",
       roles: ["admin", "oferente"],
     },
     {
-      id: "divider-1",
+      id: "divider-admin",
       type: "divider",
       roles: ["admin"],
     },
     {
       id: "usuarios",
       label: "Usuarios",
-      icon: "👥",
+      icon: <Users size={20} />,
       path: "/usuarios",
       roles: ["admin"],
-      badge: "Admin",
     },
     {
       id: "analiticas",
       label: "Analíticas",
-      icon: "📊",
+      icon: <BarChart2 size={20} />,
       path: "/analiticas",
       roles: ["admin", "oferente"],
-      badge: "Nuevo",
     },
     {
-      id: "categorias-admin",
-      label: "Categorías",
-      icon: "🏷️",
-      path: "/categorias",
-      roles: ["admin"],
-    },
-    {
-      id: "divider-2",
+      id: "divider-bottom",
       type: "divider",
       roles: ["admin", "oferente"],
     },
     {
-      id: 'anuncios',
-      label: 'Anuncios',
-      icon: '📢',
-      path: '/anuncios',
-      roles: ['admin', 'oferente']
+      id: "anuncios",
+      label: "Anuncios",
+      icon: <Megaphone size={20} />,
+      path: "/anuncios",
+      roles: ["admin", "oferente"],
     },
   ];
 
@@ -167,7 +167,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
           onClick={onToggle}
           title={isCollapsed ? "Expandir" : "Colapsar"}
         >
-          {isCollapsed ? "☰" : "✕"}
+          {isCollapsed ? <Menu size={18} /> : <X size={18} />}
         </button>
       </div>
 
@@ -181,7 +181,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
             <div className="user-info">
               <div className="user-name">{currentUser.nombre}</div>
               <div className="user-role">
-                {isAdmin ? "👑 Administrador" : "🏪 Oferente"}
+                {isAdmin ? "Administrador" : "Oferente"}
               </div>
             </div>
           )}
@@ -232,7 +232,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
           onClick={handleLogout}
           title={isCollapsed ? "Cerrar Sesión" : ""}
         >
-          <span className="nav-icon">🚪</span>
+          <span className="nav-icon"><LogOut size={20} /></span>
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>

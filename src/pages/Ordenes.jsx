@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, DollarSign, Search, Eye } from 'lucide-react';
 import React, { useState, useEffect } from "react";
 import { pedidosAPI } from "../services/api";
 import Layout from "../components/Layout";
@@ -161,7 +162,7 @@ function Ordenes() {
         <header className="ordenes-header">
           <div className="header-content">
             <div className="header-info">
-              <h1>📦 {isTurista ? "Mis Pedidos" : "Gestión de Pedidos"}</h1>
+              <h1><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> {isTurista ? "Mis Pedidos" : "Gestión de Pedidos"}</h1>
               <p className="welcome-text">
                 {isTurista
                   ? "Revisa el estado de tus compras"
@@ -176,7 +177,7 @@ function Ordenes() {
         {/* ERROR */}
         {error && (
           <div className="alert alert-error">
-            <span>⚠️</span>
+            <span><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -184,13 +185,13 @@ function Ordenes() {
         {/* STATS */}
         <div className="ordenes-stats">
           <div className="stat-card">
-            <div className="stat-icon">📦</div>
+            <div className="stat-icon"><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
             <div className="stat-value">{pedidos.length}</div>
             <div className="stat-label">Total Pedidos</div>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">⏳</div>
+            <div className="stat-icon"><Clock size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "pendiente").length}
             </div>
@@ -198,7 +199,7 @@ function Ordenes() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">✅</div>
+            <div className="stat-icon"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "pagado").length}
             </div>
@@ -206,7 +207,7 @@ function Ordenes() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">🚚</div>
+            <div className="stat-icon"><Truck size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "enviado").length}
             </div>
@@ -214,7 +215,7 @@ function Ordenes() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon"><DollarSign size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
             <div className="stat-value">
               {formatCurrency(
                 pedidos
@@ -229,7 +230,7 @@ function Ordenes() {
         {/* FILTERS */}
         <div className="ordenes-controls">
           <div className="search-box">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><Search size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
             <input
               type="text"
               placeholder="Buscar por ID o usuario..."
@@ -281,7 +282,7 @@ function Ordenes() {
         <div className="ordenes-table-container">
           {filtered.length === 0 ? (
             <div className="empty-state">
-              <span className="empty-icon">📦</span>
+              <span className="empty-icon"><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
               <p>No hay pedidos para mostrar</p>
               <small>
                 {filterEstado || searchTerm
@@ -342,17 +343,17 @@ function Ordenes() {
                             pedido.estado
                           )}`}
                         >
-                          <option value="pendiente">⏳ Pendiente</option>
-                          <option value="pagado">✅ Pagado</option>
-                          <option value="enviado">🚚 Enviado</option>
+                          <option value="pendiente"><Clock size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pendiente</option>
+                          <option value="pagado"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pagado</option>
+                          <option value="enviado"><Truck size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Enviado</option>
                         </select>
                       ) : (
                         <span
                           className={`badge ${getEstadoBadgeClass(pedido.estado)}`}
                         >
-                          {pedido.estado === "pendiente" && "⏳ Pendiente"}
-                          {pedido.estado === "pagado" && "✅ Pagado"}
-                          {pedido.estado === "enviado" && "🚚 Enviado"}
+                          {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
+                          {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
+                          {pedido.estado === "enviado" && <><Truck size={16} /> Enviado</>}
                         </span>
                       )}
                     </td>
@@ -363,7 +364,7 @@ function Ordenes() {
                         className="btn-action btn-view"
                         title="Ver detalles"
                       >
-                        👁️
+                        <Eye size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
                       </button>
                     </td>
                   </tr>

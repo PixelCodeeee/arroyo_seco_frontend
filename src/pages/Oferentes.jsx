@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info, Trash2, Edit } from 'lucide-react';
 // import React, { useState, useEffect } from 'react';
 // import { Link, useNavigate } from 'react-router-dom';
 // import { oferentesAPI } from '../services/api';
@@ -226,7 +227,7 @@
 //         {isOferente && !hasOferenteProfile && (
 //           <div className="usuarios-content">
 //             <div className="alert alert-info">
-//               <span className="alert-icon">ℹ️</span>
+//               <span className="alert-icon"><Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
 //               <div>
 //                 <strong>No tienes un perfil de oferente</strong>
 //                 <p>Crea tu perfil para empezar a ofrecer tus servicios o productos.</p>
@@ -254,7 +255,7 @@
 //       className="btn btn-success"
 //       style={{ marginLeft: "10px" }}
 //     >
-//       💳 Conectar Mercado Pago
+//       <CreditCard size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Conectar Mercado Pago
 //     </button>
 //   )}
 // </div>
@@ -388,7 +389,7 @@
 //                         )}
 //                         <td>
 //                           <span className={`badge badge-${oferente.tipo}`}>
-//                             {oferente.tipo === 'restaurante' ? '🍽️' : '🎨'} {oferente.tipo}
+//                             {oferente.tipo === 'restaurante' ? <Utensils size={16} /> : <Palette size={16} />} {oferente.tipo}
 //                           </span>
 //                         </td>
 //                         <td>
@@ -420,7 +421,7 @@
 //                                 className="btn-action btn-edit"
 //                                 title="Editar"
 //                               >
-//                                 ✏️
+//                                 <Edit size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
 //                               </Link>
 //                               {!isOferente && (
 //                                 <button
@@ -428,7 +429,7 @@
 //                                   className="btn-action btn-delete"
 //                                   title="Eliminar"
 //                                 >
-//                                   🗑️
+//                                   <Trash2 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
 //                                 </button>
 //                               )}
 //                             </>
@@ -491,10 +492,10 @@ function Oferentes() {
     const mpError  = params.get('mp_error');
 
     if (mpStatus === 'conectado') {
-      setMpMensaje('✅ ¡Cuenta de MercadoPago conectada exitosamente!');
+      setMpMensaje(' ¡Cuenta de MercadoPago conectada exitosamente!');
       fetchMpEstado();
     } else if (mpError) {
-      setMpMensaje(`❌ Error al conectar con MercadoPago: ${mpError.replace(/_/g, ' ')}`);
+      setMpMensaje(` Error al conectar con MercadoPago: ${mpError.replace(/_/g, ' ')}`);
     }
 
     // Limpiar query params de la URL
@@ -589,10 +590,10 @@ function Oferentes() {
         // Redirigir a MercadoPago para autorizar
         window.location.href = data.auth_url;
       } else {
-        setMpMensaje('❌ No se pudo obtener la URL de autorización');
+        setMpMensaje(' No se pudo obtener la URL de autorización');
       }
     } catch (err) {
-      setMpMensaje(`❌ Error: ${err.message}`);
+      setMpMensaje(` Error: ${err.message}`);
     } finally {
       setMpLoading(false);
     }
@@ -678,9 +679,9 @@ function Oferentes() {
   const getMpBadge = () => {
     if (!mpEstado) return null;
     const config = {
-      activo:    { clase: 'badge-success', texto: '✅ MercadoPago Conectado' },
-      pendiente: { clase: 'badge-warning', texto: '⏳ MercadoPago Pendiente' },
-      rechazado: { clase: 'badge-danger',  texto: '❌ MercadoPago Rechazado'  },
+      activo:    { clase: 'badge-success', texto: <><CheckCircle size={16} /> MercadoPago Conectado</> },
+      pendiente: { clase: 'badge-warning', texto: <><Clock size={16} /> MercadoPago Pendiente</> },
+      rechazado: { clase: 'badge-danger',  texto: <><XCircle size={16} /> MercadoPago Rechazado</>  },
     };
     const c = config[mpEstado] || config.pendiente;
     return <span className={`badge ${c.clase}`}>{c.texto}</span>;
@@ -726,10 +727,10 @@ function Oferentes() {
                   title={mpEstado === 'activo' ? 'Tu cuenta ya está conectada' : 'Conecta tu cuenta de MercadoPago para recibir pagos'}
                 >
                   {mpLoading
-                    ? '⏳ Conectando...'
+                    ? <><Clock size={16} /> Conectando...</>
                     : mpEstado === 'activo'
-                      ? '✅ MP Conectado'
-                      : '💳 Conectar MercadoPago'}
+                      ? <><CheckCircle size={16} /> MP Conectado</>
+                      : <><CreditCard size={16} /> Conectar MercadoPago</>}
                 </button>
               )}
             </div>
@@ -738,7 +739,7 @@ function Oferentes() {
 
         {/* Mensaje resultado OAuth MP */}
         {mpMensaje && (
-          <div className={`alert ${mpMensaje.startsWith('✅') ? 'alert-success' : 'alert-danger'}`}
+          <div className={`alert ${mpMensaje.includes('exitosamente') ? 'alert-success' : 'alert-danger'}`}
             style={{ margin: '0 0 16px 0' }}>
             {mpMensaje}
           </div>
@@ -757,7 +758,7 @@ function Oferentes() {
         {isOferente && !hasOferenteProfile && (
           <div className="usuarios-content">
             <div className="alert alert-info">
-              <span className="alert-icon">ℹ️</span>
+              <span className="alert-icon"><Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
               <div>
                 <strong>No tienes un perfil de oferente</strong>
                 <p>Crea tu perfil para empezar a ofrecer tus servicios o productos.</p>
@@ -893,7 +894,7 @@ function Oferentes() {
                         )}
                         <td>
                           <span className={`badge badge-${oferente.tipo}`}>
-                            {oferente.tipo === 'restaurante' ? '🍽️' : '🎨'} {oferente.tipo}
+                            {oferente.tipo === 'restaurante' ? <Utensils size={16} /> : <Palette size={16} />} {oferente.tipo}
                           </span>
                         </td>
                         <td>
@@ -925,7 +926,7 @@ function Oferentes() {
                                 className="btn-action btn-edit"
                                 title="Editar"
                               >
-                                ✏️
+                                <Edit size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
                               </Link>
                               {!isOferente && (
                                 <button
@@ -933,7 +934,7 @@ function Oferentes() {
                                   className="btn-action btn-delete"
                                   title="Eliminar"
                                 >
-                                  🗑️
+                                  <Trash2 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
                                 </button>
                               )}
                             </>

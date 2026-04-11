@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Info } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oferentesAPI, usuariosAPI } from '../services/api';
@@ -188,7 +189,7 @@ function CrearOferente() {
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -237,7 +238,7 @@ function CrearOferente() {
               )}
               {isOferente && (
                 <small className="field-hint">
-                  ℹ️ Como oferente, estás registrando tu propio negocio
+                  <Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Como oferente, estás registrando tu propio negocio
                 </small>
               )}
             </div>
@@ -278,8 +279,8 @@ function CrearOferente() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="restaurante">🍽️ Restaurante</option>
-                  <option value="artesanal">🎨 Artesanal</option>
+                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Restaurante</option>
+                  <option value="artesanal"><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</option>
                 </select>
               </div>
             </div>

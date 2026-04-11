@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, ClipboardList, Edit3 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productosAPI } from '../services/api';
@@ -96,13 +97,13 @@ function EditarCategoria() {
           <button onClick={() => navigate('/categorias')} className="back-button">
             ← Volver
           </button>
-          <h2>📝 Editar Categoría</h2>
+          <h2><Edit3 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Editar Categoría</h2>
           <p className="subtitle">Modifica los datos de esta categoría</p>
         </div>
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -110,7 +111,7 @@ function EditarCategoria() {
         <form onSubmit={handleSubmit} className="producto-form">
 
           <div className="form-section">
-            <h3 className="section-title">📋 Información Básica</h3>
+            <h3 className="section-title"><ClipboardList size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Información Básica</h3>
 
             {/* Nombre */}
             <div className="form-group">

@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, ClipboardList, Folder } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI } from '../services/api';
@@ -66,13 +67,13 @@ function CrearCategoria() {
           <button onClick={() => navigate('/categorias')} className="back-button">
             ← Volver
           </button>
-          <h2>📁 Crear Categoría</h2>
+          <h2><Folder size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Crear Categoría</h2>
           <p className="subtitle">Añade una nueva categoría al sistema</p>
         </div>
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -80,7 +81,7 @@ function CrearCategoria() {
         <form onSubmit={handleSubmit} className="producto-form">
 
           <div className="form-section">
-            <h3 className="section-title">📋 Información Básica</h3>
+            <h3 className="section-title"><ClipboardList size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Información Básica</h3>
 
             {/* Nombre */}
             <div className="form-group">

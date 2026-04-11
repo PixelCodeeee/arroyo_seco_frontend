@@ -1,8 +1,9 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, ClipboardList, DollarSign, Tag, ImageIcon, Settings, Check, Edit3 } from 'lucide-react';
 // src/components/EditarProducto.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
-import '../styles/CrearProducto.css'; // ✔ usa el mismo estilo
+import '../styles/CrearProducto.css'; // <Check size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> usa el mismo estilo
 
 function EditarProducto() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function EditarProducto() {
     id_categoria: '',
     id_oferente: '',
     imagenes: [],
-    esta_disponible: true,
+    estatus: true,
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -59,7 +60,7 @@ function EditarProducto() {
           id_categoria: producto.id_categoria || '',
           id_oferente: producto.id_oferente || '',
           imagenes: producto.imagenes || [],
-          esta_disponible: producto.esta_disponible === 1 || producto.esta_disponible === true,
+          estatus: producto.estatus === 1 || producto.estatus === true,
         });
 
         setImagenInput((producto.imagenes || []).join(', '));
@@ -162,13 +163,13 @@ function EditarProducto() {
           >
             ← Volver
           </button>
-          <h2>📝 Editar Producto</h2>
+          <h2><Edit3 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Editar Producto</h2>
           <p className="subtitle">Modifica los datos de este producto</p>
         </div>
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -176,7 +177,7 @@ function EditarProducto() {
         <form onSubmit={handleSubmit} className="producto-form">
           {/* Información Básica */}
           <div className="form-section">
-            <h3 className="section-title">📋 Información Básica</h3>
+            <h3 className="section-title"><ClipboardList size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Información Básica</h3>
 
             <div className="form-group">
               <label htmlFor="nombre">Nombre del Producto *</label>
@@ -206,7 +207,7 @@ function EditarProducto() {
 
           {/* Precio e Inventario */}
           <div className="form-section">
-            <h3 className="section-title">💰 Precio e Inventario</h3>
+            <h3 className="section-title"><DollarSign size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Precio e Inventario</h3>
 
             <div className="form-row">
               <div className="form-group">
@@ -240,7 +241,7 @@ function EditarProducto() {
 
           {/* Categorías */}
           <div className="form-section">
-            <h3 className="section-title">🏷️ Categorización</h3>
+            <h3 className="section-title"><Tag size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Categorización</h3>
 
             <div className="form-row">
               <div className="form-group">
@@ -284,7 +285,7 @@ function EditarProducto() {
 
           {/* Imágenes */}
           <div className="form-section">
-            <h3 className="section-title">🖼️ Imágenes</h3>
+            <h3 className="section-title"><ImageIcon size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Imágenes</h3>
 
             <div className="form-group">
               <label>URLs de Imágenes</label>
@@ -316,12 +317,12 @@ function EditarProducto() {
 
           {/* Disponibilidad */}
           <div className="form-section">
-            <h3 className="section-title">⚙️ Configuración</h3>
+            <h3 className="section-title"><Settings size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Configuración</h3>
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                name="esta_disponible"
-                checked={formData.esta_disponible}
+                name="estatus"
+                checked={formData.estatus}
                 onChange={handleChange}
               />
               Disponible para venta

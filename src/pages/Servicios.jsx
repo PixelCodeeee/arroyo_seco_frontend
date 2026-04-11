@@ -114,37 +114,38 @@ function Servicios() {
                     </td>
                   </tr>
                 ) : (
-                  servicios.map(s => (
-                    <tr key={s.id_servicio}>
-                      <td>{s.id_servicio}</td>
-                      <td>
-                        {/* Aquí deberías tener el nombre del oferente si lo traes en el backend */}
-                        #{s.id_oferente}
-                      </td>
-                      <td>{s.nombre}</td>
-                      <td>{s.rango_precio || '—'}</td>
-                      <td>{s.capacidad ? `${s.capacidad} pers.` : '—'}</td>
-                      <td>
-                        <span className={`status ${s.estatus === 1 ? 'active' : 'inactive'}`}>
-                          {s.estatus === 1 ? 'Disponible' : 'No Disponible'}
-                        </span>
-                      </td>
-                      <td className="actions">
-                        <Link
-                          to={`/servicios/editar/${s.id_servicio}`}
-                          className="btn-action btn-edit"
-                        >
-                          Editar
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(s.id_servicio)}
-                          className="btn-action btn-delete"
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  servicios.map(s => {
+                    const isActive = s.estatus === true; // Prisma already returns boolean
+
+                    return (
+                      <tr key={s.id_servicio}>
+                        <td>{s.id_servicio}</td>
+                        <td>#{s.id_oferente}</td>
+                        <td>{s.nombre}</td>
+                        <td>{s.rango_precio || '—'}</td>
+                        <td>{s.capacidad ? `${s.capacidad} pers.` : '—'}</td>
+                        <td>
+                          <span className={`status ${isActive ? 'active' : 'inactive'}`}>
+                            {isActive ? 'Disponible' : 'No Disponible'}
+                          </span>
+                        </td>
+                        <td className="actions">
+                          <Link
+                            to={`/servicios/editar/${s.id_servicio}`}
+                            className="btn-action btn-edit"
+                          >
+                            Editar
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(s.id_servicio)}
+                            className="btn-action btn-delete"
+                          >
+                            Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

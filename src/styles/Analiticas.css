@@ -32,7 +32,9 @@
   gap: 0.75rem;
 }
 
-.analiticas-header h1 svg { color: var(--accent); }
+.analiticas-header h1 svg {
+  color: var(--accent);
+}
 
 .analiticas-header .welcome-text {
   color: var(--accent);
@@ -122,7 +124,9 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.section-title svg { color: var(--accent); }
+.section-title svg {
+  color: var(--accent);
+}
 
 /* ==============================
    CHARTS GRID
@@ -152,7 +156,11 @@
 /* ==============================
    DONA SVG
 ============================== */
-.donut-section { display: flex; align-items: center; gap: 2rem; }
+.donut-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
 
 .donut-wrap {
   position: relative;
@@ -161,7 +169,9 @@
   flex-shrink: 0;
 }
 
-.donut-wrap svg { transform: rotate(-90deg); }
+.donut-wrap svg {
+  transform: rotate(-90deg);
+}
 
 .donut-center {
   position: absolute;
@@ -172,10 +182,24 @@
   justify-content: center;
 }
 
-.donut-total { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-.donut-sub   { font-size: 0.65rem; color: var(--text-faint); }
+.donut-total {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
 
-.donut-legend { flex: 1; display: flex; flex-direction: column; gap: 0.6rem; }
+.donut-sub {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+}
+
+.donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
 
 .legend-item-an {
   display: flex;
@@ -185,8 +209,18 @@
   color: var(--text-secondary);
 }
 
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-count { margin-left: auto; font-weight: 700; color: var(--text-primary); }
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-count {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--text-primary);
+}
 
 /* ==============================
    BARRAS MES
@@ -217,18 +251,41 @@
   min-height: 4px;
 }
 
-.mes-bar.purple { background: linear-gradient(180deg, #6366f1, rgba(99,102,241,0.4)); }
-.mes-bar.amber  { background: linear-gradient(180deg, #f59e0b, rgba(245,158,11,0.4)); }
+.mes-bar.purple {
+  background: linear-gradient(180deg, #6366f1, rgba(99, 102, 241, 0.4));
+}
 
-.mes-label { font-size: 0.7rem; color: var(--text-faint); text-align: center; white-space: nowrap; }
-.mes-value { font-size: 0.7rem; font-weight: 700; color: var(--accent); }
+.mes-bar.amber {
+  background: linear-gradient(180deg, #f59e0b, rgba(245, 158, 11, 0.4));
+}
+
+.mes-label {
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mes-value {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+}
 
 /* ==============================
    BARRAS HORIZONTALES
 ============================== */
-.bar-chart-an { display: flex; flex-direction: column; gap: 0.9rem; }
+.bar-chart-an {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
 
-.bar-item-an { display: flex; align-items: center; gap: 0.75rem; }
+.bar-item-an {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
 
 .bar-label-an {
   font-size: 0.8rem;
@@ -287,7 +344,10 @@
   box-shadow: var(--shadow-md);
 }
 
-.top-list-an { display: flex; flex-direction: column; }
+.top-list-an {
+  display: flex;
+  flex-direction: column;
+}
 
 .top-item-an {
   display: flex;
@@ -298,8 +358,13 @@
   transition: background-color 0.2s ease;
 }
 
-.top-item-an:last-child { border-bottom: none; }
-.top-item-an:hover      { background-color: var(--accent-soft); }
+.top-item-an:last-child {
+  border-bottom: none;
+}
+
+.top-item-an:hover {
+  background-color: var(--accent-soft);
+}
 
 .top-rank-an {
   width: 28px;
@@ -313,12 +378,30 @@
   flex-shrink: 0;
 }
 
-.top-rank-an.gold   { background-color: rgba(255,193,7,0.2);   color: #FFC107; }
-.top-rank-an.silver { background-color: rgba(158,158,158,0.2); color: #9E9E9E; }
-.top-rank-an.bronze { background-color: rgba(180,83,9,0.2);    color: #f97316; }
-.top-rank-an.normal { background-color: var(--bg-tertiary);    color: var(--text-faint); }
+.top-rank-an.gold {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+}
 
-.top-info-an { flex: 1; overflow: hidden; }
+.top-rank-an.silver {
+  background-color: rgba(158, 158, 158, 0.2);
+  color: #9E9E9E;
+}
+
+.top-rank-an.bronze {
+  background-color: rgba(180, 83, 9, 0.2);
+  color: #f97316;
+}
+
+.top-rank-an.normal {
+  background-color: var(--bg-tertiary);
+  color: var(--text-faint);
+}
+
+.top-info-an {
+  flex: 1;
+  overflow: hidden;
+}
 
 .top-name-an {
   font-size: 0.88rem;
@@ -329,8 +412,17 @@
   text-overflow: ellipsis;
 }
 
-.top-sub-an  { font-size: 0.75rem; color: var(--text-faint); }
-.top-stat-an { font-size: 0.88rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.top-sub-an {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.top-stat-an {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
 
 /* ==============================
    SIN DATOS / LOADING
@@ -364,19 +456,28 @@
 }
 
 @keyframes spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==============================
    RESPONSIVE
 ============================== */
 @media (max-width: 1024px) {
+
   .analiticas-charts,
-  .analiticas-tops { grid-template-columns: 1fr; }
+  .analiticas-tops {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
+
   .analiticas-header,
   .analiticas-charts,
   .analiticas-tops {
@@ -389,5 +490,7 @@
     padding: 1.5rem 1rem;
   }
 
-  .analiticas-header h1 { font-size: 1.5rem; }
+  .analiticas-header h1 {
+    font-size: 1.5rem;
+  }
 }

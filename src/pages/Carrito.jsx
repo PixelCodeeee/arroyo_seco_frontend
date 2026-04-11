@@ -9,7 +9,7 @@
 //   getCartItemsCount 
 // } from '../utils/cartUtils';
 // import Navbar from '../components/Navbar';
-// import PayPalCheckout from '../components/PayPalCheckout';
+// import MercadoPagoCheckout from '../components/MercadoPagoCheckout';
 // import '../styles/carrito.css';
 
 // const Carrito = () => {
@@ -17,7 +17,7 @@
 //   const [cart, setCart] = useState(null);
 //   const [mostrarDetalles, setMostrarDetalles] = useState(false);
 //   const [loading, setLoading] = useState(true);
-//   const [showPayPal, setShowPayPal] = useState(false);
+//   const [showMercadoPago, setShowMercadoPago] = useState(false);
 //   const [paymentError, setPaymentError] = useState('');
 //   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -61,7 +61,7 @@
 //     if (window.confirm('¿Estás seguro de vaciar el carrito?')) {
 //       clearCart();
 //       cargarCarrito();
-//       setShowPayPal(false);
+//       setShowMercadoPago(false);
 //     }
 //   };
 
@@ -78,13 +78,13 @@
 //     }
 
 //     setPaymentError('');
-//     setShowPayPal(true);
+//     setShowMercadoPago(true);
 //   };
 
 //   const handlePaymentSuccess = (response) => {
 //     console.log('Payment successful:', response);
 //     setPaymentSuccess(true);
-//     setShowPayPal(false);
+//     setShowMercadoPago(false);
     
 //     // Show success message
 //     alert(`¡Pago exitoso! ID de transacción: ${response.transaction.id}`);
@@ -98,7 +98,7 @@
 //   const handlePaymentError = (error) => {
 //     console.error('Payment error:', error);
 //     setPaymentError(error.message || 'Error al procesar el pago');
-//     setShowPayPal(false);
+//     setShowMercadoPago(false);
 //   };
 
 //   if (loading) {
@@ -150,7 +150,7 @@
 //           {/* Payment Error */}
 //           {paymentError && (
 //             <div className="alert alert-error" style={{ marginBottom: '20px' }}>
-//               <span>⚠️</span>
+//               <span><AlertTriangle size={18} className="lucide-icon-inline" style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
 //               <span>{paymentError}</span>
 //             </div>
 //           )}
@@ -218,7 +218,7 @@
 //                             <button 
 //                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad - 1)}
 //                               className="cantidad-btn"
-//                               disabled={showPayPal}
+//                               disabled={showMercadoPago}
 //                             >
 //                               -
 //                             </button>
@@ -226,7 +226,7 @@
 //                             <button 
 //                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad + 1)}
 //                               className="cantidad-btn"
-//                               disabled={showPayPal}
+//                               disabled={showMercadoPago}
 //                             >
 //                               +
 //                             </button>
@@ -240,7 +240,7 @@
 //                             onClick={() => eliminarItem(item.id_producto)}
 //                             className="eliminar-btn"
 //                             aria-label="Eliminar producto"
-//                             disabled={showPayPal}
+//                             disabled={showMercadoPago}
 //                           >
 //                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
 //                               <path 
@@ -289,13 +289,13 @@
 //           </div>
 
 //           {/* PayPal Payment Section */}
-//           {showPayPal && (
+//           {showMercadoPago && (
 //             <div className="carrito-section">
 //               <div className="section-header">
 //                 <span className="section-text">Método de pago</span>
 //               </div>
 //               <div className="paypal-section">
-//                 <PayPalCheckout
+//                 <MercadoPagoCheckout
 //                   amount={totalPrice.toFixed(2)}
 //                   onSuccess={handlePaymentSuccess}
 //                   onError={handlePaymentError}
@@ -306,7 +306,7 @@
 
 //           {/* Botones de acción */}
 //           <div className="carrito-acciones">
-//             {!showPayPal ? (
+//             {!showMercadoPago ? (
 //               <>
 //                 <button 
 //                   className="pagar-btn"
@@ -328,7 +328,7 @@
 //             ) : (
 //               <button 
 //                 className="btn btn-secondary"
-//                 onClick={() => setShowPayPal(false)}
+//                 onClick={() => setShowMercadoPago(false)}
 //               >
 //                 Cancelar pago
 //               </button>
@@ -344,6 +344,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
   getCart, 
@@ -354,7 +355,7 @@ import {
   getCartItemsCount 
 } from '../utils/cartUtils';
 import Navbar from '../components/Navbar';
-import PayPalCheckout from '../components/PayPalCheckout';
+import MercadoPagoCheckout from '../components/MercadoPagoCheckout';
 import '../styles/carrito.css';
 
 const Carrito = () => {
@@ -362,7 +363,7 @@ const Carrito = () => {
   const [cart, setCart]                   = useState(null);
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
   const [loading, setLoading]             = useState(true);
-  const [showPayPal, setShowPayPal]       = useState(false);
+  const [showMercadoPago, setShowMercadoPago]       = useState(false);
   const [paymentError, setPaymentError]   = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -374,7 +375,7 @@ const Carrito = () => {
     // Detectar si regresamos de MercadoPago con status=success
     const params = new URLSearchParams(window.location.search);
     if (params.get('status') === 'success') {
-      setShowPayPal(true); // Mostrar PayPalCheckout para que procese el retorno
+      setShowMercadoPago(true); // Mostrar MercadoPagoCheckout para que procese el retorno
     }
 
     const handleCartUpdate = () => cargarCarrito();
@@ -406,7 +407,7 @@ const Carrito = () => {
     if (window.confirm('¿Estás seguro de vaciar el carrito?')) {
       clearCart();
       cargarCarrito();
-      setShowPayPal(false);
+      setShowMercadoPago(false);
     }
   };
 
@@ -423,13 +424,13 @@ const Carrito = () => {
     }
 
     setPaymentError('');
-    setShowPayPal(true);
+    setShowMercadoPago(true);
   };
 
   const handlePaymentSuccess = (response) => {
     console.log('Payment successful:', response);
     setPaymentSuccess(true);
-    setShowPayPal(false);
+    setShowMercadoPago(false);
     alert(`¡Pago exitoso! ID de transacción: ${response.transaction?.id || 'N/A'}`);
     setTimeout(() => navigate('/'), 2000);
   };
@@ -437,7 +438,7 @@ const Carrito = () => {
   const handlePaymentError = (error) => {
     console.error('Payment error:', error);
     setPaymentError(error.message || 'Error al procesar el pago');
-    setShowPayPal(false);
+    setShowMercadoPago(false);
   };
 
   if (loading) {
@@ -489,7 +490,7 @@ const Carrito = () => {
           {/* Payment Error */}
           {paymentError && (
             <div className="alert alert-error" style={{ marginBottom: '20px' }}>
-              <span>⚠️</span>
+              <span><AlertTriangle size={18} className="lucide-icon-inline" style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
               <span>{paymentError}</span>
             </div>
           )}
@@ -549,13 +550,13 @@ const Carrito = () => {
                             <button
                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad - 1)}
                               className="cantidad-btn"
-                              disabled={showPayPal}
+                              disabled={showMercadoPago}
                             >-</button>
                             <span className="cantidad-texto">{item.cantidad}</span>
                             <button
                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad + 1)}
                               className="cantidad-btn"
-                              disabled={showPayPal}
+                              disabled={showMercadoPago}
                             >+</button>
                           </div>
 
@@ -567,7 +568,7 @@ const Carrito = () => {
                             onClick={() => eliminarItem(item.id_producto)}
                             className="eliminar-btn"
                             aria-label="Eliminar producto"
-                            disabled={showPayPal}
+                            disabled={showMercadoPago}
                           >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -608,13 +609,13 @@ const Carrito = () => {
           </div>
 
           {/* Sección de pago MercadoPago */}
-          {showPayPal && (
+          {showMercadoPago && (
             <div className="carrito-section">
               <div className="section-header">
                 <span className="section-text">Método de pago</span>
               </div>
               <div className="paypal-section">
-                <PayPalCheckout
+                <MercadoPagoCheckout
                   amount={totalPrice.toFixed(2)}
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentError}
@@ -625,7 +626,7 @@ const Carrito = () => {
 
           {/* Botones de acción */}
           <div className="carrito-acciones">
-            {!showPayPal ? (
+            {!showMercadoPago ? (
               <>
                 <button
                   className="pagar-btn"
@@ -642,7 +643,7 @@ const Carrito = () => {
                 )}
               </>
             ) : (
-              <button className="btn btn-secondary" onClick={() => setShowPayPal(false)}>
+              <button className="btn btn-secondary" onClick={() => setShowMercadoPago(false)}>
                 Cancelar pago
               </button>
             )}

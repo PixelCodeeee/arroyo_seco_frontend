@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productosAPI } from "../services/api";
 import Layout from "../components/Layout";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import "../styles/Usuarios.css";
 
 function Productos() {
@@ -91,7 +92,8 @@ function Productos() {
             <div className="header-actions">
               {(isAdmin || isOferente) && (
                 <Link to="/productos/crear" className="btn btn-primary">
-                  + Nuevo Producto
+                  <Plus size={16} />
+                  Nuevo Producto
                 </Link>
               )}
             </div>
@@ -176,8 +178,7 @@ function Productos() {
                     </td>
 
                     <td>
-                      {categorias.find((c) => c.id_categoria === p.id_categoria)?.nombre ||
-                        "N/A"}
+                      {categorias.find((c) => c.id_categoria === p.id_categoria)?.nombre || "N/A"}
                     </td>
 
                     <td>${p.precio}</td>
@@ -194,19 +195,26 @@ function Productos() {
                     {isAdmin && <td>{p.id_oferente}</td>}
 
                     <td className="actions">
-                      <Link to={`/productos/editar/${p.id_producto}`} className="btn-action btn-edit">
-                        ✏️
+                      <Link
+                        to={`/productos/editar/${p.id_producto}`}
+                        className="btn-action btn-edit"
+                        title="Editar"
+                      >
+                        <Pencil size={16} />
                       </Link>
 
-                      <button onClick={() => handleDelete(p.id_producto)} className="btn-action btn-delete">
-                        🗑️
+                      <button
+                        onClick={() => handleDelete(p.id_producto)}
+                        className="btn-action btn-delete"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
-
           </table>
         </div>
 

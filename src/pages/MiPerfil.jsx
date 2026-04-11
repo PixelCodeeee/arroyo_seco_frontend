@@ -62,11 +62,11 @@ function MiPerfil() {
     if (passwordData.nuevaContrasena !== passwordData.confirmarContrasena) {
       return toast.error("Las contraseñas no coinciden");
     }
-    
+
     try {
       await usuariosAPI.updatePassword(user.id_usuario, {
-         contrasenaActual: passwordData.contrasenaActual,
-         nuevaContrasena: passwordData.nuevaContrasena
+        contrasenaActual: passwordData.contrasenaActual,
+        nuevaContrasena: passwordData.nuevaContrasena
       });
       toast.success("Contraseña actualizada correctamente");
       setPasswordData({ contrasenaActual: "", nuevaContrasena: "", confirmarContrasena: "" });
@@ -175,7 +175,7 @@ function MiPerfil() {
                       onChange={handleChange}
                     />
                   </div>
-    
+
                   <div className="form-group">
                     <label>Dirección</label>
                     <input

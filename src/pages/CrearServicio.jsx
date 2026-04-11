@@ -53,7 +53,7 @@ function CrearServicio() {
         descripcion: formData.descripcion.trim() || null,
         rango_precio: formData.rango_precio.trim() || null,
         capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
-        estatus: formData.estatus ? 1 : 0,
+        estatus: formData.estatus,
         imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
       };
 
