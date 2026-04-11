@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { serviciosAPI, oferentesAPI } from '../services/api';
 import { useOfflineForm } from '../hooks/useOfflineForm';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function CrearServicio() {
@@ -58,10 +59,11 @@ function CrearServicio() {
       };
 
       await serviciosAPI.create(dataToSend);
-      alert('Servicio creado exitosamente');
+      toast.success('Servicio creado exitosamente');
       navigate('/servicios');
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Error desconocido';
+      toast.error(msg);
       setError(msg);
     } finally {
       setLoading(false);

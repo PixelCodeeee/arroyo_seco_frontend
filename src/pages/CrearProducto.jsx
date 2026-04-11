@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
 import { useOfflineForm } from '../hooks/useOfflineForm';
+import { toast } from 'sonner';
 import '../styles/CrearProducto.css';
 
 function CrearProducto() {
@@ -119,6 +120,7 @@ function CrearProducto() {
 
       if (!savedOffline) navigate('/productos');
     } catch (er) {
+      toast.error(er.message || 'Error al crear');
       setError(er.message || 'Error al crear');
     } finally {
       setLoading(false);

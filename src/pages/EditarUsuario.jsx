@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function EditarUsuario() {
@@ -76,9 +77,10 @@ function EditarUsuario() {
       }
 
       await usuariosAPI.update(id, updateData);
-      alert('Usuario actualizado exitosamente');
+      toast.success('Usuario actualizado exitosamente');
       navigate('/usuarios');
     } catch (err) {
+      toast.error(err.message || 'Error al actualizar usuario');
       setError(err.message || 'Error al actualizar usuario');
     } finally {
       setSaving(false);

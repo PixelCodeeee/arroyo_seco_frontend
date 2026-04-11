@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { pedidosAPI } from "../services/api";
 import Layout from "../components/Layout";
 import OrdenDetailModal from "../components/OrdenDetailModal";
+import ConfirmModal from "../components/ConfirmModal";
+import { toast } from "sonner";
 import "../styles/Ordenes.css";
 
 function Ordenes() {
@@ -18,6 +20,8 @@ function Ordenes() {
   // Modal
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  
+  const [confirmEstado, setConfirmEstado] = useState({ isOpen: false, id: null, nuevoEstado: '' });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
@@ -89,23 +93,26 @@ function Ordenes() {
       setSelectedPedido(detalle);
       setShowModal(true);
     } catch (err) {
-      alert(err.message || "Error al cargar detalles");
+      toast.error(err.message || "Error al cargar detalles");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangeEstado = async (id_pedido, nuevoEstado) => {
-    if (!window.confirm(`¿Cambiar el estado del pedido a "${nuevoEstado}"?`)) {
-      return;
-    }
+  const requestChangeEstado = (id_pedido, nuevoEstado) => {
+    setConfirmEstado({ isOpen: true, id: id_pedido, nuevoEstado });
+  };
 
+  const executeChangeEstado = async () => {
+    if (!confirmEstado.id) return;
     try {
-      await pedidosAPI.updateEstado(id_pedido, nuevoEstado);
+      await pedidosAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
       await loadPedidos();
-      alert("Estado actualizado exitosamente");
+      toast.success("Estado actualizado exitosamente");
     } catch (err) {
-      alert(err.message || "Error al cambiar estado");
+      toast.error(err.message || "Error al cambiar estado");
+    } finally {
+      setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' });
     }
   };
 
@@ -136,9 +143,21 @@ function Ordenes() {
         return "badge-success";
       case "enviado":
         return "badge-info";
+      case "completado":
+        return "badge-primary";
       default:
         return "badge-secondary";
     }
+  };
+
+  const getStatusLabelText = (estado) => {
+      switch(estado) {
+          case "pendiente": return "Pendiente";
+          case "pagado": return "Pagado / En Prep.";
+          case "enviado": return "Listo para Recoger";
+          case "completado": return "Recogido / Historial";
+          default: return estado;
+      }
   };
 
   if (loading && pedidos.length === 0) {
@@ -211,7 +230,15 @@ function Ordenes() {
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "enviado").length}
             </div>
-            <div className="stat-label">Enviados</div>
+            <div className="stat-label">Listos para recoger</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
+            <div className="stat-value">
+              {pedidos.filter((p) => p.estado === "completado").length}
+            </div>
+            <div className="stat-label">Completados</div>
           </div>
 
           <div className="stat-card">
@@ -263,7 +290,13 @@ function Ordenes() {
               className={`filter-btn ${filterEstado === "enviado" ? "active" : ""}`}
               onClick={() => setFilterEstado("enviado")}
             >
-              Enviados
+              Listos
+            </button>
+            <button
+              className={`filter-btn ${filterEstado === "completado" ? "active" : ""}`}
+              onClick={() => setFilterEstado("completado")}
+            >
+              Completados
             </button>
 
             {(filterEstado || searchTerm) && (
@@ -337,7 +370,7 @@ function Ordenes() {
                         <select
                           value={pedido.estado}
                           onChange={(e) =>
-                            handleChangeEstado(pedido.id_pedido, e.target.value)
+                            requestChangeEstado(pedido.id_pedido, e.target.value)
                           }
                           className={`estado-select ${getEstadoBadgeClass(
                             pedido.estado
@@ -345,15 +378,17 @@ function Ordenes() {
                         >
                           <option value="pendiente"><Clock size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pendiente</option>
                           <option value="pagado"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pagado</option>
-                          <option value="enviado"><Truck size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Enviado</option>
+                          <option value="enviado"><Truck size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Listo para recoger</option>
+                          <option value="completado"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Completado</option>
                         </select>
                       ) : (
                         <span
                           className={`badge ${getEstadoBadgeClass(pedido.estado)}`}
                         >
                           {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
-                          {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
-                          {pedido.estado === "enviado" && <><Truck size={16} /> Enviado</>}
+                          {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado / En Prep.</>}
+                          {pedido.estado === "enviado" && <><Truck size={16} /> Listo para recoger</>}
+                          {pedido.estado === "completado" && <><CheckCircle size={16} /> Completado</>}
                         </span>
                       )}
                     </td>
@@ -384,10 +419,21 @@ function Ordenes() {
             setShowModal(false);
             setSelectedPedido(null);
           }}
-          onEstadoChange={handleChangeEstado}
+          onEstadoChange={requestChangeEstado}
           canChangeEstado={isAdmin || isOferente}
+          isTurista={isTurista}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmEstado.isOpen}
+        title="Cambiar Estado"
+        message={`¿Estás seguro de que deseas cambiar el estado del pedido a "${confirmEstado.nuevoEstado}"?`}
+        onConfirm={executeChangeEstado}
+        onClose={() => setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' })}
+        confirmText="Confirmar"
+        isDestructive={false}
+      />
     </Layout>
   );
 }

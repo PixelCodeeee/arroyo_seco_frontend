@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, Info, Utensils, Frown, CheckCircle } from 'lucide-react';
 import { serviciosAPI, reservasAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/ReservaModal.css';
 
 function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
@@ -223,7 +224,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
       onClose();
 
       // Mostrar mensaje de éxito
-      alert('¡Reserva creada exitosamente! Recibirás una confirmación pronto.');
+      toast.success('¡Reserva creada exitosamente! Recibirás una confirmación pronto.');
 
     } catch (err) {
       console.error('Error creating reserva:', err);

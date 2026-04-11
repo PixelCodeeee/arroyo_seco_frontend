@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import GoogleMapComponent from "../components/GoogleMap";
 import ReservaModal from "../components/ReservaModal";
 import CartConfirmModal from "../components/CartConfirmModal";
+import { toast } from "sonner";
 import "../styles/OferenteDetail.css";
 
 function OferenteDetail() {
@@ -65,7 +66,7 @@ function OferenteDetail() {
 
       if (result.success) {
         // Successfully added
-        alert(result.message);
+        toast.success(result.message);
       } else if (result.requiresConfirmation) {
         // Different oferente - show confirmation modal
         setPendingProduct(producto);
@@ -77,7 +78,7 @@ function OferenteDetail() {
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Error al agregar al carrito: ' + error.message);
+      toast.error('Error al agregar al carrito: ' + error.message);
     }
   };
 
@@ -86,11 +87,11 @@ function OferenteDetail() {
       try {
         const result = replaceCartWithNewOferente(pendingProduct, oferente);
         if (result.success) {
-          alert(result.message);
+          toast.success(result.message);
         }
       } catch (error) {
         console.error('Error replacing cart:', error);
-        alert('Error al actualizar el carrito');
+        toast.error('Error al actualizar el carrito');
       }
     }
     setIsCartConfirmOpen(false);
@@ -106,7 +107,7 @@ function OferenteDetail() {
 
   const handleReservaClick = () => {
     if (!currentUser) {
-      alert('Debes iniciar sesión para hacer una reserva');
+      toast.error('Debes iniciar sesión para hacer una reserva');
       navigate('/login');
       return;
     }

@@ -61,18 +61,42 @@ function App() {
           <Routes>
             <Route path="/contacto" element={<Contact />} />
 
-            <Route path="/reservas" element={<Reservas />} />
+            {/* Reservas */}
+            <Route 
+              path="/reservas" 
+              element={
+                <RequireRole allowed={["admin", "oferente", "turista"]}>
+                  <Reservas />
+                </RequireRole>
+              } 
+            />
 
-            <Route path="/ordenes" element={<Ordenes />} />
+            {/* Ordenes */}
+            <Route 
+              path="/ordenes" 
+              element={
+                <RequireRole allowed={["admin", "oferente", "turista"]}>
+                  <Ordenes />
+                </RequireRole>
+              } 
+            />
 
             <Route path="/recomendaciones" element={<Recomendaciones />} />
 
-            <Route path="/categorias" element={<Categorias />} />
+            {/* Categorias - Viewer/Editor */}
+            <Route 
+              path="/categorias" 
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <Categorias />
+                </RequireRole>
+              } 
+            />
 
             <Route
               path="/analiticas"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <Analiticas />
                 </RequireRole>
               }
@@ -136,8 +160,22 @@ function App() {
             />
 
             {/* Oferentes */}
-            <Route path="/oferentes" element={<Oferentes />} />
-            <Route path="/oferentes/crear" element={<CrearOferente />} />
+            <Route 
+              path="/oferentes" 
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <Oferentes />
+                </RequireRole>
+              } 
+            />
+            <Route 
+              path="/oferentes/crear" 
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <CrearOferente />
+                </RequireRole>
+              } 
+            />
             <Route
               path="/oferentes/editar/:id"
               element={
@@ -174,8 +212,22 @@ function App() {
             />
 
             {/* Productos */}
-            <Route path="/productos" element={<Productos />} />
-            <Route path="/productos/crear" element={<CrearProducto />} />
+            <Route 
+              path="/productos" 
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <Productos />
+                </RequireRole>
+              } 
+            />
+            <Route 
+              path="/productos/crear" 
+              element={
+                <RequireRole allowed={["admin", "oferente"]}>
+                  <CrearProducto />
+                </RequireRole>
+              } 
+            />
             <Route
               path="/productos/editar/:id"
               element={
@@ -205,7 +257,7 @@ function App() {
             <Route
               path="/anuncios"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <Anuncios />
                 </RequireRole>
               }
@@ -213,7 +265,7 @@ function App() {
             <Route
               path="/anuncios/crear"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <CrearAnuncio />
                 </RequireRole>
               }
@@ -221,7 +273,7 @@ function App() {
             <Route
               path="/anuncios/editar/:id"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <EditarAnuncio />
                 </RequireRole>
               }

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import ConfirmModal from "./ConfirmModal";
 import {
   Home,
   Store,
@@ -50,16 +51,19 @@ function FontSizeToggle({ collapsed }) {
 function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
 
-  const handleLogout = () => {
-    if (window.confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-      localStorage.removeItem("currentUser");
-      localStorage.removeItem("token");
-      navigate("/login");
-    }
+  const requestLogout = () => {
+    setConfirmLogout(true);
+  };
+
+  const executeLogout = () => {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   const isActive = (path) =>
@@ -106,14 +110,14 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Órdenes",
       icon: <ClipboardList size={20} />,
       path: "/ordenes",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "turista"],
     },
     {
       id: "reservas",
       label: "Reservas",
       icon: <CalendarDays size={20} />,
       path: "/reservas",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "turista"],
     },
     {
       id: "divider-admin",
@@ -132,7 +136,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Analíticas",
       icon: <BarChart2 size={20} />,
       path: "/analiticas",
-      roles: ["admin", "oferente"],
+      roles: ["admin"],
     },
     {
       id: "divider-bottom",
@@ -144,7 +148,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Anuncios",
       icon: <Megaphone size={20} />,
       path: "/anuncios",
-      roles: ["admin", "oferente"],
+      roles: ["admin"],
     },
   ];
 
@@ -173,7 +177,11 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
 
       {/* User Info */}
       {currentUser && (
-        <div className="sidebar-user">
+        <Link 
+          to="/perfil" 
+          className="sidebar-user" 
+          style={{ textDecoration: "none", color: "inherit", cursor: "pointer", display: "flex", alignItems: "center", padding: "10px 20px" }}
+        >
           <div className="user-avatar">
             {currentUser.nombre?.charAt(0).toUpperCase() || "?"}
           </div>
@@ -181,11 +189,11 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
             <div className="user-info">
               <div className="user-name">{currentUser.nombre}</div>
               <div className="user-role">
-                {isAdmin ? "Administrador" : "Oferente"}
+                {isAdmin ? "Administrador" : isOferente ? "Oferente" : "Turista"}
               </div>
             </div>
           )}
-        </div>
+        </Link>
       )}
 
       {/* Navigation Menu */}
@@ -229,13 +237,22 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
         <FontSizeToggle collapsed={isCollapsed} />
         <button
           className="logout-button"
-          onClick={handleLogout}
+          onClick={requestLogout}
           title={isCollapsed ? "Cerrar Sesión" : ""}
         >
           <span className="nav-icon"><LogOut size={20} /></span>
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmLogout}
+        title="Cerrar Sesión"
+        message="¿Estás seguro de que deseas cerrar sesión?"
+        onConfirm={executeLogout}
+        onClose={() => setConfirmLogout(false)}
+        confirmText="Cerrar sesión"
+      />
     </aside>
   );
 }

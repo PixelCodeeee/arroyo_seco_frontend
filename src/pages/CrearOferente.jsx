@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oferentesAPI, usuariosAPI } from '../services/api';
 import { useOfflineForm } from '../hooks/useOfflineForm';
+import { toast } from 'sonner';
 import '../styles/crearOferente.css';
 
 function CrearOferente() {
@@ -166,6 +167,7 @@ function CrearOferente() {
 
       if (!savedOffline) navigate('/oferentes');
     } catch (err) {
+      toast.error(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
       setError(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
     } finally {
       setLoading(false);

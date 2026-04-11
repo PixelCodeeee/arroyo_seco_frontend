@@ -1,9 +1,30 @@
-import React from "react";
-import { X, Package, Clock, CheckCircle, Truck, User, ShoppingBag, DollarSign } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { X, Package, Clock, CheckCircle, Truck, User, ShoppingBag, DollarSign, Store, Phone, MapPin, Utensils } from 'lucide-react';
+import { oferentesAPI } from "../services/api";
 import "../styles/OrdenDetailModal.css";
 
-function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEstado }) {
+function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEstado, isTurista }) {
   if (!isOpen || !pedido) return null;
+
+  const [oferenteDetails, setOferenteDetails] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && pedido && isTurista) {
+      // Find oferente ID logic. In our schema, pedido has id_oferente directly.
+      const oferenteId = pedido.id_oferente;
+      if (oferenteId) {
+        oferentesAPI.getById(oferenteId)
+          .then(data => {
+            // If the response is an array of 1, grab the first element
+            const dataObj = Array.isArray(data) ? data[0] : data;
+            // Some backend routes nest it under `oferente`
+            const oferenteData = dataObj?.oferente || dataObj;
+            setOferenteDetails(oferenteData);
+          })
+          .catch(err => console.error("Error fetching oferente details:", err));
+      }
+    }
+  }, [isOpen, pedido, isTurista]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -32,6 +53,8 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
         return "badge-success";
       case "enviado":
         return "badge-info";
+      case "completado":
+        return "badge-primary";
       default:
         return "badge-secondary";
     }
@@ -63,55 +86,146 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
         {/* Content */}
         <div className="modal-body">
 
-          {/* Estado */}
-          <div className="orden-estado-section">
-            <div className="estado-info">
-              <label>Estado actual:</label>
-              <span className={`badge badge-large ${getEstadoBadgeClass(pedido.estado)}`}>
-                {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
-                {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
-                {pedido.estado === "enviado" && <><Truck size={16} /> Enviado</>}
-              </span>
-            </div>
+          {/* Estado Turista: Doordash-style Tracker */}
+          {isTurista ? (
+            <div className="orden-estado-section">
+              <div className="order-tracker-container" style={{ margin: "1rem 0", padding: "1rem", backgroundColor: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border-color)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", position: "relative" }}>
+                  <div style={{ position: "absolute", top: "15px", left: "10%", right: "10%", height: "4px", backgroundColor: "var(--border-color)", zIndex: 1 }}></div>
+                  
+                  {/* Progress Line Active */}
+                  <div style={{ 
+                    position: "absolute", top: "15px", left: "10%", height: "4px", backgroundColor: "var(--primary-color)", zIndex: 2, transition: "width 0.4s",
+                    width: pedido.estado === "pendiente" ? "0%" : pedido.estado === "pagado" ? "33%" : pedido.estado === "enviado" ? "66%" : "80%" 
+                  }}></div>
 
-            {canChangeEstado && (
-              <div className="estado-actions">
-                <label>Cambiar estado:</label>
-                <div className="estado-buttons">
-                  {pedido.estado !== "pendiente" && (
-                    <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => {
-                        onEstadoChange(pedido.id_pedido, "pendiente");
-                        onClose();
-                      }}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> Marcar Pendiente
-                    </button>
-                  )}
-                  {pedido.estado !== "pagado" && (
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => {
-                        onEstadoChange(pedido.id_pedido, "pagado");
-                        onClose();
-                      }}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Pagado
-                    </button>
-                  )}
-                  {pedido.estado !== "enviado" && (
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => {
-                        onEstadoChange(pedido.id_pedido, "enviado");
-                        onClose();
-                      }}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Truck size={14} /> Marcar Enviado
-                    </button>
-                  )}
+                  {/* Steps */}
+                  {[
+                    { id: "pendiente", label: "Orden Recibida", icon: <Clock size={20} /> },
+                    { id: "pagado", label: "En Preparación", icon: <Utensils size={20} /> },
+                    { id: "enviado", label: "Listo para Recoger", icon: <Truck size={20} /> },
+                    { id: "completado", label: "Completado", icon: <CheckCircle size={20} /> }
+                  ].map((step, idx) => {
+                    const stepIndex = ["pendiente", "pagado", "enviado", "completado"].indexOf(step.id);
+                    const currentStatusIndex = ["pendiente", "pagado", "enviado", "completado"].indexOf(pedido.estado);
+                    const isActive = stepIndex <= currentStatusIndex;
+                    return (
+                      <div key={idx} style={{ position: "relative", zIndex: 3, display: "flex", flexDirection: "column", alignItems: "center", width: "25%", textAlign: "center" }}>
+                        <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: isActive ? "var(--primary-color)" : "var(--bg-color)", border: `2px solid ${isActive ? "var(--primary-color)" : "var(--border-color)"}`, color: isActive ? "white" : "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "0.5rem" }}>
+                          {step.icon}
+                        </div>
+                        <span style={{ fontSize: "0.8rem", fontWeight: isActive ? "600" : "400", color: isActive ? "var(--text-dark)" : "var(--text-muted)" }}>{step.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="pickup-instructions" style={{ padding: "1rem", backgroundColor: "var(--bg-color)", borderRadius: "8px", marginTop: "1rem", textAlign: "center" }}>
+                  <h4 style={{ margin: "0 0 0.5rem 0", color: "var(--text-dark)", fontSize: "1rem" }}>Estado Actual</h4>
+                  <p style={{ margin: 0, color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+                    {pedido.estado === "pendiente" && "Estamos esperando la confirmación del pago para comenzar a preparar tu orden."}
+                    {pedido.estado === "pagado" && "El pago fue exitoso y tu orden está siendo preparada. Te notificaremos cuando esté lista para pasar por ella."}
+                    {pedido.estado === "enviado" && "¡Tu orden está lista! Dirígete a la ubicación del establecimiento para recogerla ahora mismo."}
+                    {pedido.estado === "completado" && "Orden entregada con éxito. ¡Esperamos que la disfrutes y gracias por tu compra!"}
+                  </p>
                 </div>
               </div>
-            )}
-          </div>
+
+              {oferenteDetails && (
+                <div className="oferente-contact-card" style={{ marginTop: "1rem", padding: "1.5rem", borderRadius: "12px", border: "1px solid var(--border-color)", backgroundColor: "var(--bg-card)" }}>
+                   <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", display: 'flex', alignItems: 'center', gap: '8px' }}>
+                     <Store size={20} style={{ color: "var(--primary-color)" }} /> 
+                     Información del Establecimiento para Recoger
+                   </h3>
+                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                     <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <Store size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
+                        <div>
+                          <p style={{ margin: 0, fontWeight: "600" }}>{oferenteDetails.nombre_negocio || "Establecimiento"}</p>
+                        </div>
+                     </div>
+                     {oferenteDetails.direccion && (
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                          <MapPin size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
+                          <div>
+                            <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.direccion}</p>
+                          </div>
+                        </div>
+                     )}
+                     {oferenteDetails.telefono && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <Phone size={18} color="var(--text-muted)" />
+                          <div>
+                            <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.telefono}</p>
+                          </div>
+                        </div>
+                     )}
+                   </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Estado Admin / Oferente */
+            <div className="orden-estado-section">
+              <div className="estado-info">
+                <label>Estado actual:</label>
+                <span className={`badge badge-large ${getEstadoBadgeClass(pedido.estado)}`}>
+                  {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
+                  {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
+                  {pedido.estado === "enviado" && <><Truck size={16} /> Listo para recoger (Enviado)</>}
+                  {pedido.estado === "completado" && <><CheckCircle size={16} /> Completado</>}
+                </span>
+              </div>
+
+              {canChangeEstado && (
+                <div className="estado-actions">
+                  <label>Cambiar estado:</label>
+                  <div className="estado-buttons">
+                    {pedido.estado !== "pendiente" && (
+                      <button
+                        className="btn btn-sm btn-warning"
+                        onClick={() => {
+                          onEstadoChange(pedido.id_pedido, "pendiente");
+                          onClose();
+                        }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> Marcar Pendiente
+                      </button>
+                    )}
+                    {pedido.estado !== "pagado" && (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => {
+                          onEstadoChange(pedido.id_pedido, "pagado");
+                          onClose();
+                        }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Pagado (Preparando)
+                      </button>
+                    )}
+                    {pedido.estado !== "enviado" && (
+                      <button
+                        className="btn btn-sm btn-info"
+                        onClick={() => {
+                          onEstadoChange(pedido.id_pedido, "enviado");
+                          onClose();
+                        }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Truck size={14} /> Marcar Listo (Enviado)
+                      </button>
+                    )}
+                    {pedido.estado !== "completado" && (
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => {
+                          onEstadoChange(pedido.id_pedido, "completado");
+                          onClose();
+                        }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Completado
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Información del Cliente */}
           <div className="orden-section">

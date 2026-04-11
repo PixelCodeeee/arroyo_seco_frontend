@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { serviciosAPI } from '../services/api';
 import Layout from '../components/Layout';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/Usuarios.css';
 
 function Servicios() {
@@ -9,6 +11,7 @@ function Servicios() {
   const [stats, setStats] = useState({ total: 0, disponibles: 0, no_disponibles: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   // Cargar datos
@@ -31,15 +34,20 @@ function Servicios() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Seguro que deseas eliminar este servicio?')) return;
+  const requestDelete = (id) => {
+    setConfirmDelete({ isOpen: true, id });
+  };
 
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
     try {
-      await serviciosAPI.delete(id);
-      alert('Servicio eliminado');
+      await serviciosAPI.delete(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success('Servicio eliminado exitosamente');
       fetchServicios();
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al eliminar');
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.response?.data?.error || 'Error al eliminar');
     }
   };
 
@@ -137,7 +145,7 @@ function Servicios() {
                             Editar
                           </Link>
                           <button
-                            onClick={() => handleDelete(s.id_servicio)}
+                            onClick={() => requestDelete(s.id_servicio)}
                             className="btn-action btn-delete"
                           >
                             Eliminar
@@ -152,6 +160,15 @@ function Servicios() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar servicio"
+        message="¿Estás seguro de que deseas eliminar este servicio? Esta acción no puede revertirse."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </Layout>
   );
 }

@@ -2,6 +2,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Aler
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/CrearProducto.css';
 
 function CrearCategoria() {
@@ -50,10 +51,11 @@ function CrearCategoria() {
         tipo: formData.tipo,
       });
 
-      alert('Categoría creada');
+      toast.success('Categoría creada exitosamente');
       navigate('/categorias');
     } catch (err) {
       console.error(err);
+      toast.error(err.message || 'Error al crear categoría');
       setError(err.message || 'Error al crear categoría');
     } finally {
       setLoading(false);

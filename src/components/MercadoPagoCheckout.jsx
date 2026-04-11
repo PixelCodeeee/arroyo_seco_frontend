@@ -6,12 +6,12 @@ import '../styles/MercadoPagoCheckout.css';
 
 function MercadoPagoCheckout({ amount, onSuccess, onError }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState('');
+  const [error, setError] = useState('');
 
   // Al regresar de MercadoPago, la URL trae ?status=success&payment_id=...
   useEffect(() => {
-    const params     = new URLSearchParams(window.location.search);
-    const status     = params.get('status');
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
     const payment_id = params.get('collection_id') || params.get('payment_id');
 
     if (status === 'success' && payment_id) {
@@ -22,7 +22,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
     } else if (status === 'pending') {
       setError('Tu pago está pendiente de confirmación.');
     }
-  }, []); 
+  }, []);
 
   const handleReturnFromMP = async (payment_id) => {
     try {
@@ -46,7 +46,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
 
       const captureData = {
         payment_id,
-        cartData:   cart,
+        cartData: cart,
         id_usuario: currentUser.id_usuario
       };
 
@@ -59,7 +59,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
         // Llamar callback de éxito con toda la info
         onSuccess?.({
           ...response,
-          pedido:      response.pedido,
+          pedido: response.pedido,
           transaction: response.transaction
         });
       } else {
@@ -81,7 +81,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
       setLoading(true);
       setError('');
 
-      const cart        = getCart();
+      const cart = getCart();
       const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
       if (!cart || !cart.items || cart.items.length === 0) {
@@ -93,8 +93,8 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
       }
 
       const orderData = {
-        items:       cart.items,
-        total:       amount,
+        items: cart.items,
+        total: amount,
         id_oferente: cart.id_oferente || null
       };
 
@@ -105,7 +105,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
       console.log('✅ Preferencia creada:', response.preference_id);
 
       // Redirigir a MercadoPago (sandbox en pruebas, init_point en producción)
-      const url = response.sandbox_url || response.init_point;
+      const url = response.init_point;
       window.location.href = url;
 
     } catch (err) {

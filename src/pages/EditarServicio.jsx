@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { serviciosAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function EditarServicio() {
@@ -62,9 +63,10 @@ function EditarServicio() {
       };
 
       await serviciosAPI.update(id, dataToSend);
-      alert('Servicio actualizado exitosamente');
+      toast.success('Servicio actualizado exitosamente');
       navigate('/servicios');
     } catch (err) {
+      toast.error(err.message || 'Error al actualizar servicio');
       setError(err.message || 'Error al actualizar servicio');
     } finally {
       setLoading(false);

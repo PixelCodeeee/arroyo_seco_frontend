@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { reservasAPI } from "../services/api";
 import Layout from "../components/Layout";
 import ReservaDetailModal from "../components/ReservaDetailModal";
+import ConfirmModal from "../components/ConfirmModal";
+import { toast } from "sonner";
 import "../styles/Reserva.css";
 import {
   formatDateShort,
@@ -20,6 +22,9 @@ function Reservas() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReserva, setSelectedReserva] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  
+  const [confirmEstado, setConfirmEstado] = useState({ isOpen: false, id: null, nuevoEstado: '' });
+  const [confirmCancel, setConfirmCancel] = useState({ isOpen: false, reserva: null });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
@@ -32,15 +37,19 @@ function Reservas() {
     try {
       setLoading(true);
       setError("");
-      const response = isTurista
-        ? await reservasAPI.getMisReservas()
-        : await reservasAPI.getAll();
+
+      let response;
+      if (isTurista) {
+        response = await reservasAPI.getMisReservas();
+      } else if (isOferente) {
+        response = await reservasAPI.getMisReservasComoOferente();
+      } else {
+        response = await reservasAPI.getAll();
+      }
+
       const data = response.reservas || [];
-      console.log("RESERVA SAMPLE:", data[0]); // <-- add this
-      setReservas(data);
       setReservas(data);
       setFiltered(data);
-
     } catch (err) {
       console.error("Error loading reservas:", err);
       setError(err.message || "Error al cargar reservas");
@@ -78,33 +87,47 @@ function Reservas() {
       setSelectedReserva(detalle);
       setShowModal(true);
     } catch (err) {
-      alert(err.message || "Error al cargar detalles");
+      toast.error(err.message || "Error al cargar detalles");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangeEstado = async (id_reserva, nuevoEstado) => {
-    if (!window.confirm(`¿Cambiar el estado de la reserva a "${nuevoEstado}"?`)) return;
+  const requestChangeEstado = (id_reserva, nuevoEstado) => {
+    setConfirmEstado({ isOpen: true, id: id_reserva, nuevoEstado });
+  };
+
+  const executeChangeEstado = async () => {
+    if (!confirmEstado.id) return;
     try {
-      await reservasAPI.updateEstado(id_reserva, nuevoEstado);
+      await reservasAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
+      toast.success("Estado de la reserva actualizado");
       await loadReservas();
     } catch (err) {
-      alert(err.message || "Error al cambiar estado");
+      toast.error(err.message || "Error al cambiar estado");
+    } finally {
+      setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' });
     }
   };
 
-  const handleCancelar = async (reserva) => {
+  const requestCancelar = (reserva) => {
     if (!canCancelReserva(reserva)) {
-      alert("No se puede cancelar con menos de 24 horas de anticipación");
+      toast.error("No se puede cancelar con menos de 24 horas de anticipación");
       return;
     }
-    if (!window.confirm("¿Estás seguro de cancelar esta reserva?")) return;
+    setConfirmCancel({ isOpen: true, reserva });
+  };
+
+  const executeCancelar = async () => {
+    if (!confirmCancel.reserva) return;
     try {
-      await reservasAPI.updateEstado(reserva.id_reserva, "cancelada");
+      await reservasAPI.updateEstado(confirmCancel.reserva.id_reserva, "cancelada");
+      toast.success("Reserva cancelada exitosamente");
       await loadReservas();
     } catch (err) {
-      alert(err.message || "Error al cancelar reserva");
+      toast.error(err.message || "Error al cancelar reserva");
+    } finally {
+      setConfirmCancel({ isOpen: false, reserva: null });
     }
   };
 
@@ -286,7 +309,7 @@ function Reservas() {
                         // ✅ <option> cannot render icons — text only
                         <select
                           value={reserva.estado}
-                          onChange={(e) => handleChangeEstado(reserva.id_reserva, e.target.value)}
+                          onChange={(e) => requestChangeEstado(reserva.id_reserva, e.target.value)}
                           className={`estado-select ${getEstadoBadgeClass(reserva.estado)}`}
                         >
                           <option value="pendiente">Pendiente</option>
@@ -313,7 +336,7 @@ function Reservas() {
 
                       {isTurista && canCancelReserva(reserva) && (
                         <button
-                          onClick={() => handleCancelar(reserva)}
+                          onClick={() => requestCancelar(reserva)}
                           className="btn-action btn-cancel"
                           title="Cancelar reserva"
                         >
@@ -335,12 +358,31 @@ function Reservas() {
           reserva={selectedReserva}
           isOpen={showModal}
           onClose={() => { setShowModal(false); setSelectedReserva(null); }}
-          onEstadoChange={handleChangeEstado}
-          onCancelar={handleCancelar}
+          onEstadoChange={requestChangeEstado}
+          onCancelar={requestCancelar}
           canChangeEstado={isAdmin || isOferente}
           isTurista={isTurista}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmEstado.isOpen}
+        title="Cambiar Estado"
+        message={`¿Estás seguro de cambiar el estado de la reserva a "${confirmEstado.nuevoEstado}"?`}
+        onConfirm={executeChangeEstado}
+        onClose={() => setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' })}
+        confirmText="Confirmar"
+        isDestructive={false}
+      />
+
+      <ConfirmModal
+        isOpen={confirmCancel.isOpen}
+        title="Cancelar Reserva"
+        message="¿Estás seguro de que deseas cancelar esta reserva? Esta acción no se puede deshacer."
+        onConfirm={executeCancelar}
+        onClose={() => setConfirmCancel({ isOpen: false, reserva: null })}
+        confirmText="Sí, cancelar"
+      />
     </Layout>
   );
 }

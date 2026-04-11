@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productosAPI } from "../services/api";
 import Layout from "../components/Layout";
+import ConfirmModal from "../components/ConfirmModal";
+import { toast } from 'sonner';
 import "../styles/Usuarios.css";
 
 function Categorias() {
@@ -12,9 +14,11 @@ function Categorias() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterTipo, setFilterTipo] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
+  const isOferente = currentUser?.rol === "oferente";
 
   useEffect(() => {
     loadCategorias();
@@ -45,16 +49,21 @@ function Categorias() {
 
   const clearFilters = () => setFilterTipo("");
 
-  const handleDelete = async (id) => {
-    if (!isAdmin) return alert("No tienes permiso");
-    if (!window.confirm("¿Eliminar categoría?")) return;
+  const requestDelete = (id) => {
+    if (!isAdmin) return toast.error("No tienes permiso");
+    setConfirmDelete({ isOpen: true, id });
+  };
 
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
     try {
-      await productosAPI.eliminarCategoria(id);
-      alert("Categoría eliminada");
+      await productosAPI.eliminarCategoria(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success("Categoría eliminada");
       loadCategorias();
     } catch (err) {
-      alert(err.message || "Error al eliminar");
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.message || "Error al eliminar");
     }
   };
 
@@ -90,6 +99,12 @@ function Categorias() {
         </header>
 
         {error && <div className="error-message">{error}</div>}
+
+        {isOferente && !isAdmin && (
+           <div style={{ backgroundColor: "var(--bg-card)", padding: "1rem", borderRadius: "8px", borderLeft: "4px solid var(--info-color)", marginBottom: "1.5rem", color: "var(--text-dark)" }}>
+              ⚠️ Solo el administrador puede agregar o modificar las categorías del sistema.
+           </div>
+        )}
 
         {/* STATS */}
         <div className="usuarios-stats">
@@ -175,7 +190,7 @@ function Categorias() {
                         </Link>
 
                         <button
-                          onClick={() => handleDelete(cat.id_categoria)}
+                          onClick={() => requestDelete(cat.id_categoria)}
                           className="btn-action btn-delete"
                           title="Eliminar"
                         >
@@ -191,6 +206,15 @@ function Categorias() {
         </div>
 
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar categoría"
+        message="¿Estás seguro de que deseas eliminar esta categoría? Si tiene productos asociados, esto podría fallar."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </Layout>
   );
 }

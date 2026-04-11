@@ -356,6 +356,8 @@ import {
 } from '../utils/cartUtils';
 import Navbar from '../components/Navbar';
 import MercadoPagoCheckout from '../components/MercadoPagoCheckout';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/carrito.css';
 
 const Carrito = () => {
@@ -366,6 +368,7 @@ const Carrito = () => {
   const [showMercadoPago, setShowMercadoPago]       = useState(false);
   const [paymentError, setPaymentError]   = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null, message: '', title: ''});
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
@@ -396,30 +399,40 @@ const Carrito = () => {
   };
 
   const eliminarItem = (id_producto) => {
-    if (window.confirm('¿Eliminar este producto del carrito?')) {
-      if (removeFromCart(id_producto)) {
-        cargarCarrito();
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar producto',
+      message: '¿Eliminar este producto del carrito?',
+      action: () => {
+        if (removeFromCart(id_producto)) {
+          cargarCarrito();
+        }
       }
-    }
+    });
   };
 
   const vaciarCarrito = () => {
-    if (window.confirm('¿Estás seguro de vaciar el carrito?')) {
-      clearCart();
-      cargarCarrito();
-      setShowMercadoPago(false);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Vaciar carrito',
+      message: '¿Estás seguro de vaciar el carrito?',
+      action: () => {
+        clearCart();
+        cargarCarrito();
+        setShowMercadoPago(false);
+      }
+    });
   };
 
   const iniciarPago = () => {
     if (!currentUser) {
-      alert('Debes iniciar sesión para realizar el pago');
+      toast.error('Debes iniciar sesión para realizar el pago');
       navigate('/login');
       return;
     }
 
     if (!cart || cart.items.length === 0) {
-      alert('Tu carrito está vacío');
+      toast.error('Tu carrito está vacío');
       return;
     }
 
@@ -431,7 +444,7 @@ const Carrito = () => {
     console.log('Payment successful:', response);
     setPaymentSuccess(true);
     setShowMercadoPago(false);
-    alert(`¡Pago exitoso! ID de transacción: ${response.transaction?.id || 'N/A'}`);
+    toast.success(`¡Pago exitoso! ID de transacción: ${response.transaction?.id || 'N/A'}`);
     setTimeout(() => navigate('/'), 2000);
   };
 
@@ -651,6 +664,18 @@ const Carrito = () => {
 
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          if (confirmModal.action) confirmModal.action();
+          setConfirmModal({ isOpen: false, action: null, message: '', title: '' });
+        }}
+        onClose={() => setConfirmModal({ isOpen: false, action: null, message: '', title: '' })}
+        confirmText="Confirmar"
+      />
     </>
   );
 };

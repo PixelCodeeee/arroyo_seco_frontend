@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
 import TwoFactorVerification from '../components/TwoFactorVerification';
 import { useOfflineForm } from '../hooks/useOfflineForm';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function Register() {
@@ -70,7 +71,7 @@ function Register() {
       localStorage.setItem("currentUser", JSON.stringify(response.user));
 
       // Show success and redirect
-      alert('¡Cuenta creada y verificada exitosamente!');
+      toast.success('¡Cuenta creada y verificada exitosamente!');
       navigate("/");
     } else {
       throw new Error("Error en la verificación");

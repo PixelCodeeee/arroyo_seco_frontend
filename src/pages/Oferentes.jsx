@@ -32,7 +32,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info
 //       // Get current user from localStorage
 //       const userData = JSON.parse(localStorage.getItem('currentUser') || 'null');
 //       setCurrentUser(userData);
-      
+
 //       if (userData && userData.rol === 'oferente') {
 //         setIsOferente(true);
 //         // Fetch only this user's oferente profile
@@ -64,7 +64,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info
 //     try {
 //       setLoading(true);
 //       const oferente = await oferentesAPI.getByUserId(userId);
-      
+
 //       if (oferente) {
 //         // User has an oferente profile
 //         setHasOferenteProfile(true);
@@ -81,7 +81,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info
 //       setHasOferenteProfile(false);
 //       setOferentes([]);
 //       setFilteredOferentes([]);
-      
+
 //       if (err.message && !err.message.includes('404')) {
 //         setError(err.message);
 //       }
@@ -171,7 +171,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info
 //   const canEditOferente = (oferente) => {
 //     // Admins can edit any oferente
 //     if (!isOferente) return true;
-    
+
 //     // Oferentes can only edit their own
 //     return oferente.id_usuario === currentUser?.id_usuario;
 //   };
@@ -259,7 +259,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Info
 //     </button>
 //   )}
 // </div>
- 
+
 //         )}
 
 //         {/* Show content only if there are oferentes to display */}
@@ -456,7 +456,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
 import Layout from '../components/Layout';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/Usuarios.css';
+import { mercadopagoAPI } from '../services/api';
 
 function Oferentes() {
   const [oferentes, setOferentes] = useState([]);
@@ -470,6 +473,8 @@ function Oferentes() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isOferente, setIsOferente] = useState(false);
   const [hasOferenteProfile, setHasOferenteProfile] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+  const [confirmEstado, setConfirmEstado] = useState({ isOpen: false, id: null, nuevoEstado: '' });
 
   // ── MercadoPago states ──────────────────────────────────────────────
   const [mpEstado, setMpEstado] = useState(null);       // 'pendiente' | 'activo' | 'rechazado'
@@ -489,7 +494,7 @@ function Oferentes() {
   const checkMpQueryParams = () => {
     const params = new URLSearchParams(window.location.search);
     const mpStatus = params.get('mp_status');
-    const mpError  = params.get('mp_error');
+    const mpError = params.get('mp_error');
 
     if (mpStatus === 'conectado') {
       setMpMensaje(' ¡Cuenta de MercadoPago conectada exitosamente!');
@@ -524,11 +529,11 @@ function Oferentes() {
 
   // Consultar estado MP del oferente logueado
   const fetchMpEstado = async () => {
-   try {
-    const token = localStorage.getItem('token');
-    if (!token) return; // No hay sesión activa, salir silenciosamente
-    
-    const data = await mercadopagoAPI.getEstado();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return; // No hay sesión activa, salir silenciosamente
+
+      const data = await mercadopagoAPI.getEstado();
       if (data.ok) {
         setMpEstado(data.mp_estado);
       }
@@ -625,37 +630,47 @@ function Oferentes() {
     setFilters({ estado: '', tipo: '' });
   };
 
-  const handleEstadoChange = async (id, nuevoEstado) => {
+  const requestEstadoChange = (id, nuevoEstado) => {
     if (isOferente) {
-      alert('No tienes permiso para cambiar el estado');
+      toast.error('No tienes permiso para cambiar el estado');
       return;
     }
+    setConfirmEstado({ isOpen: true, id, nuevoEstado });
+  };
 
-    if (!window.confirm(`¿Cambiar estado a "${nuevoEstado}"?`)) return;
+  const executeEstadoChange = async () => {
+    if (!confirmEstado.id) return;
 
     try {
-      await oferentesAPI.updateEstado(id, { estado: nuevoEstado });
-      alert('Estado actualizado exitosamente');
+      await oferentesAPI.updateEstado(confirmEstado.id, { estado: confirmEstado.nuevoEstado });
+      toast.success('Estado actualizado exitosamente');
       fetchOferentes();
     } catch (err) {
-      alert(err.message || 'Error al actualizar estado');
+      toast.error(err.message || 'Error al actualizar estado');
+    } finally {
+      setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' });
     }
   };
 
-  const handleDelete = async (id) => {
+  const requestDelete = (id) => {
     if (isOferente) {
-      alert('No tienes permiso para eliminar oferentes');
+      toast.error('No tienes permiso para eliminar oferentes');
       return;
     }
+    setConfirmDelete({ isOpen: true, id });
+  };
 
-    if (!window.confirm('¿Estás seguro de eliminar este oferente?')) return;
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
 
     try {
-      await oferentesAPI.delete(id);
-      alert('Oferente eliminado exitosamente');
+      await oferentesAPI.delete(confirmDelete.id);
+      toast.success('Oferente eliminado exitosamente');
       fetchOferentes();
     } catch (err) {
-      alert(err.message || 'Error al eliminar oferente');
+      toast.error(err.message || 'Error al eliminar oferente');
+    } finally {
+      setConfirmDelete({ isOpen: false, id: null });
     }
   };
 
@@ -671,7 +686,7 @@ function Oferentes() {
       case 'aprobado': return 'badge-success';
       case 'pendiente': return 'badge-warning';
       case 'suspendido': return 'badge-danger';
-      default:           return 'badge-default';
+      default: return 'badge-default';
     }
   };
 
@@ -679,9 +694,9 @@ function Oferentes() {
   const getMpBadge = () => {
     if (!mpEstado) return null;
     const config = {
-      activo:    { clase: 'badge-success', texto: <><CheckCircle size={16} /> MercadoPago Conectado</> },
+      activo: { clase: 'badge-success', texto: <><CheckCircle size={16} /> MercadoPago Conectado</> },
       pendiente: { clase: 'badge-warning', texto: <><Clock size={16} /> MercadoPago Pendiente</> },
-      rechazado: { clase: 'badge-danger',  texto: <><XCircle size={16} /> MercadoPago Rechazado</>  },
+      rechazado: { clase: 'badge-danger', texto: <><XCircle size={16} /> MercadoPago Rechazado</> },
     };
     const c = config[mpEstado] || config.pendiente;
     return <span className={`badge ${c.clase}`}>{c.texto}</span>;
@@ -901,7 +916,7 @@ function Oferentes() {
                           {!isOferente ? (
                             <select
                               value={oferente.estado}
-                              onChange={(e) => handleEstadoChange(oferente.id_oferente, e.target.value)}
+                              onChange={(e) => requestEstadoChange(oferente.id_oferente, e.target.value)}
                               className={`estado-select ${getEstadoBadgeClass(oferente.estado)}`}
                             >
                               <option value="pendiente">Pendiente</option>
@@ -930,7 +945,7 @@ function Oferentes() {
                               </Link>
                               {!isOferente && (
                                 <button
-                                  onClick={() => handleDelete(oferente.id_oferente)}
+                                  onClick={() => requestDelete(oferente.id_oferente)}
                                   className="btn-action btn-delete"
                                   title="Eliminar"
                                 >
@@ -951,6 +966,25 @@ function Oferentes() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar Oferente"
+        message="¿Estás seguro de que deseas eliminar este oferente? Esta acción no se puede deshacer."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
+
+      <ConfirmModal
+        isOpen={confirmEstado.isOpen}
+        title="Cambiar Estado"
+        message={`¿Estás seguro de que deseas cambiar el estado a "${confirmEstado.nuevoEstado}"?`}
+        onConfirm={executeEstadoChange}
+        onClose={() => setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' })}
+        confirmText="Cambiar estado"
+        isDestructive={false}
+      />
     </Layout>
   );
 }

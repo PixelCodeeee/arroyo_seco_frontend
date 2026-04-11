@@ -2,6 +2,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Aler
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/crearOferente.css';
 
 function EditarOferente() {
@@ -168,9 +169,10 @@ function EditarOferente() {
       };
 
       await oferentesAPI.update(id, dataToSend);
-      alert(' Oferente actualizado exitosamente');
+      toast.success('Oferente actualizado exitosamente');
       navigate('/oferentes');
     } catch (err) {
+      toast.error(err.message || 'Error al actualizar oferente');
       setError(err.message || 'Error al actualizar oferente');
     } finally {
       setLoading(false);

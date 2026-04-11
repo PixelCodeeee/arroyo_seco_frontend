@@ -3,6 +3,7 @@ import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Aler
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/CrearProducto.css'; // <Check size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> usa el mismo estilo
 
 function EditarProducto() {
@@ -135,11 +136,12 @@ function EditarProducto() {
         inventario: parseInt(formData.inventario),
       });
 
-      alert('Producto actualizado');
+      toast.success('Producto actualizado exitosamente');
       navigate('/productos');
 
     } catch (err) {
       console.error(err);
+      toast.error(err.message || 'Error al actualizar');
       setError(err.message || 'Error al actualizar');
     } finally {
       setLoading(false);

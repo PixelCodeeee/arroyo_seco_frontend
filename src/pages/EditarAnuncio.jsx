@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { announcementsAPI } from '../services/api';
 import Layout from '../components/Layout';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function EditarAnuncio() {
@@ -53,7 +54,7 @@ function EditarAnuncio() {
     setLoading(true);
     try {
       await announcementsAPI.update(id, formData);
-      alert('Anuncio actualizado exitosamente');
+      toast.success('Anuncio actualizado exitosamente');
       navigate('/anuncios');
     } catch (err) {
       setError(err.message || 'Error desconocido');

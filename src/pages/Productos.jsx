@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { productosAPI } from "../services/api";
 import Layout from "../components/Layout";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { toast } from "sonner";
+import ConfirmModal from "../components/ConfirmModal";
 import "../styles/Usuarios.css";
 
 function Productos() {
@@ -13,6 +15,7 @@ function Productos() {
   const [filterCategoria, setFilterCategoria] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
@@ -25,17 +28,20 @@ function Productos() {
   const loadProductos = async () => {
     try {
       setLoading(true);
-      const res = await productosAPI.getAll();
 
-      let data = res.productos;
-
-      if (isOferente && user?.oferenteId) {
-        data = data.filter((p) => p.id_oferente === user.oferenteId);
+      if (isOferente) {
+        const res = await productosAPI.getMis();
+        setProductos(res.productos);
+        setFiltered(res.productos);
+        // categorias not returned by this endpoint — fetch separately if needed
+        const allRes = await productosAPI.getAll();
+        setCategorias(allRes.categorias);
+      } else {
+        const res = await productosAPI.getAll();
+        setProductos(res.productos);
+        setFiltered(res.productos);
+        setCategorias(res.categorias);
       }
-
-      setProductos(data);
-      setFiltered(data);
-      setCategorias(res.categorias);
     } catch (err) {
       setError(err.message || "Error al cargar productos");
     } finally {
@@ -55,13 +61,20 @@ function Productos() {
 
   const clearFilters = () => setFilterCategoria("");
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Eliminar producto?")) return;
+  const requestDelete = (id) => {
+    setConfirmDelete({ isOpen: true, id });
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
     try {
-      await productosAPI.delete(id);
+      await productosAPI.delete(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success("Producto eliminado exitosamente");
       loadProductos();
     } catch (err) {
-      alert(err.message || "Error al eliminar");
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.message || "Error al eliminar");
     }
   };
 
@@ -204,7 +217,7 @@ function Productos() {
                       </Link>
 
                       <button
-                        onClick={() => handleDelete(p.id_producto)}
+                        onClick={() => requestDelete(p.id_producto)}
                         className="btn-action btn-delete"
                         title="Eliminar"
                       >
@@ -219,6 +232,15 @@ function Productos() {
         </div>
 
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar producto"
+        message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </Layout>
   );
 }

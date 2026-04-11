@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { announcementsAPI } from '../services/api';
 import Layout from '../components/Layout';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function CrearAnuncio() {
@@ -30,7 +31,7 @@ function CrearAnuncio() {
     setLoading(true);
     try {
       await announcementsAPI.create(formData);
-      alert('Anuncio creado exitosamente');
+      toast.success('Anuncio creado exitosamente');
       navigate('/anuncios');
     } catch (err) {
       setError(err.message || 'Error desconocido');

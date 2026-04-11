@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/Usuarios.css';
 
 function Usuarios() {
@@ -8,6 +10,7 @@ function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   useEffect(() => {
@@ -26,17 +29,20 @@ function Usuarios() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) {
-      return;
-    }
+  const requestDelete = (id) => {
+    setConfirmDelete({ isOpen: true, id });
+  };
 
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
     try {
-      await usuariosAPI.delete(id);
-      alert('Usuario eliminado exitosamente');
+      await usuariosAPI.delete(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success('Usuario eliminado exitosamente');
       fetchUsuarios(); // Refresh list
     } catch (err) {
-      alert(err.message || 'Error al eliminar usuario');
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.message || 'Error al eliminar usuario');
     }
   };
 
@@ -142,7 +148,7 @@ function Usuarios() {
                       Editar
                     </Link>
                     <button
-                      onClick={() => handleDelete(usuario.id_usuario)}
+                      onClick={() => requestDelete(usuario.id_usuario)}
                       className="btn-action btn-delete"
                     >
                       Eliminar
@@ -154,6 +160,15 @@ function Usuarios() {
           </table>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar usuario"
+        message="¿Estás seguro de que deseas eliminar este usuario del sistema?"
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </div>
   );
 }
