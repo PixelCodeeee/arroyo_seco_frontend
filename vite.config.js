@@ -12,8 +12,12 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
+
+
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       workbox: {
+        clientsClaim: true,   // 🔥 TAKE CONTROL IMMEDIATELY
+        skipWaiting: true,    // 🔥 ACTIVATE NEW SW IMMEDIATELY
         runtimeCaching: [
           {
             // Match API routes
@@ -53,17 +57,17 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
-  {
-    src: 'images/pwa-192x192.png',
-    sizes: '192x192',
-    type: 'image/png'
-  },
-  {
-    src: 'images/pwa-512x512.png',
-    sizes: '512x512',
-    type: 'image/png'
-  }
-]
+          {
+            src: 'images/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'images/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
       }
     })
   ],
