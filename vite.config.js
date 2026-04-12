@@ -21,7 +21,12 @@ export default defineConfig({
         runtimeCaching: [
           {
             // Match API routes
-            urlPattern: /^https?:\/\/.*\/(api|usuarios|pedidos|productos|oferentes|servicios).*/i,
+            urlPattern: ({ url }) => {
+              return (
+                url.pathname.startsWith('/api') &&
+                !url.pathname.includes('/mercadopago')
+              );
+            },
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'api-cache',
