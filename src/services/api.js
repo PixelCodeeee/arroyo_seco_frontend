@@ -610,11 +610,11 @@ export const reservasAPI = {
 };
 
 /* ======================================================
-   MERCADOPAGO API
-   (reemplaza a paypalAPI — mismo nombre mantenido para
-    compatibilidad con PayPalCheckout.jsx)
+   MERCADOPAGO OFERENTE API
+   (OAuth para que el oferente conecte su cuenta de MP)
 ====================================================== */
-export const paypalAPI = {
+export const mercadopagoAPI = {
+
   // Crear preferencia de pago (carrito)
   createOrder: (orderData) =>
     apiRequest('/mercadopago/create-order', {
@@ -639,13 +639,6 @@ export const paypalAPI = {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
-};
-
-/* ======================================================
-   MERCADOPAGO OFERENTE API
-   (OAuth para que el oferente conecte su cuenta de MP)
-====================================================== */
-export const mercadopagoAPI = {
   // Obtener URL de autorización OAuth (redirige a MP)
   getOAuthUrl: () =>
     apiRequest('/mercadopago/mp/oauth-url', {
