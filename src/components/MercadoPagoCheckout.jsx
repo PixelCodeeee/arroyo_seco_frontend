@@ -105,7 +105,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
       console.log('✅ Preferencia creada:', response.preference_id);
 
       // Redirigir a MercadoPago (sandbox en pruebas, init_point en producción)
-      const url = response.sandbox_url || response.init_point; // ✅ uses sandbox in test, falls back to production
+      const url = response.init_point; // ✅ uses sandbox in test, falls back to production
       window.location.href = url;
 
     } catch (err) {
