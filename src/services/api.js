@@ -505,6 +505,17 @@ export const reservasAPI = {
       },
     }),
 
+  // In reservasAPI object, add this method:
+
+  getMisReservas: () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (!currentUser) throw new Error("Usuario no autenticado");
+
+    return apiRequest(`/reservas/usuario/${currentUser.id_usuario}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+  },
   // Add this to reservasAPI in api.js:
   getMisReservasComoOferente: async () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
