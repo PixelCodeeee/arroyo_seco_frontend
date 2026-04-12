@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { paypalAPI } from '../services/api'; // keeping api object the same, as per previous implementation, but maybe backend is updated
+import { mercadopagoAPI, paypalAPI } from '../services/api'; // keeping api object the same, as per previous implementation, but maybe backend is updated
 import { getCart, clearCart } from '../utils/cartUtils';
 import { AlertCircle, Lock, CreditCard } from 'lucide-react';
 import '../styles/MercadoPagoCheckout.css';
@@ -51,7 +51,7 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
       };
 
       // api object uses paypalAPI for MP, keeping the existing method ref
-      const response = await paypalAPI.captureOrder(captureData);
+      const response = await mercadopagoAPI.captureOrder(captureData);
 
       if (response.success) {
         clearCart();
@@ -100,12 +100,12 @@ function MercadoPagoCheckout({ amount, onSuccess, onError }) {
 
       console.log('📦 Creando preferencia MP:', orderData);
 
-      const response = await paypalAPI.createOrder(orderData);
+      const response = await mercadopagoAPI.createOrder(orderData);
 
       console.log('✅ Preferencia creada:', response.preference_id);
 
       // Redirigir a MercadoPago (sandbox en pruebas, init_point en producción)
-      const url = response.init_point;
+      const url = response.sandbox_url || response.init_point; // ✅ uses sandbox in test, falls back to production
       window.location.href = url;
 
     } catch (err) {
