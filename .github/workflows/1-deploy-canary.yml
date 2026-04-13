@@ -44,23 +44,52 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
+      # FIX: SCP to /tmp first, then SSH to move it and fix permissions
       - name: Sync compose file to VM
         run: |
-          gcloud compute scp docker-compose.yml joshualuna@nginx-public-vm:/home/joshualuna/arroyo_seco_pwa_stage2/docker-compose.yml \
+          gcloud compute scp docker-compose.yml nginx-public-vm:/tmp/docker-compose.yml \
             --zone=us-central1-a \
             --tunnel-through-iap \
             --project=beta-prime-489121
 
+          gcloud compute ssh nginx-public-vm \
+            --zone=us-central1-a \
+            --tunnel-through-iap \
+            --project=beta-prime-489121 \
+            --command="sudo mkdir -p /home/joshualuna/arroyo_seco_pwa_stage2 && sudo mv /tmp/docker-compose.yml /home/joshualuna/arroyo_seco_pwa_stage2/docker-compose.yml && sudo chown joshualuna:joshualuna /home/joshualuna/arroyo_seco_pwa_stage2/docker-compose.yml"
+
+      # FIX: Add sudo to docker commands to bypass OS login permission issues
       - name: Pull and restart canary frontend
         run: |
-          gcloud compute ssh joshualuna@nginx-public-vm \
+          gcloud compute ssh nginx-public-vm \
             --zone=us-central1-a \
             --tunnel-through-iap \
             --project=beta-prime-489121 \
             --command="
-              echo '${{ secrets.GH_PAT }}' | docker login ghcr.io -u itsjluna --password-stdin
+              echo '${{ secrets.GH_PAT }}' | sudo docker login ghcr.io -u itsjluna --password-stdin
               cd /home/joshualuna/arroyo_seco_pwa_stage2
-              docker compose pull frontend-canary
-              docker compose up -d --no-deps frontend-canary
-              docker system prune -a -f
+              sudo docker compose pull frontend-canary
+              sudo docker compose up -d --no-deps frontend-canary
+              sudo docker system prune -a -f
             "
+
+      # NEW: Ensure the Ops repo knows this frontend is ready for the cutover
+      - name: Sync with Ops Repository
+        run: |
+          cd ops
+          mkdir -p manifests
+          
+          if [ ! -f manifests/canary.json ]; then
+            echo '{"api_contract": "v1", "frontend": {"status": "missing"}, "backend": {"status": "missing"}}' > manifests/canary.json
+          fi
+          
+          jq --arg commit "${{ github.sha }}" \
+             --arg built_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+             '.frontend.commit = $commit | .frontend.built_at = $built_at | .frontend.status = "ready"' \
+             manifests/canary.json > tmp.json && mv tmp.json manifests/canary.json
+             
+          git config user.email "ci@arroyoseco.online"
+          git config user.name "CI Bot"
+          git add manifests/canary.json
+          git commit -m "canary sync: frontend ready @ ${{ github.sha }}" || echo "No changes to commit"
+          git push origin HEAD
