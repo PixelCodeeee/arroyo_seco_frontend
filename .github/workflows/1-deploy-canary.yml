@@ -1,0 +1,66 @@
+name: 1 · Deploy Canary
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/pixelcodeeee/arroyo_seco_pwa_stage2/frontend:canary
+
+  deploy-and-route:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout Ops Repository
+        uses: actions/checkout@v4
+        with:
+          repository: PixelCodeeee/arroyo-ops
+          path: ops
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_IAP_CREDENTIALS }}'
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Sync compose file to VM
+        run: |
+          gcloud compute scp docker-compose.yml joshualuna@nginx-public-vm:/home/joshualuna/arroyo_seco_pwa_stage2/docker-compose.yml \
+            --zone=us-central1-a \
+            --tunnel-through-iap \
+            --project=beta-prime-489121
+
+      - name: Pull and restart canary frontend
+        run: |
+          gcloud compute ssh joshualuna@nginx-public-vm \
+            --zone=us-central1-a \
+            --tunnel-through-iap \
+            --project=beta-prime-489121 \
+            --command="
+              echo '${{ secrets.GH_PAT }}' | docker login ghcr.io -u itsjluna --password-stdin
+              cd /home/joshualuna/arroyo_seco_pwa_stage2
+              docker compose pull frontend-canary
+              docker compose up -d --no-deps frontend-canary
+              docker system prune -a -f
+            "

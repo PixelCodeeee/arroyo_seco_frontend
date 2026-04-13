@@ -28,7 +28,6 @@ import ErrorPage from "./pages/ErrorPage";
 import RequireRole from "./components/RequireRole";
 import MiPerfil from "./pages/MiPerfil";
 import SettingsModal from "./components/SettingsModal";
-import OfflineIndicator from "./components/OfflineIndicator";
 import ScrollToTop from "./components/ScrollToTop";
 import Categorias from './pages/Categorias';
 import Ordenes from './pages/Ordenes';
@@ -48,7 +47,12 @@ import TermsOfService from "./pages/TermsOfService";
 import AboutTeam from "./pages/AboutTeam";
 import FAQ from "./pages/FAQ";
 
+import { useOffline } from "./hooks/useOffline";
+import { useMaintenance } from "./hooks/useMaintenance";
+
 function App() {
+  useOffline();
+  const maintenance = useMaintenance();
   const initialOptions = {
     clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
     currency: "MXN",
@@ -58,8 +62,21 @@ function App() {
   return (
     <PayPalScriptProvider options={initialOptions}>
       <ThemeProvider>
+        {maintenance.show_banner && maintenance.message && (
+          <div style={{
+            backgroundColor: '#ff4d4f',
+            color: 'white',
+            textAlign: 'center',
+            padding: '10px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 9999,
+          }}>
+            ⚠️ {maintenance.message}
+          </div>
+        )}
         <InstallPrompt />
-        <OfflineIndicator />
+
         <SettingsModal />
         <Router>
           <ScrollToTop />

@@ -1,4 +1,4 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, DollarSign, Search, Eye, Download } from 'lucide-react';
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, DollarSign, Search, Eye, Download, RefreshCcw } from 'lucide-react';
 import React, { useState, useEffect } from "react";
 import { pedidosAPI } from "../services/api";
 import Layout from "../components/Layout";
@@ -6,7 +6,7 @@ import OrdenDetailModal from "../components/OrdenDetailModal";
 import ConfirmModal from "../components/ConfirmModal";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import "../styles/Ordenes.css";
 function Ordenes() {
   const [pedidos, setPedidos] = useState([]);
@@ -107,9 +107,16 @@ function Ordenes() {
   const executeChangeEstado = async () => {
     if (!confirmEstado.id) return;
     try {
-      await pedidosAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
-      await loadPedidos();
-      toast.success("Estado actualizado exitosamente");
+      const res = await pedidosAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
+      if (res && res._offlineQueued) {
+        setPedidos(prev => prev.map(p => 
+          p.id_pedido === confirmEstado.id ? { ...p, estado: confirmEstado.nuevoEstado, _isDraft: true } : p
+        ));
+        toast.info("Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        await loadPedidos();
+        toast.success("Estado actualizado exitosamente");
+      }
     } catch (err) {
       toast.error(err.message || "Error al cambiar estado");
     } finally {
@@ -179,7 +186,7 @@ function Ordenes() {
       formatCurrency(item.precio_unitario * item.cantidad)
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 55,
       head: [['Producto', 'Cantidad', 'Precio Unit.', 'Total']],
       body: tableData,
@@ -370,9 +377,14 @@ function Ordenes() {
 
               <tbody>
                 {filtered.map((pedido) => (
-                  <tr key={pedido.id_pedido}>
+                  <tr key={pedido.id_pedido} style={{ backgroundColor: pedido._isDraft ? 'var(--warning-light, #fffcf0)' : 'inherit' }}>
                     <td data-label="ID">
                       <strong>#{pedido.id_pedido}</strong>
+                      {pedido._isDraft && (
+                        <span title="Cambio pendiente de sincronización" style={{marginLeft: '6px', display: 'inline-flex', alignItems: 'center'}}>
+                          <RefreshCcw size={16} className="animate-spin" style={{ color: 'var(--warning-color, #f59e0b)' }} />
+                        </span>
+                      )}
                     </td>
 
                     {!isTurista && (

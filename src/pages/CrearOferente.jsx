@@ -1,14 +1,14 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Info } from 'lucide-react';
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Info, RefreshCcw } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oferentesAPI, usuariosAPI } from '../services/api';
-import { useOfflineForm } from '../hooks/useOfflineForm';
+
 import { toast } from 'sonner';
 import '../styles/crearOferente.css';
 
 function CrearOferente() {
   const navigate = useNavigate();
-  const { submitForm, offlineMsg } = useOfflineForm();
+
   const [formData, setFormData] = useState({
     id_usuario: '',
     nombre_negocio: '',
@@ -158,14 +158,13 @@ function CrearOferente() {
         telefono: formData.telefono || null
       };
 
-      const { savedOffline } = await submitForm({
-        endpoint: '/oferentes',
-        method: 'POST',
-        data: dataToSend,
-        onSuccess: () => navigate('/oferentes'),
-      });
-
-      if (!savedOffline) navigate('/oferentes');
+      const result = await oferentesAPI.create(dataToSend);
+      if (result && result._offlineQueued) {
+        toast.info(result.message || "Sin conexión — guardado en cola para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Oferente creado exitosamente");
+      }
+      navigate('/oferentes');
     } catch (err) {
       toast.error(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
       setError(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
@@ -191,25 +190,12 @@ function CrearOferente() {
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
             <span>{error}</span>
           </div>
         )}
 
-        {offlineMsg && (
-          <div style={{
-            padding: '10px 16px',
-            marginBottom: '12px',
-            borderRadius: '8px',
-            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
-            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
-            border: '1px solid',
-            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
-            fontSize: '14px'
-          }}>
-            {offlineMsg.text}
-          </div>
-        )}
+
         <form onSubmit={handleSubmit} className="oferente-form">
           {/* Usuario Oferente */}
           <div className="form-section">
@@ -240,7 +226,7 @@ function CrearOferente() {
               )}
               {isOferente && (
                 <small className="field-hint">
-                  <Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Como oferente, estás registrando tu propio negocio
+                  <Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Como oferente, estás registrando tu propio negocio
                 </small>
               )}
             </div>
@@ -281,7 +267,7 @@ function CrearOferente() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Restaurante</option>
+                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Restaurante</option>
                   <option value="artesanal"><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</option>
                 </select>
               </div>
@@ -413,7 +399,7 @@ function CrearOferente() {
                   Creando...
                 </>
               ) : (
-                '✓ Crear Oferente'
+                'Crear Oferente'
               )}
             </button>
           </div>

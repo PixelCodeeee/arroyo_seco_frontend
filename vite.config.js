@@ -11,11 +11,12 @@ export default defineConfig({
       },
     }),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
 
 
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['images/icon-192x192.png', 'images/icon-512x512.png', 'favicon.ico', 'images/icon-180x180.png'],
       workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg}'],
         clientsClaim: true,   // 🔥 TAKE CONTROL IMMEDIATELY
         skipWaiting: true,    // 🔥 ACTIVATE NEW SW IMMEDIATELY
         runtimeCaching: [
@@ -56,21 +57,22 @@ export default defineConfig({
       manifest: {
         name: 'Arroyo Seco',
         short_name: 'ArroyoSeco',
-        description: 'Arroyo Seco Frontend',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        description: 'Descubre la gastronomía y artesanías de Arroyo Seco',
+        theme_color: '#E91E8C',
+        background_color: '#1a1a1a',
         display: 'standalone',
         start_url: '/',
         icons: [
           {
-            src: 'images/pwa-192x192.png',
+            src: 'images/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'images/pwa-512x512.png',
+            src: 'images/icon-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       }

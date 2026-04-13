@@ -2,6 +2,9 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/LegalPages.css";
+import termsOfServiceContent from "../content/legal/terminos_condiciones.md?raw";
+import ReactMarkdown from "react-markdown";
+
 
 function TermsOfService() {
   return (
@@ -13,14 +16,7 @@ function TermsOfService() {
           <p>Última actualización: Abril 2026</p>
         </header>
         <div className="legal-content">
-          <h2>1. Introducción</h2>
-          <p>Bienvenido a Arroyo Seco. Estos términos de servicio rigen el uso general de nuestra plataforma. (Texto dummy que será reemplazado por la estructura en Markdown).</p>
-          
-          <h2>2. Uso de la Plataforma</h2>
-          <p>El uso está restringido a usuarios registrados. Al continuar usando la plataforma, aceptas estos términos provisionales.</p>
-
-          <h2>3. Obligaciones y Responsabilidades</h2>
-          <p>Tanto turistas como oferentes tienen responsabilidades respecto a las reservas y compras.</p>
+          <ReactMarkdown>{termsOfServiceContent}</ReactMarkdown>
         </div>
       </div>
       <Footer />

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme as useOldTheme } from "../context/ThemeContext";
 import { useTheme } from "../context/ThemeProvider";
 import ConfirmModal from "./ConfirmModal";
+import { getPendingOperations } from "../services/localDB";
 import {
   Home,
   Store,
@@ -59,6 +60,34 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
 
+  const [pendingCounts, setPendingCounts] = useState({
+    ordenes: 0,
+    reservas: 0,
+    productos: 0
+  });
+
+  React.useEffect(() => {
+    const checkPending = async () => {
+      try {
+        const ops = await getPendingOperations();
+        setPendingCounts({
+          ordenes: ops.filter(o => o.endpoint.includes('/pedidos') || o.endpoint.includes('/ordenes')).length,
+          reservas: ops.filter(o => o.endpoint.includes('/reservas')).length,
+          productos: ops.filter(o => o.endpoint.includes('/productos')).length,
+        });
+      } catch (err) {
+        console.warn('Error reading pending operations', err);
+      }
+    };
+    checkPending();
+    const interval = setInterval(checkPending, 8000);
+    window.addEventListener('dashboard-synced', checkPending);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('dashboard-synced', checkPending);
+    };
+  }, []);
+
   const requestLogout = () => {
     setConfirmLogout(true);
   };
@@ -93,6 +122,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       icon: <Package size={20} />,
       path: "/productos",
       roles: ["admin", "oferente"],
+      badge: pendingCounts.productos > 0 ? pendingCounts.productos : null,
     },
     {
       id: "servicios",
@@ -114,6 +144,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       icon: <ClipboardList size={20} />,
       path: "/ordenes",
       roles: ["admin", "oferente", "turista"],
+      badge: pendingCounts.ordenes > 0 ? pendingCounts.ordenes : null,
     },
     {
       id: "reservas",
@@ -121,6 +152,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       icon: <CalendarDays size={20} />,
       path: "/reservas",
       roles: ["admin", "oferente", "turista"],
+      badge: pendingCounts.reservas > 0 ? pendingCounts.reservas : null,
     },
     {
       id: "divider-admin",

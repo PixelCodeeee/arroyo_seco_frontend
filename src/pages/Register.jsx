@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
 import TwoFactorVerification from '../components/TwoFactorVerification';
-import { useOfflineForm } from '../hooks/useOfflineForm';
+import { RefreshCcw } from 'lucide-react';
+
 import { toast } from 'sonner';
 import '../styles/auth.css';
 
@@ -10,7 +11,7 @@ function Register() {
   const navigate = useNavigate();
   const [step, setStep] = useState('registration'); // 'registration' or '2fa'
   const [userId, setUserId] = useState(null);
-  const { submitForm, offlineMsg } = useOfflineForm();
+
   const [formData, setFormData] = useState({
     nombre: '',
     correo: '',
@@ -40,14 +41,11 @@ function Register() {
     }
 
     try {
-      const { savedOffline, result } = await submitForm({
-        endpoint: '/usuarios/register',
-        method: 'POST',
-        data: formData,
-      });
+      const result = await usuariosAPI.register(formData);
 
-      if (savedOffline) {
+      if (result && result._offlineQueued) {
         // Sin internet: guardado en cola, no podemos hacer 2FA ahora
+        toast.info(result.message || "Sin internet: guardado en cola, se procesará al conectar", { icon: <RefreshCcw size={18} /> });
         return;
       }
 
@@ -100,20 +98,7 @@ function Register() {
 
         {error && <div className="error-message">{error}</div>}
 
-        {offlineMsg && (
-          <div style={{
-            padding: '10px 16px',
-            marginBottom: '12px',
-            borderRadius: '8px',
-            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
-            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
-            border: '1px solid',
-            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
-            fontSize: '14px'
-          }}>
-            {offlineMsg.text}
-          </div>
-        )}
+
         <form className="auth-form" onSubmit={handleRegistrationSubmit}>
           <div className="form-group">
             <label htmlFor="nombre">Nombre Completo</label>

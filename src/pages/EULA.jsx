@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/LegalPages.css";
+import eulaContent from "../content/legal/eula.md?raw";
 
 function EULA() {
   return (
@@ -13,14 +15,7 @@ function EULA() {
           <p>Última actualización: Abril 2026</p>
         </header>
         <div className="legal-content">
-          <h2>1. Otorgamiento de Licencia</h2>
-          <p>Te otorgamos una licencia limitada, no exclusiva, intransferible y revocable para utilizar el software y la plataforma de Arroyo Seco. (Texto dummy que será reemplazado por la estructura en Markdown).</p>
-          
-          <h2>2. Restricciones de Uso</h2>
-          <p>Queda prohibido intentar alterar la infraestructura de microservicios, el código o la base de datos.</p>
-
-          <h2>3. Derechos de Propiedad</h2>
-          <p>El código y la marca registrada Arroyo Seco pertenecen a la institución y desarrolladores. Todos los derechos reservados.</p>
+          <ReactMarkdown>{eulaContent}</ReactMarkdown>
         </div>
       </div>
       <Footer />

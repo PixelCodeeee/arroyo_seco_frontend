@@ -10,6 +10,8 @@ import { CheckCircle, Mail, Key, User as UserIcon, Phone, MapPin, X } from 'luci
 function MiPerfil() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isSavingSecurity, setIsSavingSecurity] = useState(false);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -70,13 +72,14 @@ function MiPerfil() {
             correo: forcedEmail || originalEmail // Override changed email with original so backend doesn't crash, unless verified
         });
         toast.success("Perfil actualizado correctamente");
-      } catch (err) {
+      } catch {
         toast.error("Error al actualizar información personal");
       }
   }
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
+    setIsSavingProfile(true);
     
     // Check if email changed
     if (formData.correo !== originalEmail) {
@@ -90,10 +93,12 @@ function MiPerfil() {
       }
       // Do not return. Submit profile data (with original email applied temporarily to bypass block)
       await submitProfileOnly(originalEmail);
+      setIsSavingProfile(false);
       return;
     }
 
     await submitProfileOnly(originalEmail);
+    setIsSavingProfile(false);
   };
 
   const handleVerifyEmailSubmit = async (e) => {
@@ -120,6 +125,7 @@ function MiPerfil() {
       return toast.error("Las contraseñas no coinciden");
     }
 
+    setIsSavingSecurity(true);
     try {
       await usuariosAPI.updatePassword(user.id_usuario, {
         contrasenaActual: passwordData.contrasenaActual,
@@ -129,6 +135,8 @@ function MiPerfil() {
       setPasswordData({ contrasenaActual: "", nuevaContrasena: "", confirmarContrasena: "" });
     } catch (err) {
       toast.error(err.message || "Error al actualizar contraseña");
+    } finally {
+      setIsSavingSecurity(false);
     }
   };
 
@@ -137,7 +145,7 @@ function MiPerfil() {
         await usuariosAPI.forgotPassword({ correo: formData.correo });
         setShowForgotPwdModal(true);
         toast.info("Código de recuperación enviado a tu correo");
-     } catch (err) {
+     } catch {
         toast.error("Error al enviar código de recuperación");
      }
   };
@@ -172,10 +180,21 @@ function MiPerfil() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
         {/* Personal Info Section */}
-        <div className="card shadow-sm" style={{ padding: '2rem', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dark)' }}>
-             <UserIcon size={20} /> Información Personal
+        <div className="card shadow-sm" style={{ padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+             <UserIcon size={20} style={{ color: 'var(--primary-color)' }} /> Información Personal
           </h2>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--primary-light, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--primary-color)' }}>
+               <span style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>{formData.nombre ? formData.nombre.charAt(0).toUpperCase() : 'U'}</span>
+            </div>
+            <div>
+               <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-dark)' }}>{formData.nombre || 'Tu Perfil'}</h3>
+               <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.95rem' }}>{user?.rol === 'oferente' ? 'Revisa tu perfil de vendedor' : 'Revisa tu perfil de cliente'}</p>
+            </div>
+          </div>
+
           <form onSubmit={handleProfileSubmit} className="perfil-form-grid" style={{ display: 'grid', gap: '1.5rem' }}>
             
             <div className="form-group">
@@ -246,16 +265,22 @@ function MiPerfil() {
               </>
             )}
 
-            <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem', padding: '0.75rem', borderRadius: '8px', fontWeight: '600' }}>
-               Guardar Información
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={isSavingProfile}
+              style={{ marginTop: '1rem', padding: '0.85rem 1.5rem', borderRadius: '8px', fontWeight: '600', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', opacity: isSavingProfile ? 0.7 : 1, cursor: isSavingProfile ? 'not-allowed' : 'pointer' }}>
+               {isSavingProfile ? (
+                 <><div className="spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div> Guardando...</>
+               ) : 'Guardar Cambios'}
             </button>
           </form>
         </div>
 
         {/* Security / Password Section */}
-        <div className="card shadow-sm" style={{ padding: '2rem', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dark)' }}>
-             <Key size={20} /> Seguridad
+        <div className="card shadow-sm" style={{ padding: '2rem', borderRadius: '16px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+             <Key size={20} style={{ color: 'var(--primary-color)' }} /> Seguridad
           </h2>
           <form className="perfil-form-grid" onSubmit={handlePasswordSubmit} style={{ display: 'grid', gap: '1.5rem' }}>
             <div className="form-group">
@@ -303,8 +328,14 @@ function MiPerfil() {
                 </div>
             </div>
 
-            <button type="submit" className="btn-outline" style={{ marginTop: '0.5rem', padding: '0.75rem', borderRadius: '8px', fontWeight: '600' }}>
-              Actualizar Contraseña
+            <button 
+              type="submit" 
+              className="btn-outline" 
+              disabled={isSavingSecurity}
+              style={{ marginTop: '1rem', padding: '0.85rem 1.5rem', borderRadius: '8px', fontWeight: '600', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.2s', opacity: isSavingSecurity ? 0.7 : 1, cursor: isSavingSecurity ? 'not-allowed' : 'pointer' }}>
+               {isSavingSecurity ? (
+                 <><div className="spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div> Actualizando...</>
+               ) : 'Actualizar Contraseña'}
             </button>
           </form>
         </div>

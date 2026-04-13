@@ -1,4 +1,4 @@
-import { Clock, CheckCircle, XCircle, Utensils, AlertTriangle, Search, Eye, Users } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Utensils, AlertTriangle, Search, Eye, Users, RefreshCcw } from 'lucide-react';
 import React, { useState, useEffect } from "react";
 import { reservasAPI } from "../services/api";
 import Layout from "../components/Layout";
@@ -100,9 +100,16 @@ function Reservas() {
   const executeChangeEstado = async () => {
     if (!confirmEstado.id) return;
     try {
-      await reservasAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
-      toast.success("Estado de la reserva actualizado");
-      await loadReservas();
+      const res = await reservasAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
+      if (res && res._offlineQueued) {
+        setReservas(prev => prev.map(r => 
+          r.id_reserva === confirmEstado.id ? { ...r, estado: confirmEstado.nuevoEstado, _isDraft: true } : r
+        ));
+        toast.info("Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Estado de la reserva actualizado");
+        await loadReservas();
+      }
     } catch (err) {
       toast.error(err.message || "Error al cambiar estado");
     } finally {
@@ -121,9 +128,16 @@ function Reservas() {
   const executeCancelar = async () => {
     if (!confirmCancel.reserva) return;
     try {
-      await reservasAPI.updateEstado(confirmCancel.reserva.id_reserva, "cancelada");
-      toast.success("Reserva cancelada exitosamente");
-      await loadReservas();
+      const res = await reservasAPI.updateEstado(confirmCancel.reserva.id_reserva, "cancelada");
+      if (res && res._offlineQueued) {
+        setReservas(prev => prev.map(r => 
+          r.id_reserva === confirmCancel.reserva.id_reserva ? { ...r, estado: "cancelada", _isDraft: true } : r
+        ));
+        toast.info("Sin conexión — cancelación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Reserva cancelada exitosamente");
+        await loadReservas();
+      }
     } catch (err) {
       toast.error(err.message || "Error al cancelar reserva");
     } finally {
@@ -274,8 +288,15 @@ function Reservas() {
               </thead>
               <tbody>
                 {filtered.map((reserva) => (
-                  <tr key={reserva.id_reserva}>
-                    <td data-label="ID"><strong>#{reserva.id_reserva}</strong></td>
+                  <tr key={reserva.id_reserva} style={{ backgroundColor: reserva._isDraft ? 'var(--warning-light, #fffcf0)' : 'inherit' }}>
+                    <td data-label="ID">
+                      <strong>#{reserva.id_reserva}</strong>
+                      {reserva._isDraft && (
+                        <span title="Cambio pendiente de sincronización" style={{marginLeft: '6px', display: 'inline-flex', alignItems: 'center'}}>
+                          <RefreshCcw size={16} className="animate-spin" style={{ color: 'var(--warning-color, #f59e0b)' }} />
+                        </span>
+                      )}
+                    </td>
 
                     {!isTurista && (
                       <td data-label="Cliente" className="cliente-info">

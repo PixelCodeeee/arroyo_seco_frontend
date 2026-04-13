@@ -1,15 +1,15 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, ClipboardList, DollarSign, Tag, ImageIcon, Settings } from 'lucide-react';
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, ClipboardList, DollarSign, Tag, ImageIcon, Settings, RefreshCcw } from 'lucide-react';
 /// src/components/CrearProducto.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
-import { useOfflineForm } from '../hooks/useOfflineForm';
+
 import { toast } from 'sonner';
 import '../styles/CrearProducto.css';
 
 function CrearProducto() {
   const navigate = useNavigate();
-  const { submitForm, offlineMsg } = useOfflineForm();
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   const [formData, setFormData] = useState({
@@ -107,18 +107,17 @@ function CrearProducto() {
     setLoading(true);
 
     try {
-      const { savedOffline } = await submitForm({
-        endpoint: '/productos',
-        method: 'POST',
-        data: {
-          ...formData,
-          precio: parseFloat(formData.precio),
-          inventario: parseInt(formData.inventario),
-        },
-        onSuccess: () => navigate('/productos'),
+      const res = await productosAPI.create({
+        ...formData,
+        precio: parseFloat(formData.precio),
+        inventario: parseInt(formData.inventario),
       });
-
-      if (!savedOffline) navigate('/productos');
+      if (res && res._offlineQueued) {
+        toast.info(res.message || "Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Producto creado exitosamente");
+      }
+      navigate('/productos');
     } catch (er) {
       toast.error(er.message || 'Error al crear');
       setError(er.message || 'Error al crear');
@@ -152,20 +151,7 @@ function CrearProducto() {
           </div>
         )}
 
-        {offlineMsg && (
-          <div style={{
-            padding: '10px 16px',
-            marginBottom: '12px',
-            borderRadius: '8px',
-            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
-            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
-            border: '1px solid',
-            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
-            fontSize: '14px'
-          }}>
-            {offlineMsg.text}
-          </div>
-        )}
+
         <form onSubmit={handleSubmit} className="producto-form">
           {/* Información Básica */}
           <div className="form-section">
@@ -345,7 +331,7 @@ function CrearProducto() {
             </button>
 
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Creando...' : '✓ Crear Producto'}
+              {loading ? 'Creando...' : 'Crear Producto'}
             </button>
           </div>
         </form>

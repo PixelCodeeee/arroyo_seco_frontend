@@ -1,4 +1,4 @@
-import { saveToQueue } from '../utils/offlineQueue';
+import { addPendingOperation, getCache, setCache } from './localDB';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,6 +21,7 @@ const apiRequest = async (endpoint, options = {}) => {
     const response = await fetch(`${API_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
+        'x-frontend-version': import.meta.env.VITE_FRONTEND_VERSION || 'stable',
         ...options.headers,
       },
       ...options,
@@ -49,6 +50,21 @@ const apiRequest = async (endpoint, options = {}) => {
     console.log('Response data:', data);
     console.groupEnd();
 
+    // ====== OFFLINE CACHING FOR GET ======
+    if (method.toUpperCase() === 'GET') {
+      let cacheStore = 'cached_pedidos';
+      if (endpoint.includes('/pedidos') || endpoint.includes('/ordenes')) cacheStore = 'cached_pedidos';
+      else if (endpoint.includes('/reservas')) cacheStore = 'cached_reservas';
+      else if (endpoint.includes('/productos')) cacheStore = 'cached_productos';
+      else if (endpoint.includes('/categorias')) cacheStore = 'cached_categorias';
+      else if (endpoint.includes('/servicios')) cacheStore = 'cached_servicios';
+      else if (endpoint.includes('/usuarios') || endpoint.includes('/oferentes')) cacheStore = 'cached_usuarios';
+      else if (endpoint.includes('/announcements')) cacheStore = 'cached_announcements';
+
+      await setCache(cacheStore, endpoint, data).catch(console.warn);
+    }
+    // =====================================
+
     return data;
   } catch (error) {
     const duration = Date.now() - startTime;
@@ -61,25 +77,52 @@ const apiRequest = async (endpoint, options = {}) => {
     // Offline Interceptor
     const isOfflineError = error instanceof TypeError || !navigator.onLine;
 
-    if (isOfflineError && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
-      console.warn('📡 Red desconectada: Saltando error y guardando petición en cola offline para', endpoint);
+    if (isOfflineError) {
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+        console.warn('📡 Red desconectada: Saltando error y guardando petición en cola offline para', endpoint);
 
-      let parsedBody = null;
-      if (options.body) {
-        try {
-          parsedBody = JSON.parse(options.body);
-        } catch (_) {
-          parsedBody = options.body;
+        let parsedBody = null;
+        if (options.body) {
+          try {
+            parsedBody = JSON.parse(options.body);
+          } catch (_) {
+            parsedBody = options.body;
+          }
+        }
+
+        // Save to IndexedDB
+        await addPendingOperation({ endpoint, method, body: parsedBody });
+
+        return {
+          _offlineQueued: true, // Used by frontend for optimistic indicators
+          message: 'Guardado localmente para sincronizar luego'
+        };
+      } else if (method.toUpperCase() === 'GET') {
+        console.warn('📡 Red desconectada: Recuperando datos cacheados para GET', endpoint);
+        
+        let cacheStore = 'cached_pedidos';
+        if (endpoint.includes('/pedidos') || endpoint.includes('/ordenes')) cacheStore = 'cached_pedidos';
+        else if (endpoint.includes('/reservas')) cacheStore = 'cached_reservas';
+        else if (endpoint.includes('/productos')) cacheStore = 'cached_productos';
+        else if (endpoint.includes('/categorias')) cacheStore = 'cached_categorias';
+        else if (endpoint.includes('/servicios')) cacheStore = 'cached_servicios';
+        else if (endpoint.includes('/usuarios') || endpoint.includes('/oferentes')) cacheStore = 'cached_usuarios';
+        else if (endpoint.includes('/announcements')) cacheStore = 'cached_announcements';
+
+        const cachedData = await getCache(cacheStore, endpoint);
+        
+        if (cachedData) {
+          console.log(`📦 Serving cached data for ${endpoint}`);
+          // Add a custom marker to signal to the UI that these are offline results
+          if (Array.isArray(cachedData)) {
+            cachedData._isCache = true; 
+          }
+          return cachedData;
+        } else {
+           console.warn(`📦 No offline cache found for ${endpoint}`);
+           throw new Error('No hay conexión y no hay datos guardados para mostrar.');
         }
       }
-
-      // Save to IndexedDB
-      await saveToQueue(endpoint, method, parsedBody);
-
-      return {
-        _offlineQueued: true,
-        message: 'Guardado localmente para sincronizar luego'
-      };
     }
 
     throw error;
@@ -661,6 +704,9 @@ export const mercadopagoAPI = {
    ANNOUNCEMENTS API
 ====================================================== */
 export const announcementsAPI = {
+  getMaintenance: () =>
+    apiRequest('/announcements/maintenance'),
+
   getAll: () =>
     apiRequest('/announcements'),
 

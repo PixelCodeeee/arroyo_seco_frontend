@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RefreshCcw } from 'lucide-react';
 import { serviciosAPI, oferentesAPI } from '../services/api';
-import { useOfflineForm } from '../hooks/useOfflineForm';
+
 import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function CrearServicio() {
   const navigate = useNavigate();
-  const { submitForm, offlineMsg } = useOfflineForm();
+
   const [formData, setFormData] = useState({
     id_oferente: '',
     nombre: '',
@@ -58,8 +59,12 @@ function CrearServicio() {
         imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
       };
 
-      await serviciosAPI.create(dataToSend);
-      toast.success('Servicio creado exitosamente');
+      const res = await serviciosAPI.create(dataToSend);
+      if (res && res._offlineQueued) {
+        toast.info(res.message || "Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Servicio creado exitosamente");
+      }
       navigate('/servicios');
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Error desconocido';
@@ -79,20 +84,7 @@ function CrearServicio() {
 
         {error && <div className="error-banner">{error}</div>}
 
-        {offlineMsg && (
-          <div style={{
-            padding: '10px 16px',
-            marginBottom: '12px',
-            borderRadius: '8px',
-            background: offlineMsg.type === 'success' ? '#d4edda' : '#fff3cd',
-            color: offlineMsg.type === 'success' ? '#155724' : '#856404',
-            border: '1px solid',
-            borderColor: offlineMsg.type === 'success' ? '#c3e6cb' : '#ffeeba',
-            fontSize: '14px'
-          }}>
-            {offlineMsg.text}
-          </div>
-        )}
+
         <form onSubmit={handleSubmit} className="auth-form">
 
           <div className="form-group">

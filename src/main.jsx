@@ -1,17 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register'
-import { startAutoSync } from './utils/offlineQueue';
+import { startSyncEngine } from './services/syncEngine';
 
 import './index.css';
 import App from './App.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import { toast } from 'sonner';
+import { Download } from 'lucide-react';
 
 const updateSW = registerSW({
   onNeedRefresh() {
     toast('¡Nueva versión disponible!', {
+      icon: <Download size={18} />,
       description: 'Haz clic para actualizar a la última versión.',
       action: {
         label: 'Actualizar',
@@ -21,19 +23,12 @@ const updateSW = registerSW({
     });
   },
   onOfflineReady() {
-    console.log(' App lista para usar offline')
+    console.log('App lista para usar offline')
   }
 })
 
-// Sincronizar formularios pendientes cuando regrese la conexión
-startAutoSync(import.meta.env.VITE_API_URL, ({ synced, failed }) => {
-  if (synced > 0) {
-    toast.success(`¡Sincronización completada! ${synced} acción(es) enviada(s) al servidor.`);
-  }
-  if (failed > 0) {
-    toast.error(`Atención: ${failed} acción(es) no pudieron ser sincronizadas.`);
-  }
-})
+// Initialize background sync engine
+startSyncEngine();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
