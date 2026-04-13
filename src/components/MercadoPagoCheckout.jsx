@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mercadopagoAPI, paypalAPI } from '../services/api'; // keeping api object the same, as per previous implementation, but maybe backend is updated
+import { mercadopagoAPI } from '../services/api'; // keeping api object the same, as per previous implementation, but maybe backend is updated
 import { getCart, clearCart } from '../utils/cartUtils';
 import { AlertCircle, Lock, CreditCard } from 'lucide-react';
 import '../styles/MercadoPagoCheckout.css';

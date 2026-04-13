@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Truck } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
+import { pedidosAPI } from "../services/api";
+import { toast } from "sonner";
+import OrdenDetailModal from "./OrdenDetailModal";
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -13,6 +16,11 @@ function Navbar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Global Tracker State
+  const [isTrackerOpen, setIsTrackerOpen] = useState(false);
+  const [trackerPedido, setTrackerPedido] = useState(null);
+  const [isTrackerLoading, setIsTrackerLoading] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
@@ -45,6 +53,30 @@ function Navbar() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+
+  const handleTrackerClick = async () => {
+    if (!user) return;
+    try {
+      setIsTrackerLoading(true);
+      const orders = await pedidosAPI.getMisPedidos();
+      if (!orders || orders.length === 0) {
+        toast.info("No tienes órdenes recientes.");
+        return;
+      }
+      
+      // Sort orders descending by create date
+      const sortedOrders = orders.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
+      // Prioritize active (not completed) orders first, if any
+      const activeOrder = sortedOrders.find(o => o.estado !== "completado") || sortedOrders[0];
+      
+      setTrackerPedido(activeOrder);
+      setIsTrackerOpen(true);
+    } catch (err) {
+      toast.error("No se pudo cargar el rastreador de órdenes");
+    } finally {
+      setIsTrackerLoading(false);
+    }
+  };
 
   return (
     <header className="navbar">
@@ -102,6 +134,17 @@ function Navbar() {
           <i className="ri-settings-3-line"></i>
         </button>
 
+        {user && (
+          <button 
+            onClick={handleTrackerClick} 
+            className="cart-button" 
+            aria-label="Rastreador de Órdenes"
+            disabled={isTrackerLoading}
+          >
+            {isTrackerLoading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : <Truck size={20} />}
+          </button>
+        )}
+
         <button onClick={handleCartClick} className="cart-button" aria-label="Carrito de compras">
           <i className="ri-shopping-cart-line"></i>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -131,6 +174,19 @@ function Navbar() {
         <div id="google_translate_element" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', top: 0 }}></div>
 
       </div>
+
+      {/* Global Tracker Modal Injection */}
+      <OrdenDetailModal
+        pedido={trackerPedido}
+        isOpen={isTrackerOpen}
+        onClose={() => {
+          setIsTrackerOpen(false);
+          setTrackerPedido(null);
+        }}
+        onEstadoChange={() => {}}
+        canChangeEstado={false}
+        isTurista={user?.rol === "turista" || user?.rol === "oferente"}
+      />
     </header>
   );
 }

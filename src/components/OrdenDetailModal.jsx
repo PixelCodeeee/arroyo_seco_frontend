@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { X, Package, Clock, CheckCircle, Truck, User, ShoppingBag, DollarSign, Store, Phone, MapPin, Utensils } from 'lucide-react';
 import { oferentesAPI } from "../services/api";
 import "../styles/OrdenDetailModal.css";
@@ -7,6 +8,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
   if (!isOpen || !pedido) return null;
 
   const [oferenteDetails, setOferenteDetails] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen && pedido && isTurista) {
@@ -62,7 +64,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
   const calcularSubtotal = () => {
     return pedido.items?.reduce((sum, item) => {
-      return sum + parseFloat(item.precio_compra) * parseInt(item.cantidad);
+      return sum + parseFloat(item.precio_unitario) * parseInt(item.cantidad);
     }, 0) || 0;
   };
 
@@ -75,7 +77,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
           <div>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Package size={24} /> Detalle del Pedido #{pedido.id_pedido}</h2>
             <p className="modal-subtitle">
-              {formatDate(pedido.fecha_creacion)}
+              {formatDate(pedido.fecha_pedido)}
             </p>
           </div>
           <button className="modal-close" onClick={onClose}>
@@ -92,11 +94,11 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
               <div className="order-tracker-container" style={{ margin: "1rem 0", padding: "1rem", backgroundColor: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border-color)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", position: "relative" }}>
                   <div style={{ position: "absolute", top: "15px", left: "10%", right: "10%", height: "4px", backgroundColor: "var(--border-color)", zIndex: 1 }}></div>
-                  
+
                   {/* Progress Line Active */}
-                  <div style={{ 
+                  <div style={{
                     position: "absolute", top: "15px", left: "10%", height: "4px", backgroundColor: "var(--primary-color)", zIndex: 2, transition: "width 0.4s",
-                    width: pedido.estado === "pendiente" ? "0%" : pedido.estado === "pagado" ? "33%" : pedido.estado === "enviado" ? "66%" : "80%" 
+                    width: pedido.estado === "pendiente" ? "0%" : pedido.estado === "pagado" ? "33%" : pedido.estado === "enviado" ? "66%" : "80%"
                   }}></div>
 
                   {/* Steps */}
@@ -133,34 +135,34 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
               {oferenteDetails && (
                 <div className="oferente-contact-card" style={{ marginTop: "1rem", padding: "1.5rem", borderRadius: "12px", border: "1px solid var(--border-color)", backgroundColor: "var(--bg-card)" }}>
-                   <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", display: 'flex', alignItems: 'center', gap: '8px' }}>
-                     <Store size={20} style={{ color: "var(--primary-color)" }} /> 
-                     Información del Establecimiento para Recoger
-                   </h3>
-                   <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                     <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                        <Store size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
+                  <h3 style={{ margin: "0 0 1rem 0", fontSize: "1.1rem", display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Store size={20} style={{ color: "var(--primary-color)" }} />
+                    Información del Establecimiento para Recoger
+                  </h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <Store size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
+                      <div>
+                        <p style={{ margin: 0, fontWeight: "600" }}>{oferenteDetails.nombre_negocio || "Establecimiento"}</p>
+                      </div>
+                    </div>
+                    {oferenteDetails.direccion && (
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                        <MapPin size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
                         <div>
-                          <p style={{ margin: 0, fontWeight: "600" }}>{oferenteDetails.nombre_negocio || "Establecimiento"}</p>
+                          <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.direccion}</p>
                         </div>
-                     </div>
-                     {oferenteDetails.direccion && (
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                          <MapPin size={18} color="var(--text-muted)" style={{ marginTop: "2px" }} />
-                          <div>
-                            <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.direccion}</p>
-                          </div>
+                      </div>
+                    )}
+                    {oferenteDetails.telefono && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <Phone size={18} color="var(--text-muted)" />
+                        <div>
+                          <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.telefono}</p>
                         </div>
-                     )}
-                     {oferenteDetails.telefono && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <Phone size={18} color="var(--text-muted)" />
-                          <div>
-                            <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>{oferenteDetails.telefono}</p>
-                          </div>
-                        </div>
-                     )}
-                   </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -289,11 +291,11 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                         <strong>{item.cantidad}</strong>
                       </div>
                       <div className="item-price">
-                        {formatCurrency(item.precio_compra)} c/u
+                        {formatCurrency(item.precio_unitario)} c/u
                       </div>
                       <div className="item-total">
                         <strong>
-                          {formatCurrency(item.precio_compra * item.cantidad)}
+                          {formatCurrency(item.precio_unitario * item.cantidad)}
                         </strong>
                       </div>
                     </div>
@@ -315,7 +317,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
               </div>
               <div className="summary-row total">
                 <span><strong>Total:</strong></span>
-                <span><strong>{formatCurrency(pedido.monto_total)}</strong></span>
+                <span><strong>{formatCurrency(pedido.total)}</strong></span>
               </div>
             </div>
           </div>
@@ -323,7 +325,18 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
         </div>
 
         {/* Footer */}
-        <div className="modal-footer">
+        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {isTurista ? (
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                onClose();
+                navigate("/ordenes");
+              }}
+            >
+              Ver Historial de Órdenes
+            </button>
+          ) : <div></div>}
           <button className="btn btn-secondary" onClick={onClose}>
             Cerrar
           </button>
