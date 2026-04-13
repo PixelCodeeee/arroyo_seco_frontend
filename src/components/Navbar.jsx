@@ -58,18 +58,22 @@ function Navbar() {
     if (!user) return;
     try {
       setIsTrackerLoading(true);
-      const orders = await pedidosAPI.getMisPedidos();
-      if (!orders || orders.length === 0) {
+      const response = await pedidosAPI.getMisPedidos();
+      const orders = response.pedidos || [];  // ✅ extraer el array
+
+      if (orders.length === 0) {
         toast.info("No tienes órdenes recientes.");
         return;
       }
-      
-      // Sort orders descending by create date
-      const sortedOrders = orders.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
-      // Prioritize active (not completed) orders first, if any
+
+      const sortedOrders = orders.sort((a, b) =>
+        new Date(b.fecha_pedido) - new Date(a.fecha_pedido)  // ✅ campo correcto
+      );
       const activeOrder = sortedOrders.find(o => o.estado !== "completado") || sortedOrders[0];
-      
-      setTrackerPedido(activeOrder);
+
+      // Fetch full detail con items
+      const detalle = await pedidosAPI.getById(activeOrder.id_pedido);
+      setTrackerPedido(detalle);
       setIsTrackerOpen(true);
     } catch (err) {
       toast.error("No se pudo cargar el rastreador de órdenes");
@@ -135,9 +139,9 @@ function Navbar() {
         </button>
 
         {user && (
-          <button 
-            onClick={handleTrackerClick} 
-            className="cart-button" 
+          <button
+            onClick={handleTrackerClick}
+            className="cart-button"
             aria-label="Rastreador de Órdenes"
             disabled={isTrackerLoading}
           >
@@ -183,7 +187,7 @@ function Navbar() {
           setIsTrackerOpen(false);
           setTrackerPedido(null);
         }}
-        onEstadoChange={() => {}}
+        onEstadoChange={() => { }}
         canChangeEstado={false}
         isTurista={user?.rol === "turista" || user?.rol === "oferente"}
       />
