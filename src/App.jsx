@@ -42,6 +42,12 @@ import Recomendaciones from "./pages/Recomendaciones";
 import Analiticas from "./pages/Analiticas";
 import InstallPrompt from "./components/InstallPrompt";
 
+import EULA from "./pages/EULA";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import AboutTeam from "./pages/AboutTeam";
+import FAQ from "./pages/FAQ";
+
 function App() {
   const initialOptions = {
     clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
@@ -292,6 +298,13 @@ function App() {
 
             <Route path="/oferente/:id" element={<OferenteDetail />} />
             <Route path="/carrito" element={<Carrito />} />
+            
+            {/* Legal Pages */}
+            <Route path="/eula" element={<EULA />} />
+            <Route path="/privacidad" element={<PrivacyPolicy />} />
+            <Route path="/terminos" element={<TermsOfService />} />
+            <Route path="/equipo" element={<AboutTeam />} />
+            <Route path="/faq" element={<FAQ />} />
             
             {/* Catch-all route for robust 404 rendering */}
             <Route path="*" element={<ErrorPage />} />

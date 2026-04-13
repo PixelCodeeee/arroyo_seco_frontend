@@ -388,7 +388,10 @@
    RESPONSIVE
 ============================== */
 @media (max-width: 768px) {
-  .ordenes-header,
+  .ordenes-header {
+    padding: 2rem 1rem;
+  }
+
   .ordenes-controls,
   .ordenes-table-container,
   .alert {
@@ -401,6 +404,8 @@
   .ordenes-stats {
     grid-template-columns: repeat(2, 1fr);
     padding: 1.5rem 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 
   .ordenes-controls {

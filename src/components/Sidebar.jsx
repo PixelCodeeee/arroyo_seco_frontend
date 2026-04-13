@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme as useOldTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/ThemeProvider";
 import ConfirmModal from "./ConfirmModal";
 import {
   Home,
@@ -17,11 +18,12 @@ import {
   Menu,
   X,
   Type,
+  Settings,
 } from "lucide-react";
 import "../styles/Sidebar.css";
 
 function FontSizeToggle({ collapsed }) {
-  const { fontSize, cycleFontSize } = useTheme();
+  const { fontSize, cycleFontSize } = useOldTheme();
   const labels = { normal: "Normal", large: "Grande", xlarge: "Extra" };
   const nextLabel = { normal: "Grande", large: "Extra grande", xlarge: "Normal" };
 
@@ -49,6 +51,7 @@ function FontSizeToggle({ collapsed }) {
 }
 
 function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
+  const { isSettingsOpen, setIsSettingsOpen } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -235,6 +238,15 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       {/* Sidebar Footer */}
       <div className="sidebar-footer">
         <FontSizeToggle collapsed={isCollapsed} />
+        <button
+          className="sidebar-settings-btn logout-button"
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          title={isCollapsed ? "Cerrar Ajustes" : ""}
+          style={{ marginBottom: '8px' }}
+        >
+          <span className="nav-icon"><Settings size={20} /></span>
+          {!isCollapsed && <span>Ajustes Globales</span>}
+        </button>
         <button
           className="logout-button"
           onClick={requestLogout}

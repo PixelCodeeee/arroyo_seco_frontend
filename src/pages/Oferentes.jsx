@@ -762,7 +762,7 @@ function Oferentes() {
 
         {/* Badge estado MP */}
         {isOferente && hasOferenteProfile && mpEstado && (
-          <div style={{ marginBottom: '12px' }}>
+          <div style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
             {getMpBadge()}
           </div>
         )}
@@ -872,7 +872,7 @@ function Oferentes() {
               </div>
             )}
 
-            <div className="usuarios-table-container">
+            <div className="usuarios-table-container table-responsive">
               <table className="usuarios-table">
                 <thead>
                   <tr>
@@ -896,23 +896,23 @@ function Oferentes() {
                   ) : (
                     filteredOferentes.map((oferente) => (
                       <tr key={oferente.id_oferente}>
-                        <td>{oferente.id_oferente}</td>
-                        <td>
+                        <td data-label="ID">{oferente.id_oferente}</td>
+                        <td data-label="Nombre Negocio">
                           <strong>{oferente.nombre_negocio}</strong>
                         </td>
                         {!isOferente && (
-                          <td>
+                          <td data-label="Propietario">
                             {oferente.nombre_usuario}
                             <br />
                             <small>{oferente.correo_usuario}</small>
                           </td>
                         )}
-                        <td>
+                        <td data-label="Tipo">
                           <span className={`badge badge-${oferente.tipo}`}>
                             {oferente.tipo === 'restaurante' ? <Utensils size={16} /> : <Palette size={16} />} {oferente.tipo}
                           </span>
                         </td>
-                        <td>
+                        <td data-label="Estado">
                           {!isOferente ? (
                             <select
                               value={oferente.estado}
@@ -929,11 +929,11 @@ function Oferentes() {
                             </span>
                           )}
                         </td>
-                        <td>{oferente.telefono || 'N/A'}</td>
-                        <td>
+                        <td data-label="Teléfono">{oferente.telefono || 'N/A'}</td>
+                        <td data-label="Dirección">
                           <small>{oferente.direccion || 'N/A'}</small>
                         </td>
-                        <td className="actions">
+                        <td data-label="Acciones" className="actions">
                           {canEditOferente(oferente) ? (
                             <>
                               <Link
@@ -941,7 +941,7 @@ function Oferentes() {
                                 className="btn-action btn-edit"
                                 title="Editar"
                               >
-                                <Edit size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
+                                <Edit size={18} />
                               </Link>
                               {!isOferente && (
                                 <button
@@ -949,7 +949,7 @@ function Oferentes() {
                                   className="btn-action btn-delete"
                                   title="Eliminar"
                                 >
-                                  <Trash2 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
+                                  <Trash2 size={18} />
                                 </button>
                               )}
                             </>

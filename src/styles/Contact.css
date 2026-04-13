@@ -241,6 +241,12 @@
   flex-wrap: wrap;
 }
 
+.cta-buttons a {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
 /* ==============================
    BUTTONS
 ============================== */

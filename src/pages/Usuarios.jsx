@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Edit, Trash2 } from 'lucide-react';
 import { usuariosAPI } from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
 import { toast } from 'sonner';
@@ -110,7 +111,7 @@ function Usuarios() {
           </div>
         </div>
 
-        <div className="usuarios-table-container">
+        <div className="usuarios-table-container table-responsive">
           <table className="usuarios-table">
             <thead>
               <tr>
@@ -126,32 +127,34 @@ function Usuarios() {
             <tbody>
               {usuarios.map((usuario) => (
                 <tr key={usuario.id_usuario}>
-                  <td>{usuario.id_usuario}</td>
-                  <td>{usuario.nombre}</td>
-                  <td>{usuario.correo}</td>
-                  <td>
+                  <td data-label="ID">{usuario.id_usuario}</td>
+                  <td data-label="Nombre">{usuario.nombre}</td>
+                  <td data-label="Correo">{usuario.correo}</td>
+                  <td data-label="Rol">
                     <span className={`badge badge-${usuario.rol}`}>
                       {usuario.rol}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Estado">
                     <span className={`status ${usuario.esta_activo ? 'active' : 'inactive'}`}>
                       {usuario.esta_activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td>{new Date(usuario.fecha_creacion).toLocaleDateString()}</td>
-                  <td className="actions">
+                  <td data-label="Fecha Creación">{new Date(usuario.fecha_creacion).toLocaleDateString()}</td>
+                  <td data-label="Acciones" className="actions">
                     <Link
                       to={`/usuarios/editar/${usuario.id_usuario}`}
                       className="btn-action btn-edit"
+                      title="Editar"
                     >
-                      Editar
+                      <Edit size={18} />
                     </Link>
                     <button
                       onClick={() => requestDelete(usuario.id_usuario)}
                       className="btn-action btn-delete"
+                      title="Eliminar"
                     >
-                      Eliminar
+                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>

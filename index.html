@@ -8,10 +8,21 @@
   <meta name="theme-color" content="#E91E8C" />
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
   <title>Arroyo Seco</title>
+  <style>
+    /* Google Translate Widget Overrides */
+    iframe[src*="translate.googleapis.com"] { display: none !important; }
+    iframe.goog-te-banner-frame { display: none !important; visibility: hidden !important; }
+    .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+    body { top: 0px !important; position: static !important; }
+    #goog-gt-tt { display: none !important; }
+    .goog-te-gadget { display: none !important; }
+    .goog-tooltip { display: none !important; }
+  </style>
 </head>
 
 <body>
   <div id="root"></div>
+  <div id="google_translate_element" style="display: none;"></div>
   <script type="module" src="/src/main.jsx"></script>
 
   <script type="text/javascript">

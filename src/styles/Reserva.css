@@ -164,7 +164,10 @@
    RESPONSIVE
 ============================== */
 @media (max-width: 768px) {
-  .reservas-header,
+  .reservas-header {
+    padding: 2rem 1rem;
+  }
+
   .reservas-controls,
   .reservas-table-container {
     padding-left: 1rem;
@@ -176,6 +179,8 @@
   .reservas-stats {
     grid-template-columns: repeat(2, 1fr);
     padding: 1.5rem 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 
   .reservas-table th:nth-child(3),

@@ -245,6 +245,12 @@ a {
 .bg-card      { background-color: var(--bg-card); }
 .bg-primary   { background-color: var(--bg-primary); }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Transición suave al cambiar tema en todos los elementos */
 *,
 *::before,
@@ -350,4 +356,93 @@ body {
 
 .settings-backdrop {
   animation: fadeBackdrop 0.3s ease-out forwards;
+}
+
+/* ==============================
+   TABLE TO CARD RESPONSIVE LAYOUT
+============================== */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: hidden !important; /* Force hide horizontal overflow */
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+  }
+
+  /* Reset forced widths from sub-stylesheet classes like .usuarios-table */
+  .table-responsive table,
+  .table-responsive thead,
+  .table-responsive tbody,
+  .table-responsive th,
+  .table-responsive td,
+  .table-responsive tr {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide table headers (but keep them accessible for screen readers) */
+  .table-responsive thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  /* Each row becomes a card */
+  .table-responsive tr {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 8px);
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .table-responsive td {
+    border: none;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Allows tall string wrapping */
+    padding: 0.75rem 0.5rem;
+    min-height: 2.5rem;
+    text-align: right;
+    word-break: break-word; /* Crucial for long emails/IDs without a space */
+    gap: 0.5rem;
+  }
+  
+  .table-responsive td > * {
+    /* Allow cell children to compress rather than overflow the card */
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .table-responsive td:last-child {
+    border-bottom: 0;
+  }
+
+  /* Display the data-label before the content */
+  .table-responsive td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-transform: capitalize;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: left;
+    margin-right: 0.5rem;
+    flex-shrink: 0; 
+    max-width: 40%; /* Reserve space but don't eat the whole row */
+    word-break: normal;
+  }
+
+  /* Actions column specific sizing */
+  .table-responsive td.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap; /* Actions might need to wrap on a tiny screen */
+  }
 }

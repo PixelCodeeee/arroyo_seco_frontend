@@ -3,7 +3,7 @@
 ============================== */
 .orden-modal {
   max-width: 900px;
-  max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
 }
 

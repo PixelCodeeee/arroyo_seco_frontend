@@ -160,7 +160,7 @@ function Productos() {
         </div>
 
         {/* TABLE */}
-        <div className="usuarios-table-container">
+        <div className="usuarios-table-container table-responsive">
           <table className="usuarios-table">
             <thead>
               <tr>
@@ -184,36 +184,36 @@ function Productos() {
               ) : (
                 filtered.map((p) => (
                   <tr key={p.id_producto}>
-                    <td>{p.id_producto}</td>
+                    <td data-label="ID">{p.id_producto}</td>
 
-                    <td>
+                    <td data-label="Nombre">
                       <strong>{p.nombre}</strong>
                     </td>
 
-                    <td>
+                    <td data-label="Categoría">
                       {categorias.find((c) => c.id_categoria === p.id_categoria)?.nombre || "N/A"}
                     </td>
 
-                    <td>${p.precio}</td>
-                    <td>{p.inventario}</td>
+                    <td data-label="Precio">${p.precio}</td>
+                    <td data-label="Inventario">{p.inventario}</td>
 
-                    <td>{Array.isArray(p.imagenes) ? p.imagenes.length : 0}</td>
+                    <td data-label="Imágenes">{Array.isArray(p.imagenes) ? p.imagenes.length : 0}</td>
 
-                    <td>
+                    <td data-label="Estatus">
                       <span className={`badge ${p.estatus ? "badge-success" : "badge-danger"}`}>
                         {p.estatus ? "Activo" : "Inactivo"}
                       </span>
                     </td>
 
-                    {isAdmin && <td>{p.id_oferente}</td>}
+                    {isAdmin && <td data-label="Oferente">{p.id_oferente}</td>}
 
-                    <td className="actions">
+                    <td data-label="Acciones" className="actions">
                       <Link
                         to={`/productos/editar/${p.id_producto}`}
                         className="btn-action btn-edit"
                         title="Editar"
                       >
-                        <Pencil size={16} />
+                        <Pencil size={18} />
                       </Link>
 
                       <button
@@ -221,7 +221,7 @@ function Productos() {
                         className="btn-action btn-delete"
                         title="Eliminar"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                       </button>
                     </td>
                   </tr>

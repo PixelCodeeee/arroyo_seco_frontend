@@ -27,13 +27,23 @@ const SettingsModal = () => {
         } catch(e) {}
         
         localStorage.setItem('app_language', lng);
+        
+        // Ensure persistency over page refreshes directly on the native Google Translate cookie
+        document.cookie = `googtrans=/es/${lng}; path=/;`;
+        document.cookie = `googtrans=/es/${lng}; domain=${window.location.hostname}; path=/;`;
+        
         toast.success(lng === 'en' ? 'Changing language...' : 'Cambiando idioma...', { duration: 1500 });
         
-        // Native Google Translate trigger
+        // Native Google Translate dynamic trigger
         const selectField = document.querySelector('.goog-te-combo');
         if (selectField) {
             selectField.value = lng;
             selectField.dispatchEvent(new Event('change'));
+        } else {
+            // Hot fallback: If Google hasn't asynchronously loaded the combo box yet, force a refresh to apply the cookie
+            setTimeout(() => {
+                window.location.reload();
+            }, 600);
         }
     };
 

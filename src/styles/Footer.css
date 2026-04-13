@@ -38,6 +38,27 @@
   color: var(--accent);
 }
 
+.footer-links {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.footer-links a {
+  color: var(--dark-bg);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
 .footer small {
   display: block;
   margin-top: 1rem;

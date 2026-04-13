@@ -154,7 +154,7 @@ function Categorias() {
         </div>
 
         {/* TABLE */}
-        <div className="usuarios-table-container">
+        <div className="usuarios-table-container table-responsive">
           <table className="usuarios-table">
             <thead>
               <tr>
@@ -172,21 +172,21 @@ function Categorias() {
               ) : (
                 filtered.map((cat) => (
                   <tr key={cat.id_categoria}>
-                    <td>{cat.id_categoria}</td>
-                    <td><strong>{cat.nombre}</strong></td>
-                    <td>
+                    <td data-label="ID">{cat.id_categoria}</td>
+                    <td data-label="Nombre"><strong>{cat.nombre}</strong></td>
+                    <td data-label="Tipo">
                       <span className={`badge badge-${cat.tipo}`}>
-                        {cat.tipo === 'gastronomica' ? <><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Gastronómica</> : <><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</>}
+                        {cat.tipo === 'gastronomica' ? <><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Gastronómica</> : <><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</>}
                       </span>
                     </td>
                     {isAdmin && (
-                      <td className="actions">
+                      <td data-label="Acciones" className="actions">
                         <Link
                           to={`/categorias/editar/${cat.id_categoria}`}
                           className="btn-action btn-edit"
                           title="Editar"
                         >
-                          <Edit size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
+                          <Edit size={18} />
                         </Link>
 
                         <button
@@ -194,7 +194,7 @@ function Categorias() {
                           className="btn-action btn-delete"
                           title="Eliminar"
                         >
-                          <Trash2 size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
+                          <Trash2 size={18} />
                         </button>
                       </td>
                     )}

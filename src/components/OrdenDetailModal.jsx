@@ -5,8 +5,6 @@ import { oferentesAPI } from "../services/api";
 import "../styles/OrdenDetailModal.css";
 
 function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEstado, isTurista }) {
-  if (!isOpen || !pedido) return null;
-
   const [oferenteDetails, setOferenteDetails] = useState(null);
   const navigate = useNavigate();
 
@@ -27,6 +25,8 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
       }
     }
   }, [isOpen, pedido, isTurista]);
+
+  if (!isOpen || !pedido) return null;
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -59,6 +59,16 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
         return "badge-primary";
       default:
         return "badge-secondary";
+    }
+  };
+
+  const getStatusLabelText = (estado) => {
+    switch (estado) {
+      case "pendiente": return "Pendiente";
+      case "pagado": return "Pagado / En Prep.";
+      case "enviado": return "Listo para Recoger";
+      case "completado": return "Recogido / Historial";
+      default: return estado;
     }
   };
 
@@ -103,10 +113,10 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
 
                   {/* Steps */}
                   {[
-                    { id: "pendiente", label: "Orden Recibida", icon: <Clock size={20} /> },
-                    { id: "pagado", label: "En Preparación", icon: <Utensils size={20} /> },
+                    { id: "pendiente", label: "Pendiente", icon: <Clock size={20} /> },
+                    { id: "pagado", label: "Pagado / En Prep.", icon: <Utensils size={20} /> },
                     { id: "enviado", label: "Listo para Recoger", icon: <Truck size={20} /> },
-                    { id: "completado", label: "Completado", icon: <CheckCircle size={20} /> }
+                    { id: "completado", label: "Recogido / Historial", icon: <CheckCircle size={20} /> }
                   ].map((step, idx) => {
                     const stepIndex = ["pendiente", "pagado", "enviado", "completado"].indexOf(step.id);
                     const currentStatusIndex = ["pendiente", "pagado", "enviado", "completado"].indexOf(pedido.estado);
@@ -172,10 +182,10 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
               <div className="estado-info">
                 <label>Estado actual:</label>
                 <span className={`badge badge-large ${getEstadoBadgeClass(pedido.estado)}`}>
-                  {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
-                  {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado</>}
-                  {pedido.estado === "enviado" && <><Truck size={16} /> Listo para recoger (Enviado)</>}
-                  {pedido.estado === "completado" && <><CheckCircle size={16} /> Completado</>}
+                  {pedido.estado === "pendiente" && <><Clock size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                  {pedido.estado === "pagado" && <><CheckCircle size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                  {pedido.estado === "enviado" && <><Truck size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                  {pedido.estado === "completado" && <><CheckCircle size={16} /> {getStatusLabelText(pedido.estado)}</>}
                 </span>
               </div>
 
@@ -200,7 +210,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                           onEstadoChange(pedido.id_pedido, "pagado");
                           onClose();
                         }}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Pagado (Preparando)
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Pagado / En Prep.
                       </button>
                     )}
                     {pedido.estado !== "enviado" && (
@@ -210,7 +220,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                           onEstadoChange(pedido.id_pedido, "enviado");
                           onClose();
                         }}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Truck size={14} /> Marcar Listo (Enviado)
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Truck size={14} /> Marcar Listo para Recoger
                       </button>
                     )}
                     {pedido.estado !== "completado" && (
@@ -220,7 +230,7 @@ function OrdenDetailModal({ pedido, isOpen, onClose, onEstadoChange, canChangeEs
                           onEstadoChange(pedido.id_pedido, "completado");
                           onClose();
                         }}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Completado
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={14} /> Marcar Recogido / Historial
                       </button>
                     )}
                   </div>

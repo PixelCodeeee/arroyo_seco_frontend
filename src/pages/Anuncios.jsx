@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Edit, Trash2 } from 'lucide-react';
 import { announcementsAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ConfirmModal from '../components/ConfirmModal';
@@ -95,7 +96,7 @@ function Anuncios() {
             </div>
           </div>
 
-          <div className="usuarios-table-container">
+          <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
                 <tr>
@@ -117,21 +118,21 @@ function Anuncios() {
                 ) : (
                   anuncios.map(a => (
                     <tr key={a.id}>
-                      <td>{a.id}</td>
-                      <td>{a.title}</td>
-                      <td>{a.description?.substring(0, 60)}...</td>
-                      <td>{a.event_date ? new Date(a.event_date).toLocaleDateString('es-MX') : '—'}</td>
-                      <td>
+                      <td data-label="ID">{a.id}</td>
+                      <td data-label="Título">{a.title}</td>
+                      <td data-label="Descripción">{a.description?.substring(0, 60)}...</td>
+                      <td data-label="Fecha Evento">{a.event_date ? new Date(a.event_date).toLocaleDateString('es-MX') : '—'}</td>
+                      <td data-label="Estado">
                         <span className={`status ${a.is_active ? 'active' : 'inactive'}`}>
                           {a.is_active ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="actions">
-                        <Link to={`/anuncios/editar/${a.id}`} className="btn-action btn-edit">
-                          Editar
+                      <td data-label="Acciones" className="actions">
+                        <Link to={`/anuncios/editar/${a.id}`} className="btn-action btn-edit" title="Editar">
+                          <Edit size={18} />
                         </Link>
-                        <button onClick={() => requestDelete(a.id)} className="btn-action btn-delete">
-                          Eliminar
+                        <button onClick={() => requestDelete(a.id)} className="btn-action btn-delete" title="Eliminar">
+                          <Trash2 size={18} />
                         </button>
                       </td>
                     </tr>

@@ -247,7 +247,7 @@ function Reservas() {
         </div>
 
         {/* TABLE */}
-        <div className="reservas-table-container">
+        <div className="reservas-table-container table-responsive">
           {filtered.length === 0 ? (
             <div className="empty-state">
               <span className="empty-icon"><Utensils size={32} /></span>
@@ -275,36 +275,36 @@ function Reservas() {
               <tbody>
                 {filtered.map((reserva) => (
                   <tr key={reserva.id_reserva}>
-                    <td><strong>#{reserva.id_reserva}</strong></td>
+                    <td data-label="ID"><strong>#{reserva.id_reserva}</strong></td>
 
                     {!isTurista && (
-                      <td className="cliente-info">
+                      <td data-label="Cliente" className="cliente-info">
                         <div>
                           <strong>{reserva.usuario?.nombre || "N/A"}</strong>
-                          <small>{reserva.usuario?.correo || ""}</small>
+                          <br /><small>{reserva.usuario?.correo || ""}</small>
                         </div>
                       </td>
                     )}
 
                     {!isOferente && (
-                      <td>
+                      <td data-label="Servicio">
                         <div className="servicio-info">
                           <strong>{reserva.servicio?.nombre || "N/A"}</strong>
-                          {reserva.servicio?.oferente?.nombre && <small>{reserva.servicio.oferente.nombre}</small>}
+                          {reserva.servicio?.oferente?.nombre && <><br /><small>{reserva.servicio.oferente.nombre}</small></>}
                         </div>
                       </td>
                     )}
 
-                    <td>{formatDateShort(reserva.fecha)}</td>
-                    <td className="hora">{formatTime(reserva.hora)}</td>
+                    <td data-label="Fecha">{formatDateShort(reserva.fecha)}</td>
+                    <td data-label="Hora" className="hora">{formatTime(reserva.hora)}</td>
 
-                    <td>
+                    <td data-label="Personas">
                       <span className="personas-badge">
                         {reserva.numero_personas} <Users size={14} />
                       </span>
                     </td>
 
-                    <td>
+                    <td data-label="Estado">
                       {isAdmin || isOferente ? (
                         // ✅ <option> cannot render icons — text only
                         <select
@@ -325,13 +325,13 @@ function Reservas() {
                       )}
                     </td>
 
-                    <td className="actions">
+                    <td data-label="Acciones" className="actions">
                       <button
                         onClick={() => handleViewDetails(reserva)}
                         className="btn-action btn-view"
                         title="Ver detalles"
                       >
-                        <Eye size={16} />
+                        <Eye size={18} />
                       </button>
 
                       {isTurista && canCancelReserva(reserva) && (
@@ -340,7 +340,7 @@ function Reservas() {
                           className="btn-action btn-cancel"
                           title="Cancelar reserva"
                         >
-                          <XCircle size={16} />
+                          <XCircle size={18} />
                         </button>
                       )}
                     </td>

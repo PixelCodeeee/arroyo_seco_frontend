@@ -1,12 +1,13 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, DollarSign, Search, Eye } from 'lucide-react';
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, DollarSign, Search, Eye, Download } from 'lucide-react';
 import React, { useState, useEffect } from "react";
 import { pedidosAPI } from "../services/api";
 import Layout from "../components/Layout";
 import OrdenDetailModal from "../components/OrdenDetailModal";
 import ConfirmModal from "../components/ConfirmModal";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import "../styles/Ordenes.css";
-
 function Ordenes() {
   const [pedidos, setPedidos] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -160,6 +161,36 @@ function Ordenes() {
     }
   };
 
+  const generatePDF = (pedido) => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`Recibo de Pedido #${pedido.id_pedido}`, 14, 22);
+
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${formatDate(pedido.fecha_pedido)}`, 14, 32);
+    doc.text(`Estado: ${getStatusLabelText(pedido.estado)}`, 14, 40);
+    doc.text(`Cliente: ${pedido.nombre_usuario || "N/A"} (${pedido.email_usuario || "N/A"})`, 14, 48);
+
+    const items = pedido.items || [];
+    const tableData = items.map(item => [
+      item.nombre_producto,
+      item.cantidad,
+      formatCurrency(item.precio_unitario),
+      formatCurrency(item.precio_unitario * item.cantidad)
+    ]);
+
+    doc.autoTable({
+      startY: 55,
+      head: [['Producto', 'Cantidad', 'Precio Unit.', 'Total']],
+      body: tableData,
+    });
+
+    const finalY = doc.lastAutoTable.finalY || 55;
+    doc.text(`Total: ${formatCurrency(pedido.total)}`, 14, finalY + 10);
+
+    doc.save(`pedido_${pedido.id_pedido}.pdf`);
+  };
+
   if (loading && pedidos.length === 0) {
     return (
       <Layout>
@@ -222,7 +253,7 @@ function Ordenes() {
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "pagado").length}
             </div>
-            <div className="stat-label">Pagados</div>
+            <div className="stat-label">Pagados / En Prep.</div>
           </div>
 
           <div className="stat-card">
@@ -230,7 +261,7 @@ function Ordenes() {
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "enviado").length}
             </div>
-            <div className="stat-label">Listos para recoger</div>
+            <div className="stat-label">Listos para Recoger</div>
           </div>
 
           <div className="stat-card">
@@ -238,7 +269,7 @@ function Ordenes() {
             <div className="stat-value">
               {pedidos.filter((p) => p.estado === "completado").length}
             </div>
-            <div className="stat-label">Completados</div>
+            <div className="stat-label">Recogidos / Historial</div>
           </div>
 
           <div className="stat-card">
@@ -284,19 +315,19 @@ function Ordenes() {
               className={`filter-btn ${filterEstado === "pagado" ? "active" : ""}`}
               onClick={() => setFilterEstado("pagado")}
             >
-              Pagados
+              Pagados / En Prep.
             </button>
             <button
               className={`filter-btn ${filterEstado === "enviado" ? "active" : ""}`}
               onClick={() => setFilterEstado("enviado")}
             >
-              Listos
+              Listos para Recoger
             </button>
             <button
               className={`filter-btn ${filterEstado === "completado" ? "active" : ""}`}
               onClick={() => setFilterEstado("completado")}
             >
-              Completados
+              Recogidos / Historial
             </button>
 
             {(filterEstado || searchTerm) && (
@@ -312,7 +343,7 @@ function Ordenes() {
         </div>
 
         {/* TABLE */}
-        <div className="ordenes-table-container">
+        <div className="ordenes-table-container table-responsive">
           {filtered.length === 0 ? (
             <div className="empty-state">
               <span className="empty-icon"><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
@@ -340,32 +371,32 @@ function Ordenes() {
               <tbody>
                 {filtered.map((pedido) => (
                   <tr key={pedido.id_pedido}>
-                    <td>
+                    <td data-label="ID">
                       <strong>#{pedido.id_pedido}</strong>
                     </td>
 
                     {!isTurista && (
-                      <td className="cliente-info">
+                      <td data-label="Cliente" className="cliente-info">
                         <div>
                           <strong>{pedido.nombre_usuario || "N/A"}</strong>
-                          <small>{pedido.email_usuario || ""}</small>
+                          <br /><small>{pedido.email_usuario || ""}</small>
                         </div>
                       </td>
                     )}
 
-                    <td>{formatDate(pedido.fecha_pedido)}</td>
+                    <td data-label="Fecha">{formatDate(pedido.fecha_pedido)}</td>
 
-                    <td>
+                    <td data-label="Items">
                       <span className="items-badge">
                         {pedido.total_items || 0} items
                       </span>
                     </td>
 
-                    <td className="monto">
+                    <td data-label="Total" className="monto">
                       <strong>{formatCurrency(pedido.total)}</strong>
                     </td>
 
-                    <td>
+                    <td data-label="Estado">
                       {isAdmin || isOferente ? (
                         <select
                           value={pedido.estado}
@@ -376,31 +407,47 @@ function Ordenes() {
                             pedido.estado
                           )}`}
                         >
-                          <option value="pendiente"><Clock size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pendiente</option>
-                          <option value="pagado"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Pagado</option>
-                          <option value="enviado"><Truck size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Listo para recoger</option>
-                          <option value="completado"><CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Completado</option>
+                          <option value="pendiente">Pendiente</option>
+                          <option value="pagado">Pagado / En Prep.</option>
+                          <option value="enviado">Listo para Recoger</option>
+                          <option value="completado">Recogido / Historial</option>
                         </select>
                       ) : (
                         <span
                           className={`badge ${getEstadoBadgeClass(pedido.estado)}`}
                         >
-                          {pedido.estado === "pendiente" && <><Clock size={16} /> Pendiente</>}
-                          {pedido.estado === "pagado" && <><CheckCircle size={16} /> Pagado / En Prep.</>}
-                          {pedido.estado === "enviado" && <><Truck size={16} /> Listo para recoger</>}
-                          {pedido.estado === "completado" && <><CheckCircle size={16} /> Completado</>}
+                          {pedido.estado === "pendiente" && <><Clock size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                          {pedido.estado === "pagado" && <><CheckCircle size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                          {pedido.estado === "enviado" && <><Truck size={16} /> {getStatusLabelText(pedido.estado)}</>}
+                          {pedido.estado === "completado" && <><CheckCircle size={16} /> {getStatusLabelText(pedido.estado)}</>}
                         </span>
                       )}
                     </td>
 
-                    <td className="actions">
-                      <button
-                        onClick={() => handleViewDetails(pedido)}
-                        className="btn-action btn-view"
-                        title="Ver detalles"
-                      >
-                        <Eye size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️
-                      </button>
+                    <td data-label="Acciones" className="actions">
+                      <div style={{display: 'flex', gap: '8px'}}>
+                        <button
+                          onClick={() => handleViewDetails(pedido)}
+                          className="btn-action btn-view"
+                          title="Ver detalles"
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!pedido.items) {
+                              toast.info("Cargando detalles para el PDF...");
+                              pedidosAPI.getById(pedido.id_pedido).then(detalle => generatePDF(detalle)).catch(() => toast.error("Error al cargar detalles para PDF"));
+                            } else {
+                              generatePDF(pedido);
+                            }
+                          }}
+                          className="btn-action btn-view"
+                          title="Descargar Recibo (PDF)"
+                        >
+                          <Download size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
