@@ -12,15 +12,15 @@ function Ordenes() {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
+
   // Filtros
   const [filterEstado, setFilterEstado] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Modal
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  
+
   const [confirmEstado, setConfirmEstado] = useState({ isOpen: false, id: null, nuevoEstado: '' });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
@@ -44,12 +44,12 @@ function Ordenes() {
         response = await pedidosAPI.getMisPedidos();
         setPedidos(response.pedidos || []);
         setFiltered(response.pedidos || []);
-      } else  {
+      } else {
         // Admin: todos los pedidos
         response = await pedidosAPI.getAll();
         setPedidos(response.pedidos || []);
         setFiltered(response.pedidos || []);
-      } 
+      }
     } catch (err) {
       console.error("Error loading pedidos:", err);
       setError(err.message || "Error al cargar pedidos");
@@ -151,13 +151,13 @@ function Ordenes() {
   };
 
   const getStatusLabelText = (estado) => {
-      switch(estado) {
-          case "pendiente": return "Pendiente";
-          case "pagado": return "Pagado / En Prep.";
-          case "enviado": return "Listo para Recoger";
-          case "completado": return "Recogido / Historial";
-          default: return estado;
-      }
+    switch (estado) {
+      case "pendiente": return "Pendiente";
+      case "pagado": return "Pagado / En Prep.";
+      case "enviado": return "Listo para Recoger";
+      case "completado": return "Recogido / Historial";
+      default: return estado;
+    }
   };
 
   if (loading && pedidos.length === 0) {
@@ -176,7 +176,7 @@ function Ordenes() {
   return (
     <Layout>
       <div className="ordenes-container">
-        
+
         {/* HEADER */}
         <header className="ordenes-header">
           <div className="header-content">
@@ -186,8 +186,8 @@ function Ordenes() {
                 {isTurista
                   ? "Revisa el estado de tus compras"
                   : isOferente
-                  ? "Pedidos que incluyen tus productos"
-                  : "Administra todos los pedidos del sistema"}
+                    ? "Pedidos que incluyen tus productos"
+                    : "Administra todos los pedidos del sistema"}
               </p>
             </div>
           </div>
@@ -353,7 +353,7 @@ function Ordenes() {
                       </td>
                     )}
 
-                    <td>{formatDate(pedido.fecha_creacion)}</td>
+                    <td>{formatDate(pedido.fecha_pedido)}</td>
 
                     <td>
                       <span className="items-badge">
@@ -362,7 +362,7 @@ function Ordenes() {
                     </td>
 
                     <td className="monto">
-                      <strong>{formatCurrency(pedido.monto_total)}</strong>
+                      <strong>{formatCurrency(pedido.total)}</strong>
                     </td>
 
                     <td>
