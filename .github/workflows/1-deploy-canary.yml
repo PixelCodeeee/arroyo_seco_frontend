@@ -2,7 +2,7 @@ name: 1 · Deploy Canary
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   build-and-push:
