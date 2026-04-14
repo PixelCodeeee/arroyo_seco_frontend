@@ -93,9 +93,13 @@ jobs:
       - name: Sync with Ops Repository
         run: |
           cd ops
+          # Force CommonJS mode by renaming to .cjs
+          mv scripts/sync.js scripts/sync.cjs
+          
           git pull --rebase origin HEAD || true
           
-          node scripts/sync.js frontend "${{ github.sha }}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || BLOCKED=1
+          # Run the .cjs version
+          node scripts/sync.cjs frontend "${{ github.sha }}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || BLOCKED=1
              
           git config user.email "ci@arroyoseco.online"
           git config user.name "CI Bot"
