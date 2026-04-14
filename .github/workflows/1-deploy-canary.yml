@@ -64,24 +64,30 @@ jobs:
           gcloud compute ssh nginx-public-vm \
             --zone=us-central1-a \
             --tunnel-through-iap \
-            --project=beta-prime-489121 \
-            --command="
+            --project=beta-prime-489121 << 'EOF'
+              # Authenticate Docker
               echo '${{ secrets.GH_PAT }}' | sudo docker login ghcr.io -u itsjluna --password-stdin
+              
               cd /home/joshualuna/arroyo_seco_pwa_stage2
+              
+              # Deploy Canary
               sudo docker compose pull frontend-canary
               sudo docker compose up -d --no-deps frontend-canary
 
               echo "Waiting for containers to boot..."
               sleep 10
               
-              UNHEALTHY=$(sudo docker compose ps --format json | jq '\''[.[] | select(.Health == "unhealthy" or .State != "running")] | length'\'')
+              # Check health - no extra escaping needed for jq inside heredoc
+              UNHEALTHY=$(sudo docker compose ps --format json | jq '[.[] | select(.Health == "unhealthy" or .State != "running")] | length')
+              
               if [ "$UNHEALTHY" -gt 0 ]; then
                 echo "🚨 Containers not healthy, aborting manifest sync"
                 exit 1
               fi
 
+              # Clean up disk space
               sudo docker system prune -a -f
-            "
+          EOF
 
       # NEW: Ensure the Ops repo knows this frontend is ready for the cutover
       - name: Sync with Ops Repository
