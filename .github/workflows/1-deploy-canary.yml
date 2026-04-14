@@ -70,6 +70,16 @@ jobs:
               cd /home/joshualuna/arroyo_seco_pwa_stage2
               sudo docker compose pull frontend-canary
               sudo docker compose up -d --no-deps frontend-canary
+
+              echo "Waiting for containers to boot..."
+              sleep 10
+              
+              UNHEALTHY=$(sudo docker compose ps --format json | jq '\''[.[] | select(.Health == "unhealthy" or .State != "running")] | length'\'')
+              if [ "$UNHEALTHY" -gt 0 ]; then
+                echo "🚨 Containers not healthy, aborting manifest sync"
+                exit 1
+              fi
+
               sudo docker system prune -a -f
             "
 
@@ -77,19 +87,14 @@ jobs:
       - name: Sync with Ops Repository
         run: |
           cd ops
-          mkdir -p manifests
+          git pull --rebase origin HEAD || true
           
-          if [ ! -f manifests/canary.json ]; then
-            echo '{"api_contract": "v1", "frontend": {"status": "missing"}, "backend": {"status": "missing"}}' > manifests/canary.json
-          fi
-          
-          jq --arg commit "${{ github.sha }}" \
-             --arg built_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-             '.frontend.commit = $commit | .frontend.built_at = $built_at | .frontend.status = "ready"' \
-             manifests/canary.json > tmp.json && mv tmp.json manifests/canary.json
+          node scripts/sync.js frontend "${{ github.sha }}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || BLOCKED=1
              
           git config user.email "ci@arroyoseco.online"
           git config user.name "CI Bot"
           git add manifests/canary.json
           git commit -m "canary sync: frontend ready @ ${{ github.sha }}" || echo "No changes to commit"
           git push origin HEAD
+          
+          [ -z "$BLOCKED" ] || exit 1

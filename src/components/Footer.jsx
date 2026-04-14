@@ -7,7 +7,8 @@ function Footer() {
     <footer className="footer">
       <h3>Arroyo Seco</h3>
       <p>Descubre la riqueza cultural y gastronómica de nuestro pueblo</p>
-      
+      <p>canary test version</p>
+
       <div className="footer-icons">
         <i className="fab fa-facebook-f"></i>
         <i className="fab fa-instagram"></i>
@@ -21,7 +22,7 @@ function Footer() {
         <Link to="/equipo">Equipo</Link>
         <Link to="/faq">FAQ</Link>
       </div>
-      
+
       <small>© 2026 Arroyo Seco. Todos los derechos reservados.</small>
     </footer>
   );
