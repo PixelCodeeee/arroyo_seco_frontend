@@ -7,7 +7,7 @@ function Footer() {
     <footer className="footer">
       <h3>Arroyo Seco</h3>
       <p>Descubre la riqueza cultural y gastronómica de nuestro pueblo</p>
-      <p>newer canary test version</p>
+      <p>super new canary test version</p>
 
       <div className="footer-icons">
         <i className="fab fa-facebook-f"></i>
