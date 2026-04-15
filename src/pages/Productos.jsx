@@ -20,6 +20,7 @@ function Productos() {
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
   const isOferente = user?.rol === "oferente";
+  const isModerador = user?.rol === "moderador";
 
   useEffect(() => {
     loadProductos();
@@ -33,7 +34,6 @@ function Productos() {
         const res = await productosAPI.getMis();
         setProductos(res.productos);
         setFiltered(res.productos);
-        // categorias not returned by this endpoint — fetch separately if needed
         const allRes = await productosAPI.getAll();
         setCategorias(allRes.categorias);
       } else {
@@ -216,13 +216,15 @@ function Productos() {
                         <Pencil size={18} />
                       </Link>
 
-                      <button
-                        onClick={() => requestDelete(p.id_producto)}
-                        className="btn-action btn-delete"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {!isModerador && (
+                        <button
+                          onClick={() => requestDelete(p.id_producto)}
+                          className="btn-action btn-delete"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

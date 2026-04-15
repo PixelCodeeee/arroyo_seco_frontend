@@ -1,4 +1,3 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Trash2, Edit } from 'lucide-react';
 // src/components/Categorias.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -6,6 +5,7 @@ import { productosAPI } from "../services/api";
 import Layout from "../components/Layout";
 import ConfirmModal from "../components/ConfirmModal";
 import { toast } from 'sonner';
+import { Utensils, Palette, Edit, Trash2 } from 'lucide-react';
 import "../styles/Usuarios.css";
 
 function Categorias() {
@@ -19,6 +19,7 @@ function Categorias() {
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
+  const isModerador = currentUser?.rol === "moderador"; // 👈 nuevo rol
 
   useEffect(() => {
     loadCategorias();
@@ -50,7 +51,7 @@ function Categorias() {
   const clearFilters = () => setFilterTipo("");
 
   const requestDelete = (id) => {
-    if (!isAdmin) return toast.error("No tienes permiso");
+    if (!isAdmin) return toast.error("No tienes permiso para eliminar");
     setConfirmDelete({ isOpen: true, id });
   };
 
@@ -100,10 +101,18 @@ function Categorias() {
 
         {error && <div className="error-message">{error}</div>}
 
-        {isOferente && !isAdmin && (
-           <div style={{ backgroundColor: "var(--bg-card)", padding: "1rem", borderRadius: "8px", borderLeft: "4px solid var(--info-color)", marginBottom: "1.5rem", color: "var(--text-dark)" }}>
-              ⚠️ Solo el administrador puede agregar o modificar las categorías del sistema.
-           </div>
+        {/* Aviso para oferente y moderador */}
+        {(isOferente || isModerador) && !isAdmin && (
+          <div style={{
+            backgroundColor: "var(--bg-card)",
+            padding: "1rem",
+            borderRadius: "8px",
+            borderLeft: "4px solid var(--info-color)",
+            marginBottom: "1.5rem",
+            color: "var(--text-dark)"
+          }}>
+            ⚠️ Solo el administrador puede agregar o modificar las categorías del sistema.
+          </div>
         )}
 
         {/* STATS */}
@@ -131,23 +140,18 @@ function Categorias() {
           <div className="filters-row">
             <div className="filter-group">
               <label>Tipo:</label>
-              <select
-                value={filterTipo}
-                onChange={(e) => setFilterTipo(e.target.value)}
-              >
+              <select value={filterTipo} onChange={(e) => setFilterTipo(e.target.value)}>
                 <option value="">Todos</option>
                 <option value="gastronomica">Gastronómica</option>
                 <option value="artesanal">Artesanal</option>
               </select>
             </div>
-
             {filterTipo && (
               <button className="btn btn-secondary btn-sm" onClick={clearFilters}>
                 Limpiar Filtros
               </button>
             )}
           </div>
-
           <div className="results-count">
             Mostrando {filtered.length} de {categorias.length}
           </div>
@@ -161,13 +165,14 @@ function Categorias() {
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Tipo</th>
+                {/* Acciones solo visible para admin */}
                 {isAdmin && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan="4">No hay categorías</td>
+                  <td colSpan={isAdmin ? 4 : 3}>No hay categorías</td>
                 </tr>
               ) : (
                 filtered.map((cat) => (
@@ -176,7 +181,10 @@ function Categorias() {
                     <td data-label="Nombre"><strong>{cat.nombre}</strong></td>
                     <td data-label="Tipo">
                       <span className={`badge badge-${cat.tipo}`}>
-                        {cat.tipo === 'gastronomica' ? <><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Gastronómica</> : <><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</>}
+                        {cat.tipo === 'gastronomica'
+                          ? <><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Gastronómica</>
+                          : <><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</>
+                        }
                       </span>
                     </td>
                     {isAdmin && (
@@ -188,7 +196,6 @@ function Categorias() {
                         >
                           <Edit size={18} />
                         </Link>
-
                         <button
                           onClick={() => requestDelete(cat.id_categoria)}
                           className="btn-action btn-delete"

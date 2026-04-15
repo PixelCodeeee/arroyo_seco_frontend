@@ -59,6 +59,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
+  const isModerador = currentUser?.rol === "moderador";
 
   const [pendingCounts, setPendingCounts] = useState({
     ordenes: 0,
@@ -107,21 +108,21 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Inicio",
       icon: <Home size={20} />,
       path: "/",
-      roles: ["admin", "oferente", "turista"],
+      roles: ["admin", "oferente", "turista", "moderador"],
     },
     {
       id: "oferentes",
       label: isOferente ? "Mi Perfil" : "Oferentes",
       icon: <Store size={20} />,
       path: "/oferentes",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
       id: "productos",
       label: "Productos",
       icon: <Package size={20} />,
       path: "/productos",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
       badge: pendingCounts.productos > 0 ? pendingCounts.productos : null,
     },
     {
@@ -129,21 +130,21 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Servicios",
       icon: <BellRing size={20} />,
       path: "/servicios",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
       id: "categorias",
       label: "Categorías",
       icon: <Tag size={20} />,
       path: "/categorias",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "ordenes",
       label: "Órdenes",
       icon: <ClipboardList size={20} />,
       path: "/ordenes",
-      roles: ["admin", "oferente", "turista"],
+      roles: ["admin", "oferente", "turista", "moderador"],
       badge: pendingCounts.ordenes > 0 ? pendingCounts.ordenes : null,
     },
     {
@@ -151,39 +152,39 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Reservas",
       icon: <CalendarDays size={20} />,
       path: "/reservas",
-      roles: ["admin", "oferente", "turista"],
+      roles: ["admin", "oferente", "turista", "moderador"],
       badge: pendingCounts.reservas > 0 ? pendingCounts.reservas : null,
     },
     {
       id: "divider-admin",
       type: "divider",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "usuarios",
       label: "Usuarios",
       icon: <Users size={20} />,
       path: "/usuarios",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "analiticas",
       label: "Analíticas",
       icon: <BarChart2 size={20} />,
       path: "/analiticas",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "divider-bottom",
       type: "divider",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
       id: "anuncios",
       label: "Anuncios",
       icon: <Megaphone size={20} />,
       path: "/anuncios",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
   ];
 
@@ -212,9 +213,9 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
 
       {/* User Info */}
       {currentUser && (
-        <Link 
-          to="/perfil" 
-          className="sidebar-user" 
+        <Link
+          to="/perfil"
+          className="sidebar-user"
           style={{ textDecoration: "none", color: "inherit", cursor: "pointer", display: "flex", alignItems: "center", padding: "10px 20px" }}
         >
           <div className="user-avatar">
@@ -224,7 +225,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
             <div className="user-info">
               <div className="user-name">{currentUser.nombre}</div>
               <div className="user-role">
-                {isAdmin ? "Administrador" : isOferente ? "Oferente" : "Turista"}
+                {isAdmin ? "Administrador" : isOferente ? "Oferente" : isModerador ? "Moderador" : "Turista"}
               </div>
             </div>
           )}

@@ -130,6 +130,11 @@ function Navbar() {
             {t('nav.admin_panel', 'Panel Admin')}
           </Link>
         )}
+        {user?.rol === "moderador" && (
+  <Link to="/panel-moderador" className={`nav-role-btn ${isActive("/panel-moderador") ? "active" : ""}`}>
+    {t('nav.moderador_panel', 'Panel Moderador')}
+  </Link>
+)}
       </nav>
 
       <div className="nav-icons">

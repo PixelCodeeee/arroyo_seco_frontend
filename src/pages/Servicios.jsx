@@ -14,8 +14,8 @@ function Servicios() {
   const [error, setError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isModerador = currentUser?.rol === 'moderador';
 
-  // Cargar datos
   useEffect(() => {
     fetchServicios();
   }, []);
@@ -24,7 +24,7 @@ function Servicios() {
     try {
       setLoading(true);
       setError(null);
-      const data = await serviciosAPI.getAll(); // ← devuelve { servicios, stats, total }
+      const data = await serviciosAPI.getAll();
       setServicios(data.servicios || []);
       setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
     } catch (err) {
@@ -76,15 +76,16 @@ function Servicios() {
                 </p>
               )}
             </div>
-            <Link to="/servicios/crear" className="btn btn-primary">
-              + Nuevo Servicio
-            </Link>
+            {!isModerador && (
+              <Link to="/servicios/crear" className="btn btn-primary">
+                + Nuevo Servicio
+              </Link>
+            )}
           </div>
         </header>
 
         {error && <div className="error-message">{error}</div>}
 
-        {/* Estadísticas */}
         <div className="usuarios-content">
           <div className="usuarios-stats">
             <div className="stat-card">
@@ -101,7 +102,6 @@ function Servicios() {
             </div>
           </div>
 
-          {/* Tabla */}
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
@@ -124,8 +124,7 @@ function Servicios() {
                   </tr>
                 ) : (
                   servicios.map(s => {
-                    const isActive = s.estatus === true; // Prisma already returns boolean
-
+                    const isActive = s.estatus === true;
                     return (
                       <tr key={s.id_servicio}>
                         <td data-label="ID">{s.id_servicio}</td>
@@ -146,13 +145,15 @@ function Servicios() {
                           >
                             <Edit size={18} />
                           </Link>
-                          <button
-                            onClick={() => requestDelete(s.id_servicio)}
-                            className="btn-action btn-delete"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          {!isModerador && (
+                            <button
+                              onClick={() => requestDelete(s.id_servicio)}
+                              className="btn-action btn-delete"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

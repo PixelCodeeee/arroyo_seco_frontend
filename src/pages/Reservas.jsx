@@ -30,6 +30,7 @@ function Reservas() {
   const isAdmin = user?.rol === "admin";
   const isTurista = user?.rol === "turista";
   const isOferente = user?.rol === "oferente";
+  const isModerador = user?.rol === "moderador"; // ✅ agregado
 
   useEffect(() => { loadReservas(); }, []);
 
@@ -44,6 +45,7 @@ function Reservas() {
       } else if (isOferente) {
         response = await reservasAPI.getMisReservasComoOferente();
       } else {
+        // admin y moderador ven todo
         response = await reservasAPI.getAll();
       }
 
@@ -69,7 +71,6 @@ function Reservas() {
       data = data.filter(
         (r) =>
           r.id_reserva.toString().includes(q) ||
-          // WITH this:
           r.usuario?.nombre?.toLowerCase().includes(q) ||
           r.servicio?.nombre?.toLowerCase().includes(q) ||
           r.usuario?.correo?.toLowerCase().includes(q)
@@ -145,7 +146,6 @@ function Reservas() {
     }
   };
 
-  // Stats derived from reservas array
   const statPendientes = reservas.filter((r) => r.estado === "pendiente").length;
   const statConfirmadas = reservas.filter((r) => r.estado === "confirmada").length;
   const statCanceladas = reservas.filter((r) => r.estado === "cancelada").length;
@@ -181,13 +181,28 @@ function Reservas() {
               <p className="welcome-text">
                 {isTurista
                   ? "Administra tus reservaciones de restaurantes"
-                  : isOferente
-                    ? "Reservaciones en tus servicios"
-                    : "Administra todas las reservaciones del sistema"}
+                  : isModerador
+                    ? "Visualización de todas las reservaciones del sistema"
+                    : isOferente
+                      ? "Reservaciones en tus servicios"
+                      : "Administra todas las reservaciones del sistema"}
               </p>
             </div>
           </div>
         </header>
+
+        {/* ✅ aviso moderador */}
+        {isModerador && (
+          <div style={{
+            backgroundColor: "var(--bg-card)",
+            padding: "1rem",
+            borderRadius: "8px",
+            borderLeft: "4px solid var(--info-color)",
+            marginBottom: "1.5rem"
+          }}>
+            ⚠️ Estás en modo supervisión. Solo puedes visualizar las reservas.
+          </div>
+        )}
 
         {/* ERROR */}
         {error && (
@@ -266,11 +281,6 @@ function Reservas() {
             <div className="empty-state">
               <span className="empty-icon"><Utensils size={32} /></span>
               <p>No hay reservas para mostrar</p>
-              <small>
-                {filterEstado || searchTerm
-                  ? "Intenta cambiar los filtros"
-                  : "Las reservas aparecerán aquí cuando se realicen"}
-              </small>
             </div>
           ) : (
             <table className="reservas-table">
@@ -288,83 +298,50 @@ function Reservas() {
               </thead>
               <tbody>
                 {filtered.map((reserva) => (
-                  <tr key={reserva.id_reserva} style={{ backgroundColor: reserva._isDraft ? 'var(--warning-light, #fffcf0)' : 'inherit' }}>
-                    <td data-label="ID">
-                      <strong>#{reserva.id_reserva}</strong>
-                      {reserva._isDraft && (
-                        <span title="Cambio pendiente de sincronización" style={{marginLeft: '6px', display: 'inline-flex', alignItems: 'center'}}>
-                          <RefreshCcw size={16} className="animate-spin" style={{ color: 'var(--warning-color, #f59e0b)' }} />
-                        </span>
-                      )}
-                    </td>
+                  <tr key={reserva.id_reserva}>
+                    <td>#{reserva.id_reserva}</td>
 
                     {!isTurista && (
-                      <td data-label="Cliente" className="cliente-info">
-                        <div>
-                          <strong>{reserva.usuario?.nombre || "N/A"}</strong>
-                          <br /><small>{reserva.usuario?.correo || ""}</small>
-                        </div>
-                      </td>
+                      <td>{reserva.usuario?.nombre || reserva.usuario_nombre || "N/A"}</td>
                     )}
 
                     {!isOferente && (
-                      <td data-label="Servicio">
-                        <div className="servicio-info">
-                          <strong>{reserva.servicio?.nombre || "N/A"}</strong>
-                          {reserva.servicio?.oferente?.nombre && <><br /><small>{reserva.servicio.oferente.nombre}</small></>}
-                        </div>
-                      </td>
+                      <td>{reserva.servicio?.nombre}</td>
                     )}
 
-                    <td data-label="Fecha">{formatDateShort(reserva.fecha)}</td>
-                    <td data-label="Hora" className="hora">{formatTime(reserva.hora)}</td>
+                    <td>{formatDateShort(reserva.fecha)}</td>
+                    <td>{formatTime(reserva.hora)}</td>
+                    <td>{reserva.numero_personas}</td>
 
-                    <td data-label="Personas">
-                      <span className="personas-badge">
-                        {reserva.numero_personas} <Users size={14} />
-                      </span>
-                    </td>
-
-                    <td data-label="Estado">
-                      {isAdmin || isOferente ? (
-                        // ✅ <option> cannot render icons — text only
+                    <td>
+                      {(isAdmin || isOferente) && !isModerador ? (
                         <select
                           value={reserva.estado}
-                          onChange={(e) => requestChangeEstado(reserva.id_reserva, e.target.value)}
-                          className={`estado-select ${getEstadoBadgeClass(reserva.estado)}`}
+                          onChange={(e) =>
+                            requestChangeEstado(reserva.id_reserva, e.target.value)
+                          }
                         >
                           <option value="pendiente">Pendiente</option>
                           <option value="confirmada">Confirmada</option>
                           <option value="cancelada">Cancelada</option>
                         </select>
                       ) : (
-                        <span className={`badge ${getEstadoBadgeClass(reserva.estado)}`}>
-                          {reserva.estado === "pendiente" && <><Clock size={14} />       Pendiente</>}
-                          {reserva.estado === "confirmada" && <><CheckCircle size={14} /> Confirmada</>}
-                          {reserva.estado === "cancelada" && <><XCircle size={14} />     Cancelada</>}
-                        </span>
+                        reserva.estado
                       )}
                     </td>
 
-                    <td data-label="Acciones" className="actions">
-                      <button
-                        onClick={() => handleViewDetails(reserva)}
-                        className="btn-action btn-view"
-                        title="Ver detalles"
-                      >
-                        <Eye size={18} />
+                    <td>
+                      <button onClick={() => handleViewDetails(reserva)}>
+                        <Eye size={16} />
                       </button>
 
-                      {isTurista && canCancelReserva(reserva) && (
-                        <button
-                          onClick={() => requestCancelar(reserva)}
-                          className="btn-action btn-cancel"
-                          title="Cancelar reserva"
-                        >
-                          <XCircle size={18} />
+                      {isTurista && !isModerador && canCancelReserva(reserva) && (
+                        <button onClick={() => requestCancelar(reserva)}>
+                          <XCircle size={16} />
                         </button>
                       )}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -373,7 +350,6 @@ function Reservas() {
         </div>
       </div>
 
-      {/* MODAL */}
       {showModal && selectedReserva && (
         <ReservaDetailModal
           reserva={selectedReserva}
@@ -381,7 +357,7 @@ function Reservas() {
           onClose={() => { setShowModal(false); setSelectedReserva(null); }}
           onEstadoChange={requestChangeEstado}
           onCancelar={requestCancelar}
-          canChangeEstado={isAdmin || isOferente}
+          canChangeEstado={(isAdmin || isOferente) && !isModerador}
           isTurista={isTurista}
         />
       )}
@@ -392,17 +368,14 @@ function Reservas() {
         message={`¿Estás seguro de cambiar el estado de la reserva a "${confirmEstado.nuevoEstado}"?`}
         onConfirm={executeChangeEstado}
         onClose={() => setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' })}
-        confirmText="Confirmar"
-        isDestructive={false}
       />
 
       <ConfirmModal
         isOpen={confirmCancel.isOpen}
         title="Cancelar Reserva"
-        message="¿Estás seguro de que deseas cancelar esta reserva? Esta acción no se puede deshacer."
+        message="¿Seguro que deseas cancelar?"
         onConfirm={executeCancelar}
         onClose={() => setConfirmCancel({ isOpen: false, reserva: null })}
-        confirmText="Sí, cancelar"
       />
     </Layout>
   );
