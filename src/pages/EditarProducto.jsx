@@ -36,13 +36,28 @@ function EditarProducto() {
   useEffect(() => {
     (async () => {
       try {
-        const [cats, ofs] = await Promise.all([
-          productosAPI.getCategorias(),
-          oferentesAPI.getAll()
-        ]);
-
+        // Fetch categories
+        const cats = await productosAPI.getCategorias();
         setCategorias(cats.categorias || []);
-        setOferentes(ofs.oferentes || []);
+
+        // Fetch oferentes based on role
+        let ofeList = [];
+        if (currentUser?.rol === 'oferente' && currentUser?.id_usuario) {
+          // Oferente: fetch only own profile
+          try {
+            const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+            if (miOferente && miOferente.id_oferente) {
+              ofeList = [miOferente];
+            }
+          } catch {
+            // no profile
+          }
+        } else {
+          // Admin: fetch all oferentes
+          const ofs = await oferentesAPI.getAll();
+          ofeList = ofs.oferentes || [];
+        }
+        setOferentes(ofeList);
 
         // Load existing product
         const res = await productosAPI.getAll();

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme as useOldTheme } from "../context/ThemeContext";
 import { useTheme } from "../context/ThemeProvider";
 import ConfirmModal from "./ConfirmModal";
 import { getPendingOperations } from "../services/localDB";
+import { oferentesAPI } from "../services/api";
 import {
   Home,
   Store,
@@ -59,6 +60,18 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
+  const [oferenteTipo, setOferenteTipo] = useState(null); // 'restaurante' | 'artesanal' | null
+
+  // Fetch oferente tipo on mount so we can hide restaurant-only menu items for artesanía
+  useEffect(() => {
+    if (isOferente && currentUser?.id_usuario) {
+      oferentesAPI.getByUserId(currentUser.id_usuario)
+        .then(res => {
+          if (res?.tipo) setOferenteTipo(res.tipo);
+        })
+        .catch(() => { /* no profile yet */ });
+    }
+  }, []);
 
   const [pendingCounts, setPendingCounts] = useState({
     ordenes: 0,
@@ -130,6 +143,8 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       icon: <BellRing size={20} />,
       path: "/servicios",
       roles: ["admin", "oferente"],
+      // Hide for artesanía oferentes — servicios are restaurant-only
+      hidden: isOferente && oferenteTipo && oferenteTipo !== 'restaurante',
     },
     {
       id: "categorias",
@@ -153,6 +168,8 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       path: "/reservas",
       roles: ["admin", "oferente", "turista"],
       badge: pendingCounts.reservas > 0 ? pendingCounts.reservas : null,
+      // Hide for artesanía oferentes — reservas are restaurant-service-only
+      hidden: isOferente && oferenteTipo && oferenteTipo !== 'restaurante',
     },
     {
       id: "divider-admin",
@@ -188,6 +205,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   ];
 
   const visibleMenuItems = menuItems.filter((item) => {
+    if (item.hidden) return false;
     if (!item.roles) return true;
     return item.roles.includes(currentUser?.rol);
   });

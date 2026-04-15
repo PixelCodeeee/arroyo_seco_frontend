@@ -1,9 +1,9 @@
 // src/components/Productos.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { productosAPI } from "../services/api";
+import { productosAPI, oferentesAPI } from "../services/api";
 import Layout from "../components/Layout";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Info, Store } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "../components/ConfirmModal";
 import "../styles/Usuarios.css";
@@ -16,6 +16,7 @@ function Productos() {
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+  const [hasOferenteProfile, setHasOferenteProfile] = useState(true); // assume true, detect false
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
@@ -28,22 +29,46 @@ function Productos() {
   const loadProductos = async () => {
     try {
       setLoading(true);
+      setError("");
 
       if (isOferente) {
+        // First check if oferente profile exists
+        try {
+          const miOferente = await oferentesAPI.getByUserId(user.id_usuario);
+          if (!miOferente || !miOferente.id_oferente) {
+            setHasOferenteProfile(false);
+            setLoading(false);
+            return;
+          }
+          setHasOferenteProfile(true);
+        } catch {
+          setHasOferenteProfile(false);
+          setLoading(false);
+          return;
+        }
+
         const res = await productosAPI.getMis();
-        setProductos(res.productos);
-        setFiltered(res.productos);
-        // categorias not returned by this endpoint — fetch separately if needed
-        const allRes = await productosAPI.getAll();
-        setCategorias(allRes.categorias);
+        setProductos(res.productos || []);
+        setFiltered(res.productos || []);
+        // categorias not returned by this endpoint — fetch separately
+        try {
+          const catRes = await productosAPI.getCategorias();
+          setCategorias(catRes.categorias || []);
+        } catch {
+          // non-critical
+        }
       } else {
         const res = await productosAPI.getAll();
-        setProductos(res.productos);
-        setFiltered(res.productos);
-        setCategorias(res.categorias);
+        setProductos(res.productos || []);
+        setFiltered(res.productos || []);
+        setCategorias(res.categorias || []);
       }
     } catch (err) {
-      setError(err.message || "Error al cargar productos");
+      if (err.message?.includes('403') || err.message?.includes('oferente')) {
+        setHasOferenteProfile(false);
+      } else {
+        setError(err.message || "Error al cargar productos");
+      }
     } finally {
       setLoading(false);
     }
@@ -103,7 +128,7 @@ function Productos() {
             </div>
 
             <div className="header-actions">
-              {(isAdmin || isOferente) && (
+              {(isAdmin || (isOferente && hasOferenteProfile)) && (
                 <Link to="/productos/crear" className="btn btn-primary">
                   <Plus size={16} />
                   Nuevo Producto
@@ -114,6 +139,22 @@ function Productos() {
         </header>
 
         {error && <div className="error-message">{error}</div>}
+
+        {/* Oferente without profile */}
+        {isOferente && !hasOferenteProfile && (
+          <div className="usuarios-content">
+            <div className="alert alert-info" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '20px', borderRadius: 8, background: 'var(--info-bg, #e0f2fe)', color: 'var(--info-color, #0369a1)', border: '1px solid var(--info-border, #7dd3fc)' }}>
+              <Info size={22} style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ fontSize: '1.05em' }}>Necesitas crear tu perfil de oferente para gestionar productos.</strong>
+                <p style={{ marginTop: 8, opacity: 0.9 }}>Antes de agregar o ver tus productos, debes registrar tu negocio como oferente.</p>
+                <Link to="/oferentes/crear" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                  <Store size={16} style={{ verticalAlign: 'middle', marginRight: 4 }} /> Crear Mi Perfil de Oferente
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* STATS */}
         <div className="usuarios-stats">

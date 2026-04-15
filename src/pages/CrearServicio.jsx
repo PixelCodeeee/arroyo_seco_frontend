@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { RefreshCcw } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { RefreshCcw, AlertTriangle, Info, Store } from 'lucide-react';
 import { serviciosAPI, oferentesAPI } from '../services/api';
 
 import { toast } from 'sonner';
@@ -8,6 +8,9 @@ import '../styles/auth.css';
 
 function CrearServicio() {
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isOferente = currentUser?.rol === 'oferente';
+  const isAdmin = currentUser?.rol === 'admin';
 
   const [formData, setFormData] = useState({
     id_oferente: '',
@@ -19,19 +22,51 @@ function CrearServicio() {
     imagenes: [] // array de strings (URLs)
   });
   const [oferentes, setOferentes] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // State for oferente-specific checks
+  const [hasOferenteProfile, setHasOferenteProfile] = useState(null); // null = loading, true/false
+  const [oferenteTipo, setOferenteTipo] = useState(null); // 'restaurante' | 'artesanal' | null
+
   useEffect(() => {
-    fetchOferentes();
+    initializeComponent();
   }, []);
 
-  const fetchOferentes = async () => {
+  const initializeComponent = async () => {
     try {
-      const res = await oferentesAPI.getAll({ tipo: 'restaurante' });
-      setOferentes(res.oferentes || res); // depende de cómo devuelvas
+      if (!currentUser) {
+        navigate('/login');
+        return;
+      }
+
+      if (isOferente) {
+        // Fetch only own oferente profile
+        try {
+          const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+          if (miOferente && miOferente.id_oferente) {
+            setHasOferenteProfile(true);
+            setOferenteTipo(miOferente.tipo);
+            setOferentes([miOferente]);
+            setFormData(prev => ({ ...prev, id_oferente: miOferente.id_oferente }));
+          } else {
+            setHasOferenteProfile(false);
+          }
+        } catch {
+          setHasOferenteProfile(false);
+        }
+      } else if (isAdmin) {
+        // Admin can see all restaurant oferentes
+        const res = await oferentesAPI.getAll({ tipo: 'restaurante' });
+        setOferentes(res.oferentes || res);
+      } else {
+        navigate('/');
+        return;
+      }
     } catch {
-      setError('No se pudieron cargar los restaurantes');
+      setError('Error al cargar información');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,6 +110,78 @@ function CrearServicio() {
     }
   };
 
+  // ── Loading state ──
+  if (loading) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="loading">Cargando...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Oferente: no profile yet ──
+  if (isOferente && hasOferenteProfile === false) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h2><Store size={22} style={{ verticalAlign: 'middle', marginRight: 8 }} />Crear Servicio</h2>
+          </div>
+          <div className="error-banner" style={{ background: 'var(--info-bg, #e0f2fe)', color: 'var(--info-color, #0369a1)', border: '1px solid var(--info-border, #7dd3fc)' }}>
+            <Info size={18} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+            <strong>Necesitas crear tu perfil de oferente primero.</strong>
+            <p style={{ marginTop: 8 }}>
+              Antes de crear servicios, debes registrar tu negocio como oferente.
+            </p>
+            <Link to="/oferentes/crear" className="btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+              Crear Mi Perfil de Oferente
+            </Link>
+          </div>
+          <div className="form-actions" style={{ marginTop: 16 }}>
+            <button type="button" onClick={() => navigate('/servicios')} className="btn-secondary">
+              Volver
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Oferente: wrong tipo (artesanía, not restaurante) ──
+  if (isOferente && oferenteTipo && oferenteTipo !== 'restaurante') {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h2><Store size={22} style={{ verticalAlign: 'middle', marginRight: 8 }} />Servicios de Restaurante</h2>
+          </div>
+          <div className="error-banner" style={{ background: 'var(--warning-bg, #fefce8)', color: 'var(--warning-color, #854d0e)', border: '1px solid var(--warning-border, #fde047)' }}>
+            <AlertTriangle size={18} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+            <strong>Esta sección es exclusiva para restaurantes.</strong>
+            <p style={{ marginTop: 8 }}>
+              Los servicios están diseñados para oferentes tipo restaurante que desean ofrecer experiencias culinarias, 
+              servicios de buffet, eventos gastronómicos y similares.
+            </p>
+            <p style={{ marginTop: 4, fontSize: '0.9em', opacity: 0.8 }}>
+              Tu perfil es de tipo <strong>{oferenteTipo}</strong>. Puedes gestionar tus productos desde la sección de Productos.
+            </p>
+          </div>
+          <div className="form-actions" style={{ marginTop: 16 }}>
+            <button type="button" onClick={() => navigate('/productos')} className="btn-primary">
+              Ir a Productos
+            </button>
+            <button type="button" onClick={() => navigate(-1)} className="btn-secondary">
+              Volver
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Normal form ──
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -89,7 +196,13 @@ function CrearServicio() {
 
           <div className="form-group">
             <label>Restaurante *</label>
-            <select name="id_oferente" value={formData.id_oferente} onChange={handleChange} required>
+            <select
+              name="id_oferente"
+              value={formData.id_oferente}
+              onChange={handleChange}
+              required
+              disabled={isOferente}
+            >
               <option value="">Seleccionar restaurante</option>
               {oferentes.map(o => (
                 <option key={o.id_oferente} value={o.id_oferente}>
@@ -97,6 +210,11 @@ function CrearServicio() {
                 </option>
               ))}
             </select>
+            {isOferente && (
+              <small style={{ color: 'var(--text-muted, #6b7280)', fontSize: '0.85em' }}>
+                Tu restaurante se selecciona automáticamente.
+              </small>
+            )}
           </div>
 
           <div className="form-group">

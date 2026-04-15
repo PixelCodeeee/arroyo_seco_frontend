@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
-import { serviciosAPI } from '../services/api';
+import { Edit, Trash2, Info, Store, AlertTriangle } from 'lucide-react';
+import { serviciosAPI, oferentesAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ConfirmModal from '../components/ConfirmModal';
 import { toast } from 'sonner';
@@ -14,22 +14,58 @@ function Servicios() {
   const [error, setError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isOferente = currentUser?.rol === 'oferente';
+  const isAdmin = currentUser?.rol === 'admin';
+
+  // Oferente-specific state
+  const [hasOferenteProfile, setHasOferenteProfile] = useState(true);
+  const [oferenteTipo, setOferenteTipo] = useState(null);
 
   // Cargar datos
   useEffect(() => {
-    fetchServicios();
+    initializeAndFetch();
   }, []);
 
-  const fetchServicios = async () => {
+  const initializeAndFetch = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await serviciosAPI.getAll(); // ← devuelve { servicios, stats, total }
+
+      if (isOferente) {
+        // Check oferente profile and tipo
+        try {
+          const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+          if (!miOferente || !miOferente.id_oferente) {
+            setHasOferenteProfile(false);
+            setLoading(false);
+            return;
+          }
+          setHasOferenteProfile(true);
+          setOferenteTipo(miOferente.tipo);
+
+          // If not restaurant, don't fetch servicios
+          if (miOferente.tipo !== 'restaurante') {
+            setLoading(false);
+            return;
+          }
+        } catch {
+          setHasOferenteProfile(false);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fetch servicios (either admin or restaurant oferente)
+      const data = await serviciosAPI.getAll();
       setServicios(data.servicios || []);
       setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
     } catch (err) {
       console.error(err);
-      setError('Error al cargar servicios');
+      if (err.message?.includes('403') || err.message?.includes('oferente')) {
+        setHasOferenteProfile(false);
+      } else {
+        setError('Error al cargar servicios');
+      }
     } finally {
       setLoading(false);
     }
@@ -45,7 +81,7 @@ function Servicios() {
       await serviciosAPI.delete(confirmDelete.id);
       setConfirmDelete({ isOpen: false, id: null });
       toast.success('Servicio eliminado exitosamente');
-      fetchServicios();
+      initializeAndFetch();
     } catch (err) {
       setConfirmDelete({ isOpen: false, id: null });
       toast.error(err.response?.data?.error || 'Error al eliminar');
@@ -76,13 +112,55 @@ function Servicios() {
                 </p>
               )}
             </div>
-            <Link to="/servicios/crear" className="btn btn-primary">
+            <Link
+              to="/servicios/crear"
+              className="btn btn-primary"
+              style={isOferente && (!hasOferenteProfile || oferenteTipo !== 'restaurante') ? { pointerEvents: 'none', opacity: 0.5 } : {}}
+            >
               + Nuevo Servicio
             </Link>
           </div>
         </header>
 
         {error && <div className="error-message">{error}</div>}
+
+        {/* Oferente without profile */}
+        {isOferente && !hasOferenteProfile && (
+          <div className="usuarios-content">
+            <div className="alert alert-info" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '20px', borderRadius: 8, background: 'var(--info-bg, #e0f2fe)', color: 'var(--info-color, #0369a1)', border: '1px solid var(--info-border, #7dd3fc)' }}>
+              <Info size={22} style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ fontSize: '1.05em' }}>Necesitas crear tu perfil de oferente para gestionar servicios.</strong>
+                <p style={{ marginTop: 8, opacity: 0.9 }}>Antes de crear servicios de restaurante, debes registrar tu negocio como oferente.</p>
+                <Link to="/oferentes/crear" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                  <Store size={16} style={{ verticalAlign: 'middle', marginRight: 4 }} /> Crear Mi Perfil de Oferente
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Oferente with wrong tipo */}
+        {isOferente && hasOferenteProfile && oferenteTipo && oferenteTipo !== 'restaurante' && (
+          <div className="usuarios-content">
+            <div className="alert alert-info" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '20px', borderRadius: 8, background: 'var(--warning-bg, #fefce8)', color: 'var(--warning-color, #854d0e)', border: '1px solid var(--warning-border, #fde047)' }}>
+              <AlertTriangle size={22} style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ fontSize: '1.05em' }}>Esta sección es exclusiva para restaurantes.</strong>
+                <p style={{ marginTop: 8, opacity: 0.9 }}>
+                  Los servicios están diseñados para oferentes tipo restaurante que desean ofrecer experiencias culinarias, 
+                  servicios de buffet, eventos gastronómicos y similares.
+                </p>
+                <p style={{ marginTop: 4, fontSize: '0.9em', opacity: 0.7 }}>
+                  Tu perfil es de tipo <strong>{oferenteTipo}</strong>. Puedes gestionar tus productos desde la sección de Productos.
+                </p>
+                <Link to="/productos" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                  Ir a Productos
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Estadísticas */}
         <div className="usuarios-content">

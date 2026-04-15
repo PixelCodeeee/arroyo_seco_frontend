@@ -1,7 +1,7 @@
-import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, ClipboardList, DollarSign, Tag, ImageIcon, Settings, RefreshCcw } from 'lucide-react';
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, ClipboardList, DollarSign, Tag, ImageIcon, Settings, RefreshCcw, Info, Store } from 'lucide-react';
 /// src/components/CrearProducto.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
 
 import { toast } from 'sonner';
@@ -26,9 +26,11 @@ function CrearProducto() {
   const [categorias, setCategorias] = useState([]);
   const [oferentes, setOferentes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [imagenInput, setimagenInput] = useState('');
+  const [hasOferenteProfile, setHasOferenteProfile] = useState(null); // null = loading
 
   // ---------------------------------------------------------------
   // INITIAL DATA
@@ -36,27 +38,35 @@ function CrearProducto() {
   useEffect(() => {
     (async () => {
       try {
-        const [catRes, ofeRes] = await Promise.all([
-          productosAPI.getCategorias(),
-          oferentesAPI.getAll() // <CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Only approved oferentes
-        ]);
-
+        // Always fetch categories
+        const catRes = await productosAPI.getCategorias();
         setCategorias(catRes.categorias || []);
-        setOferentes(ofeRes.oferentes || []);
 
-        // <CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> If user is oferente, find their oferente record by id_usuario
         if (currentUser?.rol === 'oferente' && currentUser?.id_usuario) {
-          const miOferente = (ofeRes.oferentes || []).find(
-            o => o.id_usuario === currentUser.id_usuario
-          );
-
-          if (miOferente) {
-            setFormData(p => ({ ...p, id_oferente: miOferente.id_oferente }));
+          // Oferente: fetch only own oferente profile
+          try {
+            const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+            if (miOferente && miOferente.id_oferente) {
+              setHasOferenteProfile(true);
+              setOferentes([miOferente]);
+              setFormData(p => ({ ...p, id_oferente: miOferente.id_oferente }));
+            } else {
+              setHasOferenteProfile(false);
+            }
+          } catch {
+            setHasOferenteProfile(false);
           }
+        } else if (currentUser?.rol === 'admin') {
+          // Admin: fetch all oferentes
+          const ofeRes = await oferentesAPI.getAll();
+          setOferentes(ofeRes.oferentes || []);
+          setHasOferenteProfile(true); // N/A for admin
         }
       } catch (e) {
         console.error(e);
         setError('Error al cargar datos iniciales');
+      } finally {
+        setInitialLoading(false);
       }
     })();
   }, []);
@@ -129,6 +139,41 @@ function CrearProducto() {
   // ---------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------
+
+  // Loading state
+  if (initialLoading) {
+    return (
+      <div className="crear-producto-container">
+        <div className="crear-producto-card">
+          <div className="loading">Cargando...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Oferente with no profile
+  if (currentUser?.rol === 'oferente' && hasOferenteProfile === false) {
+    return (
+      <div className="crear-producto-container">
+        <div className="crear-producto-card">
+          <div className="producto-header">
+            <button onClick={() => navigate('/productos')} className="back-button" aria-label="Volver">← Volver</button>
+            <h2><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Crear Nuevo Producto</h2>
+          </div>
+          <div className="alert alert-error" style={{ background: 'var(--info-bg, #e0f2fe)', color: 'var(--info-color, #0369a1)', borderColor: 'var(--info-border, #7dd3fc)' }}>
+            <span className="alert-icon"><Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
+            <div>
+              <strong>Necesitas crear tu perfil de oferente primero.</strong>
+              <p style={{ marginTop: 8 }}>Antes de agregar productos, debes registrar tu negocio como oferente.</p>
+              <Link to="/oferentes/crear" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                Crear Mi Perfil de Oferente
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="crear-producto-container">
       <div className="crear-producto-card">
