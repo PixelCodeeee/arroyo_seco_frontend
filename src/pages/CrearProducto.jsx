@@ -1,11 +1,15 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Package, ClipboardList, DollarSign, Tag, ImageIcon, Settings, RefreshCcw } from 'lucide-react';
 /// src/components/CrearProducto.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productosAPI, oferentesAPI } from '../services/api';
+
+import { toast } from 'sonner';
 import '../styles/CrearProducto.css';
 
 function CrearProducto() {
   const navigate = useNavigate();
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   const [formData, setFormData] = useState({
@@ -16,7 +20,7 @@ function CrearProducto() {
     id_categoria: '',
     id_oferente: '',
     imagenes: [],
-    esta_disponible: true,
+    estatus: true,
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -27,35 +31,35 @@ function CrearProducto() {
   const [imagenInput, setimagenInput] = useState('');
 
   // ---------------------------------------------------------------
-// INITIAL DATA
-// ---------------------------------------------------------------
-useEffect(() => {
-  (async () => {
-    try {
-      const [catRes, ofeRes] = await Promise.all([
-        productosAPI.getCategorias(),
-        oferentesAPI.getAll() // ✅ Only approved oferentes
-      ]);
+  // INITIAL DATA
+  // ---------------------------------------------------------------
+  useEffect(() => {
+    (async () => {
+      try {
+        const [catRes, ofeRes] = await Promise.all([
+          productosAPI.getCategorias(),
+          oferentesAPI.getAll() // <CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Only approved oferentes
+        ]);
 
-      setCategorias(catRes.categorias || []);
-      setOferentes(ofeRes.oferentes || []);
+        setCategorias(catRes.categorias || []);
+        setOferentes(ofeRes.oferentes || []);
 
-      // ✅ If user is oferente, find their oferente record by id_usuario
-      if (currentUser?.rol === 'oferente' && currentUser?.id_usuario) {
-        const miOferente = (ofeRes.oferentes || []).find(
-          o => o.id_usuario === currentUser.id_usuario
-        );
-        
-        if (miOferente) {
-          setFormData(p => ({ ...p, id_oferente: miOferente.id_oferente }));
+        // <CheckCircle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> If user is oferente, find their oferente record by id_usuario
+        if (currentUser?.rol === 'oferente' && currentUser?.id_usuario) {
+          const miOferente = (ofeRes.oferentes || []).find(
+            o => o.id_usuario === currentUser.id_usuario
+          );
+
+          if (miOferente) {
+            setFormData(p => ({ ...p, id_oferente: miOferente.id_oferente }));
+          }
         }
+      } catch (e) {
+        console.error(e);
+        setError('Error al cargar datos iniciales');
       }
-    } catch (e) {
-      console.error(e);
-      setError('Error al cargar datos iniciales');
-    }
-  })();
-}, []);
+    })();
+  }, []);
 
   // ---------------------------------------------------------------
   // HANDLERS
@@ -103,15 +107,19 @@ useEffect(() => {
     setLoading(true);
 
     try {
-      await productosAPI.create({
+      const res = await productosAPI.create({
         ...formData,
         precio: parseFloat(formData.precio),
         inventario: parseInt(formData.inventario),
       });
-
-      alert('Producto creado');
+      if (res && res._offlineQueued) {
+        toast.info(res.message || "Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Producto creado exitosamente");
+      }
       navigate('/productos');
     } catch (er) {
+      toast.error(er.message || 'Error al crear');
       setError(er.message || 'Error al crear');
     } finally {
       setLoading(false);
@@ -132,21 +140,22 @@ useEffect(() => {
           >
             ← Volver
           </button>
-          <h2>📦 Crear Nuevo Producto</h2>
+          <h2><Package size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Crear Nuevo Producto</h2>
           <p className="subtitle">Agrega un nuevo producto al catálogo</p>
         </div>
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
 
+
         <form onSubmit={handleSubmit} className="producto-form">
           {/* Información Básica */}
           <div className="form-section">
-            <h3 className="section-title">📋 Información Básica</h3>
+            <h3 className="section-title"><ClipboardList size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Información Básica</h3>
 
             <div className="form-group">
               <label htmlFor="nombre">
@@ -181,7 +190,7 @@ useEffect(() => {
 
           {/* Precio e Inventario */}
           <div className="form-section">
-            <h3 className="section-title">💰 Precio e Inventario</h3>
+            <h3 className="section-title"><DollarSign size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Precio e Inventario</h3>
 
             <div className="form-row">
               <div className="form-group">
@@ -217,7 +226,7 @@ useEffect(() => {
 
           {/* Categorías */}
           <div className="form-section">
-            <h3 className="section-title">🏷️ Categorización</h3>
+            <h3 className="section-title"><Tag size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Categorización</h3>
 
             <div className="form-row">
               <div className="form-group">
@@ -263,7 +272,7 @@ useEffect(() => {
 
           {/* Imágenes */}
           <div className="form-section">
-            <h3 className="section-title">🖼️ Imágenes</h3>
+            <h3 className="section-title"><ImageIcon size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Imágenes</h3>
 
             <div className="form-group">
               <label>URLs de Imágenes</label>
@@ -298,12 +307,12 @@ useEffect(() => {
 
           {/* Disponibilidad */}
           <div className="form-section">
-            <h3 className="section-title">⚙️ Configuración</h3>
+            <h3 className="section-title"><Settings size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Configuración</h3>
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                name="esta_disponible"
-                checked={formData.esta_disponible}
+                name="estatus"
+                checked={formData.estatus}
                 onChange={handleChange}
               />
               Disponible para venta
@@ -322,7 +331,7 @@ useEffect(() => {
             </button>
 
             <button type="submit" disabled={loading} className="btn btn-primary">
-              {loading ? 'Creando...' : '✓ Crear Producto'}
+              {loading ? 'Creando...' : 'Crear Producto'}
             </button>
           </div>
         </form>

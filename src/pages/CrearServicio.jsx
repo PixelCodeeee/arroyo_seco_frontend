@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RefreshCcw } from 'lucide-react';
 import { serviciosAPI, oferentesAPI } from '../services/api';
+
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function CrearServicio() {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     id_oferente: '',
     nombre: '',
@@ -26,7 +30,7 @@ function CrearServicio() {
     try {
       const res = await oferentesAPI.getAll({ tipo: 'restaurante' });
       setOferentes(res.oferentes || res); // depende de cómo devuelvas
-    } catch (err) {
+    } catch {
       setError('No se pudieron cargar los restaurantes');
     }
   };
@@ -45,21 +49,26 @@ function CrearServicio() {
     setLoading(true);
 
     try {
-const dataToSend = {
-  id_oferente: parseInt(formData.id_oferente),
-  nombre: formData.nombre.trim(),
-  descripcion: formData.descripcion.trim() || null,
-  rango_precio: formData.rango_precio.trim() || null,
-  capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
-  estatus: formData.estatus ? 1 : 0,
-  imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
-};
+      const dataToSend = {
+        id_oferente: parseInt(formData.id_oferente),
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion.trim() || null,
+        rango_precio: formData.rango_precio.trim() || null,
+        capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
+        estatus: formData.estatus,
+        imagenes: formData.imagenes.length > 0 ? formData.imagenes : null  // ← null en vez de []
+      };
 
-      await serviciosAPI.create(dataToSend);
-      alert('Servicio creado exitosamente');
+      const res = await serviciosAPI.create(dataToSend);
+      if (res && res._offlineQueued) {
+        toast.info(res.message || "Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Servicio creado exitosamente");
+      }
       navigate('/servicios');
     } catch (err) {
       const msg = err?.response?.data?.error || err.message || 'Error desconocido';
+      toast.error(msg);
       setError(msg);
     } finally {
       setLoading(false);
@@ -74,6 +83,7 @@ const dataToSend = {
         </div>
 
         {error && <div className="error-banner">{error}</div>}
+
 
         <form onSubmit={handleSubmit} className="auth-form">
 

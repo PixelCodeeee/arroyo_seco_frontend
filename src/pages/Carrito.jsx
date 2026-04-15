@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  getCart, 
-  updateItemQuantity, 
-  removeFromCart, 
+import {
+  getCart,
+  updateItemQuantity,
+  removeFromCart,
   clearCart,
   getCartTotal,
-  getCartItemsCount 
+  getCartItemsCount
 } from '../utils/cartUtils';
 import Navbar from '../components/Navbar';
-import PayPalCheckout from '../components/PayPalCheckout';
+import MercadoPagoCheckout from '../components/MercadoPagoCheckout';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/carrito.css';
 
 const Carrito = () => {
@@ -17,24 +20,25 @@ const Carrito = () => {
   const [cart, setCart] = useState(null);
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showPayPal, setShowPayPal] = useState(false);
+  const [showMercadoPago, setShowMercadoPago] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null, message: '', title: '' });
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
   useEffect(() => {
     cargarCarrito();
-    
-    const handleCartUpdate = () => {
-      cargarCarrito();
-    };
-    
+
+    // Detectar si regresamos de MercadoPago con status=success
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'success') {
+      setShowMercadoPago(true); // Mostrar MercadoPagoCheckout para que procese el retorno
+    }
+
+    const handleCartUpdate = () => cargarCarrito();
     window.addEventListener('cartUpdated', handleCartUpdate);
-    
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartUpdate);
-    };
+    return () => window.removeEventListener('cartUpdated', handleCartUpdate);
   }, []);
 
   const cargarCarrito = () => {
@@ -50,55 +54,59 @@ const Carrito = () => {
   };
 
   const eliminarItem = (id_producto) => {
-    if (window.confirm('¿Eliminar este producto del carrito?')) {
-      if (removeFromCart(id_producto)) {
-        cargarCarrito();
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar producto',
+      message: '¿Eliminar este producto del carrito?',
+      action: () => {
+        if (removeFromCart(id_producto)) {
+          cargarCarrito();
+        }
       }
-    }
+    });
   };
 
   const vaciarCarrito = () => {
-    if (window.confirm('¿Estás seguro de vaciar el carrito?')) {
-      clearCart();
-      cargarCarrito();
-      setShowPayPal(false);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Vaciar carrito',
+      message: '¿Estás seguro de vaciar el carrito?',
+      action: () => {
+        clearCart();
+        cargarCarrito();
+        setShowMercadoPago(false);
+      }
+    });
   };
 
   const iniciarPago = () => {
     if (!currentUser) {
-      alert('Debes iniciar sesión para realizar el pago');
+      toast.error('Debes iniciar sesión para realizar el pago');
       navigate('/login');
       return;
     }
 
     if (!cart || cart.items.length === 0) {
-      alert('Tu carrito está vacío');
+      toast.error('Tu carrito está vacío');
       return;
     }
 
     setPaymentError('');
-    setShowPayPal(true);
+    setShowMercadoPago(true);
   };
 
   const handlePaymentSuccess = (response) => {
     console.log('Payment successful:', response);
     setPaymentSuccess(true);
-    setShowPayPal(false);
-    
-    // Show success message
-    alert(`¡Pago exitoso! ID de transacción: ${response.transaction.id}`);
-    
-    // Redirect to orders page after 2 seconds
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    setShowMercadoPago(false);
+    toast.success(`¡Pago exitoso! ID de transacción: ${response.transaction?.id || 'N/A'}`);
+    setTimeout(() => navigate('/'), 2000);
   };
 
   const handlePaymentError = (error) => {
     console.error('Payment error:', error);
     setPaymentError(error.message || 'Error al procesar el pago');
-    setShowPayPal(false);
+    setShowMercadoPago(false);
   };
 
   if (loading) {
@@ -150,35 +158,29 @@ const Carrito = () => {
           {/* Payment Error */}
           {paymentError && (
             <div className="alert alert-error" style={{ marginBottom: '20px' }}>
-              <span>⚠️</span>
+              <span><AlertTriangle size={18} className="lucide-icon-inline" style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
               <span>{paymentError}</span>
             </div>
           )}
 
-          {/* Sección de productos en carrito */}
+          {/* Productos en carrito */}
           <div className="carrito-section">
             <div className="section-header">
               <span className="section-text">
                 Productos en carrito: {totalItems}
               </span>
-              <button 
+              <button
                 className="ver-detalles-btn"
                 onClick={() => setMostrarDetalles(!mostrarDetalles)}
               >
                 {mostrarDetalles ? 'Ocultar detalles' : 'Ver detalles'}
-                <svg 
+                <svg
                   className={`arrow-icon ${mostrarDetalles ? 'rotated' : ''}`}
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
-                  fill="none"
+                  width="24" height="24" viewBox="0 0 24 24" fill="none"
                 >
-                  <path 
-                    d="M19 9L12 16L5 9" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
+                  <path
+                    d="M19 9L12 16L5 9"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                   />
                 </svg>
               </button>
@@ -197,13 +199,11 @@ const Carrito = () => {
                     return (
                       <div key={item.id_producto} className="producto-carrito-item">
                         <div className="producto-info-carrito">
-                          <img 
+                          <img
                             src={primeraImagen}
                             alt={item.nombre}
                             className="producto-imagen-mini"
-                            onError={(e) => {
-                              e.target.src = '/images/placeholder.png';
-                            }}
+                            onError={(e) => { e.target.src = '/images/placeholder.png'; }}
                           />
                           <div>
                             <h4>{item.nombre}</h4>
@@ -212,43 +212,34 @@ const Carrito = () => {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="producto-controles">
                           <div className="cantidad-control">
-                            <button 
+                            <button
                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad - 1)}
                               className="cantidad-btn"
-                              disabled={showPayPal}
-                            >
-                              -
-                            </button>
+                              disabled={showMercadoPago}
+                            >-</button>
                             <span className="cantidad-texto">{item.cantidad}</span>
-                            <button 
+                            <button
                               onClick={() => actualizarCantidad(item.id_producto, item.cantidad + 1)}
                               className="cantidad-btn"
-                              disabled={showPayPal}
-                            >
-                              +
-                            </button>
+                              disabled={showMercadoPago}
+                            >+</button>
                           </div>
-                          
+
                           <p className="producto-precio-carrito">
                             ${(item.precio * item.cantidad).toFixed(2)}
                           </p>
-                          
-                          <button 
+
+                          <button
                             onClick={() => eliminarItem(item.id_producto)}
                             className="eliminar-btn"
                             aria-label="Eliminar producto"
-                            disabled={showPayPal}
+                            disabled={showMercadoPago}
                           >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                              <path 
-                                d="M18 6L6 18M6 6L18 18" 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round"
-                              />
+                              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             </svg>
                           </button>
                         </div>
@@ -260,12 +251,11 @@ const Carrito = () => {
             )}
           </div>
 
-          {/* Resumen de compra */}
+          {/* Resumen */}
           <div className="carrito-section resumen-section">
             <div className="resumen-header">
               <h3>Resumen de compra</h3>
             </div>
-            
             <div className="resumen-items">
               {items.map((item) => (
                 <div key={item.id_producto} className="resumen-item">
@@ -278,9 +268,7 @@ const Carrito = () => {
                   </span>
                 </div>
               ))}
-              
               <div className="resumen-divider"></div>
-              
               <div className="resumen-total">
                 <span className="total-label">Total</span>
                 <span className="total-precio">$ {totalPrice.toFixed(2)} MXN</span>
@@ -288,14 +276,14 @@ const Carrito = () => {
             </div>
           </div>
 
-          {/* PayPal Payment Section */}
-          {showPayPal && (
+          {/* Sección de pago MercadoPago */}
+          {showMercadoPago && (
             <div className="carrito-section">
               <div className="section-header">
                 <span className="section-text">Método de pago</span>
               </div>
               <div className="paypal-section">
-                <PayPalCheckout
+                <MercadoPagoCheckout
                   amount={totalPrice.toFixed(2)}
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentError}
@@ -306,9 +294,9 @@ const Carrito = () => {
 
           {/* Botones de acción */}
           <div className="carrito-acciones">
-            {!showPayPal ? (
+            {!showMercadoPago ? (
               <>
-                <button 
+                <button
                   className="pagar-btn"
                   onClick={iniciarPago}
                   disabled={!cart || items.length === 0}
@@ -317,25 +305,32 @@ const Carrito = () => {
                 </button>
 
                 {cart && items.length > 0 && (
-                  <button 
-                    className="vaciar-carrito-btn"
-                    onClick={vaciarCarrito}
-                  >
+                  <button className="vaciar-carrito-btn" onClick={vaciarCarrito}>
                     Vaciar carrito
                   </button>
                 )}
               </>
             ) : (
-              <button 
-                className="btn btn-secondary"
-                onClick={() => setShowPayPal(false)}
-              >
+              <button className="btn btn-secondary" onClick={() => setShowMercadoPago(false)}>
                 Cancelar pago
               </button>
             )}
           </div>
+
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          if (confirmModal.action) confirmModal.action();
+          setConfirmModal({ isOpen: false, action: null, message: '', title: '' });
+        }}
+        onClose={() => setConfirmModal({ isOpen: false, action: null, message: '', title: '' })}
+        confirmText="Confirmar"
+      />
     </>
   );
 };

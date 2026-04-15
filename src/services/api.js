@@ -1,3 +1,5 @@
+import { addPendingOperation, getCache, setCache } from './localDB';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Generic API request handler with full logging
@@ -16,12 +18,17 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 
   try {
+    // ✅ FIXED
+    const { headers: customHeaders, ...restOptions } = options;
+
     const response = await fetch(`${API_URL}${endpoint}`, {
+      ...restOptions,
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        'x-frontend-version': import.meta.env.VITE_FRONTEND_VERSION || 'stable',
+        ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {}),
+        ...customHeaders,
       },
-      ...options,
     });
 
     const responseTime = Date.now() - startTime;
@@ -47,6 +54,21 @@ const apiRequest = async (endpoint, options = {}) => {
     console.log('Response data:', data);
     console.groupEnd();
 
+    // ====== OFFLINE CACHING FOR GET ======
+    if (method.toUpperCase() === 'GET') {
+      let cacheStore = 'cached_pedidos';
+      if (endpoint.includes('/pedidos') || endpoint.includes('/ordenes')) cacheStore = 'cached_pedidos';
+      else if (endpoint.includes('/reservas')) cacheStore = 'cached_reservas';
+      else if (endpoint.includes('/productos')) cacheStore = 'cached_productos';
+      else if (endpoint.includes('/categorias')) cacheStore = 'cached_categorias';
+      else if (endpoint.includes('/servicios')) cacheStore = 'cached_servicios';
+      else if (endpoint.includes('/usuarios') || endpoint.includes('/oferentes')) cacheStore = 'cached_usuarios';
+      else if (endpoint.includes('/announcements')) cacheStore = 'cached_announcements';
+
+      await setCache(cacheStore, endpoint, data).catch(console.warn);
+    }
+    // =====================================
+
     return data;
   } catch (error) {
     const duration = Date.now() - startTime;
@@ -56,7 +78,57 @@ const apiRequest = async (endpoint, options = {}) => {
     );
     console.groupEnd();
 
-    // Optional: send error to external logging service here
+    // Offline Interceptor
+    const isOfflineError = error instanceof TypeError || !navigator.onLine;
+
+    if (isOfflineError) {
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
+        console.warn('📡 Red desconectada: Saltando error y guardando petición en cola offline para', endpoint);
+
+        let parsedBody = null;
+        if (options.body) {
+          try {
+            parsedBody = JSON.parse(options.body);
+          } catch (_) {
+            parsedBody = options.body;
+          }
+        }
+
+        // Save to IndexedDB
+        await addPendingOperation({ endpoint, method, body: parsedBody });
+
+        return {
+          _offlineQueued: true, // Used by frontend for optimistic indicators
+          message: 'Guardado localmente para sincronizar luego'
+        };
+      } else if (method.toUpperCase() === 'GET') {
+        console.warn('📡 Red desconectada: Recuperando datos cacheados para GET', endpoint);
+
+        let cacheStore = 'cached_pedidos';
+        if (endpoint.includes('/pedidos') || endpoint.includes('/ordenes')) cacheStore = 'cached_pedidos';
+        else if (endpoint.includes('/reservas')) cacheStore = 'cached_reservas';
+        else if (endpoint.includes('/productos')) cacheStore = 'cached_productos';
+        else if (endpoint.includes('/categorias')) cacheStore = 'cached_categorias';
+        else if (endpoint.includes('/servicios')) cacheStore = 'cached_servicios';
+        else if (endpoint.includes('/usuarios') || endpoint.includes('/oferentes')) cacheStore = 'cached_usuarios';
+        else if (endpoint.includes('/announcements')) cacheStore = 'cached_announcements';
+
+        const cachedData = await getCache(cacheStore, endpoint);
+
+        if (cachedData) {
+          console.log(`📦 Serving cached data for ${endpoint}`);
+          // Add a custom marker to signal to the UI that these are offline results
+          if (Array.isArray(cachedData)) {
+            cachedData._isCache = true;
+          }
+          return cachedData;
+        } else {
+          console.warn(`📦 No offline cache found for ${endpoint}`);
+          throw new Error('No hay conexión y no hay datos guardados para mostrar.');
+        }
+      }
+    }
+
     throw error;
   }
 };
@@ -121,6 +193,97 @@ export const usuariosAPI = {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
+
+  forgotPassword: (data) =>
+    apiRequest('/usuarios/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  resetPassword: (data) =>
+    apiRequest('/usuarios/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updatePassword: (id, data) =>
+    apiRequest(`/usuarios/${id}/password`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }),
+
+  solicitarCambioCorreo: (id, data) =>
+    apiRequest(`/usuarios/${id}/cambio-correo/solicitar`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }),
+
+  verificarCambioCorreo: (id, data) =>
+    apiRequest(`/usuarios/${id}/cambio-correo/verificar`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    }),
+
+  getPerfil: async () => {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) throw new Error('No autenticado');
+    const user = JSON.parse(userStr);
+
+    const userData = await apiRequest(`/usuarios/${user.id_usuario}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    if (user.rol === 'oferente') {
+      try {
+        const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+        const oferenteData = Array.isArray(response) ? response[0] : response;
+        if (oferenteData) {
+          return { ...userData, telefono: oferenteData.telefono || "", direccion: oferenteData.direccion || "" };
+        }
+      } catch (err) {
+        console.warn("Could not fetch oferente profile data", err);
+      }
+    }
+    return userData;
+  },
+
+  actualizarPerfil: async (dataToUpdate) => {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) throw new Error('No autenticado');
+    const user = JSON.parse(userStr);
+
+    const userData = { nombre: dataToUpdate.nombre, correo: dataToUpdate.correo };
+
+    await apiRequest(`/usuarios/${user.id_usuario}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    if (user.rol === 'oferente' && (dataToUpdate.telefono !== undefined || dataToUpdate.direccion !== undefined)) {
+      try {
+        const response = await apiRequest(`/oferentes/usuario/${user.id_usuario}`, { method: 'GET' });
+        const oferente = Array.isArray(response) ? response[0] : response;
+        if (oferente && oferente.id_oferente) {
+          await apiRequest(`/oferentes/${oferente.id_oferente}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              telefono: dataToUpdate.telefono,
+              direccion: dataToUpdate.direccion
+            }),
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+        }
+      } catch (err) {
+        console.error("Failed to update oferente profile", err);
+      }
+    }
+    return true;
+  }
 };
 
 /* ======================================================
@@ -189,7 +352,6 @@ export const oferentesAPI = {
    SERVICIOS API
 ====================================================== */
 export const serviciosAPI = {
-  // POST /api/servicios
   create: (data) =>
     apiRequest('/servicios', {
       method: 'POST',
@@ -199,19 +361,15 @@ export const serviciosAPI = {
       },
     }),
 
-  // GET /api/servicios → devuelve { servicios: [], stats: {} }
   getAll: () =>
     apiRequest('/servicios'),
 
-  // GET /api/servicios/:id
   getById: (id) =>
     apiRequest(`/servicios/${id}`),
 
-  // GET /api/servicios/oferente/:oferenteId
   getByOferenteId: (oferenteId) =>
     apiRequest(`/servicios/oferente/${oferenteId}`),
 
-  // PUT /api/servicios/:id
   update: (id, data) =>
     apiRequest(`/servicios/${id}`, {
       method: 'PUT',
@@ -221,7 +379,6 @@ export const serviciosAPI = {
       },
     }),
 
-  // DELETE /api/servicios/:id
   delete: (id) =>
     apiRequest(`/servicios/${id}`, {
       method: 'DELETE',
@@ -230,6 +387,7 @@ export const serviciosAPI = {
       },
     }),
 };
+
 // ---------------------------------------------------------------------
 // PRODUCTOS
 // ---------------------------------------------------------------------
@@ -254,7 +412,7 @@ export const productosAPI = {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   }),
-  getCategorias: (tipo) => apiRequest('/categorias'),
+  getCategorias: () => apiRequest('/categorias'),
   crearCategoria: (data) => apiRequest('/categorias', {
     method: 'POST',
     body: JSON.stringify(data),
@@ -273,12 +431,10 @@ export const productosAPI = {
 
 /* ======================================================
    PEDIDOS (ORDERS) API
-   Consolidated API for managing orders
 ====================================================== */
 export const pedidosAPI = {
-  // Create order
   create: (pedidoData) =>
-    apiRequest('/pedidos', { // Corrected from /pedido to /pedidos
+    apiRequest('/pedidos', {
       method: 'POST',
       body: JSON.stringify(pedidoData),
       headers: {
@@ -286,30 +442,26 @@ export const pedidosAPI = {
       },
     }),
 
-  // Get all orders (admin)
   getAll: () =>
-    apiRequest('/pedidos', { // Corrected from /pedido to /pedidos
+    apiRequest('/pedidos', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
 
-  // Get order by ID
   getById: (id) =>
-    apiRequest(`/pedidos/${id}`, { // Corrected from /pedido/${id} to /pedidos/${id}
+    apiRequest(`/pedidos/${id}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
 
-  // Get my orders (current user)
   getMisPedidos: () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     if (!currentUser) throw new Error('Usuario no autenticado');
 
-    // Using the new endpoint structure: /api/pedidos/usuario/:usuarioId or /api/pedidos/mis-pedidos/:usuarioId
     return apiRequest(`/pedidos/usuario/${currentUser.id_usuario}`, {
       method: 'GET',
       headers: {
@@ -318,7 +470,6 @@ export const pedidosAPI = {
     });
   },
 
-  // Get orders by user ID (admin/flexible)
   getByUsuarioId: (usuarioId) =>
     apiRequest(`/pedidos/usuario/${usuarioId}`, {
       method: 'GET',
@@ -327,7 +478,6 @@ export const pedidosAPI = {
       },
     }),
 
-  // Get orders by provider (for sales view)
   getByOferenteId: (oferenteId) =>
     apiRequest(`/pedidos/oferente/${oferenteId}`, {
       method: 'GET',
@@ -336,7 +486,6 @@ export const pedidosAPI = {
       },
     }),
 
-  // Get orders by status
   getByEstado: (estado) =>
     apiRequest(`/pedidos/estado/${estado}`, {
       method: 'GET',
@@ -345,7 +494,6 @@ export const pedidosAPI = {
       },
     }),
 
-  // Update order status
   updateEstado: (id, estado) =>
     apiRequest(`/pedidos/${id}/estado`, {
       method: 'PATCH',
@@ -355,7 +503,6 @@ export const pedidosAPI = {
       },
     }),
 
-  // Delete order
   delete: (id) =>
     apiRequest(`/pedidos/${id}`, {
       method: 'DELETE',
@@ -365,14 +512,13 @@ export const pedidosAPI = {
     }),
 };
 
-// Deprecated alias for backward compatibility until refactor is complete
+// Deprecated alias for backward compatibility
 export const ordenesAPI = pedidosAPI;
 
 /* ======================================================
    RESERVAS API
 ====================================================== */
 export const reservasAPI = {
-  // Crear nueva reserva
   create: (reservaData) =>
     apiRequest('/reservas', {
       method: 'POST',
@@ -382,7 +528,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Obtener todas las reservas (admin)
   getAll: () =>
     apiRequest('/reservas', {
       method: 'GET',
@@ -391,7 +536,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Obtener reserva por ID
   getById: (id) =>
     apiRequest(`/reservas/${id}`, {
       method: 'GET',
@@ -400,7 +544,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Obtener reservas por usuario
   getByUsuarioId: (usuarioId) =>
     apiRequest(`/reservas/usuario/${usuarioId}`, {
       method: 'GET',
@@ -409,29 +552,33 @@ export const reservasAPI = {
       },
     }),
 
-  // Obtener mis reservas (usando el usuario actual del localStorage)
   getMisReservas: () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if (!currentUser) throw new Error('Usuario no autenticado');
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (!currentUser) throw new Error("Usuario no autenticado");
 
     return apiRequest(`/reservas/usuario/${currentUser.id_usuario}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      method: "GET",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
   },
 
-  // Obtener reservas por servicio
-  getByServicioId: (servicioId) =>
-    apiRequest(`/reservas/servicio/${servicioId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    }),
+  getMisReservasComoOferente: async () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (!currentUser) throw new Error("Usuario no autenticado");
 
-  // Obtener reservas por oferente
+    const oferenteData = await oferentesAPI.getByUserId(currentUser.id_usuario);
+    const id_oferente = oferenteData?.id_oferente ?? oferenteData?.oferente?.id_oferente;
+    if (!id_oferente) throw new Error("No se encontró el perfil de oferente");
+
+    return apiRequest(`/reservas/oferente/${id_oferente}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+  },
+
+  getByServicioId: (servicioId) =>
+    apiRequest(`/reservas/servicio/${servicioId}`),
+
   getByOferenteId: (oferenteId) =>
     apiRequest(`/reservas/oferente/${oferenteId}`, {
       method: 'GET',
@@ -440,7 +587,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Obtener reservas por estado
   getByEstado: (estado) =>
     apiRequest(`/reservas/estado/${estado}`, {
       method: 'GET',
@@ -449,7 +595,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Actualizar reserva completa
   update: (id, reservaData) =>
     apiRequest(`/reservas/${id}`, {
       method: 'PUT',
@@ -459,7 +604,6 @@ export const reservasAPI = {
       },
     }),
 
-  // Cambiar solo el estado de una reserva
   updateEstado: (id, estado) =>
     apiRequest(`/reservas/${id}/estado`, {
       method: 'PATCH',
@@ -469,15 +613,13 @@ export const reservasAPI = {
       },
     }),
 
-  // Verificar disponibilidad antes de reservar
   checkDisponibilidad: (id_servicio, fecha, hora) => {
     const params = new URLSearchParams({ id_servicio, fecha, hora });
-    return apiRequest(`/reservas/check/disponibilidad?${params.toString()}`, {
+    return apiRequest(`/reservas/disponibilidad?${params.toString()}`, {
       method: 'GET',
     });
   },
 
-  // Eliminar reserva
   delete: (id) =>
     apiRequest(`/reservas/${id}`, {
       method: 'DELETE',
@@ -486,9 +628,7 @@ export const reservasAPI = {
       },
     }),
 
-  // Cancelar reserva (con validación de 24h)
   cancelar: async (id) => {
-    // Primero obtener la reserva para validar
     const reserva = await apiRequest(`/reservas/${id}`, {
       method: 'GET',
       headers: {
@@ -496,7 +636,6 @@ export const reservasAPI = {
       },
     });
 
-    // Validar que falten al menos 24h
     const fechaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
     const ahora = new Date();
     const horasRestantes = (fechaReserva - ahora) / (1000 * 60 * 60);
@@ -505,7 +644,6 @@ export const reservasAPI = {
       throw new Error('No se puede cancelar con menos de 24 horas de anticipación');
     }
 
-    // Si pasa la validación, cancelar
     return apiRequest(`/reservas/${id}/estado`, {
       method: 'PATCH',
       body: JSON.stringify({ estado: 'cancelada' }),
@@ -517,17 +655,21 @@ export const reservasAPI = {
 };
 
 /* ======================================================
-   PAYPAL API
+   MERCADOPAGO OFERENTE API
+   (OAuth para que el oferente conecte su cuenta de MP)
 ====================================================== */
-export const paypalAPI = {
+export const mercadopagoAPI = {
+
+  // Crear preferencia de pago (carrito)
   createOrder: (orderData) =>
-    apiRequest('/paypal/create-order', {
+    apiRequest('/mercadopago/create-order', {
       method: 'POST',
       body: JSON.stringify(orderData),
     }),
 
+  // Confirmar pago después del redirect
   captureOrder: (captureData) =>
-    apiRequest('/paypal/capture-order', {
+    apiRequest('/mercadopago/capture-order', {
       method: 'POST',
       body: JSON.stringify(captureData),
       headers: {
@@ -535,43 +677,64 @@ export const paypalAPI = {
       },
     }),
 
+  // Detalle de un pago
   getOrderDetails: (orderID) =>
-    apiRequest(`/paypal/orders/${orderID}`),
+    apiRequest(`/mercadopago/orders/${orderID}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
+
+  // Obtener URL de autorización OAuth (redirige a MP)
+  getOAuthUrl: () =>
+    apiRequest('/mercadopago/mp/oauth-url', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
+
+  // Consultar estado de conexión del oferente con MP
+  getEstado: () =>
+    apiRequest('/mercadopago/mp/estado', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }),
 };
+
 /* ======================================================
    ANNOUNCEMENTS API
 ====================================================== */
 export const announcementsAPI = {
+  getMaintenance: () =>
+    apiRequest('/announcements/public'),   // ✅
+
   getAll: () =>
-    apiRequest('/announcements'),
+    apiRequest('/announcements'),           // ✅
 
   getById: (id) =>
-    apiRequest(`/announcements/${id}`),
+    apiRequest(`/announcements/${id}`),     // ✅
 
   create: (data) =>
     apiRequest('/announcements', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 
   update: (id, data) =>
     apiRequest(`/announcements/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 
   delete: (id) =>
     apiRequest(`/announcements/${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 };
 

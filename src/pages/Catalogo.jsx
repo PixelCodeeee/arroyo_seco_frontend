@@ -17,8 +17,9 @@ function Catalogo() {
 
   // Hero slides con imágenes diferentes
   const heroSlides = [
-    { id: 1, image: "/images/tesoro.jpg", alt: "Arroyo Seco" },
-    { id: 2, image: "/images/comida.jpg", alt: "Gastronomía Local" }
+    { id: 1, image: "/images/comida.jpg", alt: "Gastronomía Local" },
+    { id: 2, image: "/images/helado.jpeg", alt: "Gastronomía Local" },
+    { id: 3, image: "/images/restaurante.jpeg", alt: "Arroyo Seco" }
   ];
 
   useEffect(() => {
@@ -112,7 +113,7 @@ function Catalogo() {
             alt={oferente.nombre_negocio}
             onError={(e) => {
               e.target.src = oferente.tipo === "restaurante" 
-                ? "/images/tesoro.jpg" 
+                ? "/images/tesoro.jpeg" 
                 : "/images/artesania1.png";
             }}
           />

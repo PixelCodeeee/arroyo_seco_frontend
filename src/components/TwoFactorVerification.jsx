@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/auth.css';
 
-function TwoFactorVerification({ userId, onSuccess, onResend }) {
+function TwoFactorVerification({ onSuccess, onResend }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ function TwoFactorVerification({ userId, onSuccess, onResend }) {
 
     try {
       await onResend();
-    } catch (err) {
+    } catch {
       setError('Error al reenviar el código');
     } finally {
       setLoading(false);

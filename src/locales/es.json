@@ -1,0 +1,54 @@
+{
+    "app": {
+        "title": "Sistema Arroyo Seco",
+        "loading": "Cargando...",
+        "error": "Ocurrió un error",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "search": "Buscar..."
+    },
+    "nav": {
+        "home": "Inicio",
+        "events": "Eventos",
+        "gastronomy": "Gastronomía",
+        "handicrafts": "Artesanías",
+        "recommendations": "Recomendaciones",
+        "contact": "Contacto",
+        "oferente_panel": "Panel Oferente",
+        "admin_panel": "Panel Admin",
+        "profile": "Mi Perfil",
+        "login": "Iniciar sesión",
+        "register": "Regístrate",
+        "logout": "Cerrar Sesión",
+        "settings": "Configuración"
+    },
+    "home": {
+        "welcome": "Bienvenido al",
+        "welcome_system": "Sistema de Gestión",
+        "subtitle": "Selecciona una opción del menú para comenzar",
+        "hero_prefix": "Descubre",
+        "hero_highlight": "Arroyo Seco",
+        "tesoro_title1": "El",
+        "tesoro_highlight": "Tesoro Escondido",
+        "tesoro_title2": "De Querétaro",
+        "tesoro_desc": "Una experiencia inigualable en la sierra gorda de Querétaro, conoce nuestra cultura, historia y bellezas naturales.",
+        "gastronomy_title": "Nuestra",
+        "gastronomy_desc": "Prueba los sabores auténticos de la región, desde platillos tradicionales hasta creaciones locales exquisitas que deleitarán tu paladar.",
+        "explore": "Explora",
+        "handicrafts_title": "Nuestras"
+    },
+    "settings": {
+        "title": "Configuración y Accesibilidad",
+        "theme": "Tema",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "high_contrast": "Alto Contraste",
+        "dyslexia_font": "Fuente para Dislexia",
+        "font_size": "Tamaño de Texto",
+        "language": "Idioma",
+        "english": "Inglés",
+        "spanish": "Español"
+    }
+}

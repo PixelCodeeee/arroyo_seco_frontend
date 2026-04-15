@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { MapPin, Loader } from 'lucide-react';
 import '../styles/GoogleMap.css';
@@ -59,7 +59,7 @@ function GoogleMapComponent({ ubicacion, nombreNegocio }) {
     return (
       <div className="google-map-wrapper map-fallback">
         <img
-          src="/images/pan.png"
+          src="/images/pan.jpeg"
           alt="Mapa de ubicación"
           onError={(e) => (e.target.style.display = 'none')}
         />

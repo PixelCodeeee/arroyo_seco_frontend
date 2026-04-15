@@ -8,8 +8,8 @@
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
-  background-color: #1a1a1a;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -24,54 +24,43 @@ button {
 }
 
 /* ==============================
-   CSS VARIABLES
-============================== */
-:root {
-  --accent: #e3008c;
-  --accent-hover: #c9007a;
-  --dark-bg: #1a1a1a;
-  --card-bg: #222;
-  --footer-bg: #111;
-  --text-primary: #fff;
-  --text-secondary: #d1d1d1;
-  --text-muted: #bbb;
-  --border-color: #333;
-}
-
-/* ==============================
    SHARED BUTTON STYLES
 ============================== */
+.btn-primary,
+.btn-secondary {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  text-align: center;
+}
+
 .btn-primary {
   background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.6rem;
-  font-weight: 600;
-  transition: 0.3s;
-  cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
+  color: black;
+  border: 2px solid var(--accent);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+  color: black;
 }
 
 .btn-secondary {
-  background: #fff;
-  color: #1a1a1a;
-  border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.6rem;
-  font-weight: 600;
-  transition: 0.3s;
-  cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--text-primary);
 }
 
 .btn-secondary:hover {
-  background: var(--accent);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
 }
 
 /* ==============================

@@ -1,0 +1,16 @@
+services:
+  frontend-stable:
+    image: ghcr.io/pixelcodeeee/arroyo_seco_pwa_stage2/frontend:stable
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_APP_VERSION=stable
+
+  frontend-canary:
+    image: ghcr.io/pixelcodeeee/arroyo_seco_pwa_stage2/frontend:canary
+    restart: unless-stopped
+    ports:
+      - "3001:3000" # host 3001 → container 3000
+    environment:
+      - VITE_APP_VERSION=canary

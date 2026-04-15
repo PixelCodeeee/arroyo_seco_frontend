@@ -1,5 +1,7 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Menu } from 'lucide-react';
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
+import DashboardHelpFab from './DashboardHelpFab';
 import '../styles/Sidebar.css';
 
 function Layout({ children }) {
@@ -34,12 +36,14 @@ function Layout({ children }) {
         className="mobile-menu-button"
         onClick={toggleMobileSidebar}
       >
-        ☰
+        <Menu size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />
       </button>
 
       <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         {children}
       </main>
+      
+      <DashboardHelpFab />
     </div>
   );
 }

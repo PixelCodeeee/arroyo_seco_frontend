@@ -1,31 +1,38 @@
+import { Clock, CheckCircle, XCircle, Utensils, AlertTriangle, Search, Eye, Users, RefreshCcw } from 'lucide-react';
 import React, { useState, useEffect } from "react";
 import { reservasAPI } from "../services/api";
 import Layout from "../components/Layout";
 import ReservaDetailModal from "../components/ReservaDetailModal";
+import ConfirmModal from "../components/ConfirmModal";
+import { toast } from "sonner";
 import "../styles/Reserva.css";
+import {
+  formatDateShort,
+  formatTime,
+  getEstadoBadgeClass,
+  canCancelReserva,
+} from "../utils/Reservautils";
 
 function Reservas() {
   const [reservas, setReservas] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
-  // Filtros
   const [filterEstado, setFilterEstado] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // Modal
   const [selectedReserva, setSelectedReserva] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  
+  const [confirmEstado, setConfirmEstado] = useState({ isOpen: false, id: null, nuevoEstado: '' });
+  const [confirmCancel, setConfirmCancel] = useState({ isOpen: false, reserva: null });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
   const isTurista = user?.rol === "turista";
   const isOferente = user?.rol === "oferente";
+  const isModerador = user?.rol === "moderador"; // ✅ agregado
 
-  useEffect(() => {
-    loadReservas();
-  }, []);
+  useEffect(() => { loadReservas(); }, []);
 
   const loadReservas = async () => {
     try {
@@ -33,18 +40,18 @@ function Reservas() {
       setError("");
 
       let response;
-
       if (isTurista) {
-        // Turista: solo sus reservas
         response = await reservasAPI.getMisReservas();
-        setReservas(response.reservas || []);
-        setFiltered(response.reservas || []);
-      } else  {
-        // Admin: todas las reservas
+      } else if (isOferente) {
+        response = await reservasAPI.getMisReservasComoOferente();
+      } else {
+        // admin y moderador ven todo
         response = await reservasAPI.getAll();
-        setReservas(response.reservas || []);
-        setFiltered(response.reservas || []);
-      } 
+      }
+
+      const data = response.reservas || [];
+      setReservas(data);
+      setFiltered(data);
     } catch (err) {
       console.error("Error loading reservas:", err);
       setError(err.message || "Error al cargar reservas");
@@ -53,33 +60,26 @@ function Reservas() {
     }
   };
 
-  // Aplicar filtros
+  // Apply filters
   useEffect(() => {
     let data = [...reservas];
-
-    // Filtrar por estado
     if (filterEstado) {
       data = data.filter((r) => r.estado === filterEstado);
     }
-
-    // Buscar por ID, usuario o servicio
     if (searchTerm) {
+      const q = searchTerm.toLowerCase();
       data = data.filter(
         (r) =>
-          r.id_reserva.toString().includes(searchTerm) ||
-          r.nombre_usuario?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          r.nombre_servicio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          r.email_usuario?.toLowerCase().includes(searchTerm.toLowerCase())
+          r.id_reserva.toString().includes(q) ||
+          r.usuario?.nombre?.toLowerCase().includes(q) ||
+          r.servicio?.nombre?.toLowerCase().includes(q) ||
+          r.usuario?.correo?.toLowerCase().includes(q)
       );
     }
-
     setFiltered(data);
   }, [filterEstado, searchTerm, reservas]);
 
-  const clearFilters = () => {
-    setFilterEstado("");
-    setSearchTerm("");
-  };
+  const clearFilters = () => { setFilterEstado(""); setSearchTerm(""); };
 
   const handleViewDetails = async (reserva) => {
     try {
@@ -88,87 +88,70 @@ function Reservas() {
       setSelectedReserva(detalle);
       setShowModal(true);
     } catch (err) {
-      alert(err.message || "Error al cargar detalles");
+      toast.error(err.message || "Error al cargar detalles");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangeEstado = async (id_reserva, nuevoEstado) => {
-    if (!window.confirm(`¿Cambiar el estado de la reserva a "${nuevoEstado}"?`)) {
-      return;
-    }
+  const requestChangeEstado = (id_reserva, nuevoEstado) => {
+    setConfirmEstado({ isOpen: true, id: id_reserva, nuevoEstado });
+  };
 
+  const executeChangeEstado = async () => {
+    if (!confirmEstado.id) return;
     try {
-      await reservasAPI.updateEstado(id_reserva, nuevoEstado);
-      await loadReservas();
-      alert("Estado actualizado exitosamente");
+      const res = await reservasAPI.updateEstado(confirmEstado.id, confirmEstado.nuevoEstado);
+      if (res && res._offlineQueued) {
+        setReservas(prev => prev.map(r => 
+          r.id_reserva === confirmEstado.id ? { ...r, estado: confirmEstado.nuevoEstado, _isDraft: true } : r
+        ));
+        toast.info("Sin conexión — operación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Estado de la reserva actualizado");
+        await loadReservas();
+      }
     } catch (err) {
-      alert(err.message || "Error al cambiar estado");
+      toast.error(err.message || "Error al cambiar estado");
+    } finally {
+      setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' });
     }
   };
 
-  const handleCancelar = async (reserva) => {
-    // Validar 24 horas
-    const fechaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
-    const ahora = new Date();
-    const horasRestantes = (fechaReserva - ahora) / (1000 * 60 * 60);
-    
-    if (horasRestantes < 24) {
-      alert("No se puede cancelar con menos de 24 horas de anticipación");
+  const requestCancelar = (reserva) => {
+    if (!canCancelReserva(reserva)) {
+      toast.error("No se puede cancelar con menos de 24 horas de anticipación");
       return;
     }
+    setConfirmCancel({ isOpen: true, reserva });
+  };
 
-    if (!window.confirm("¿Estás seguro de cancelar esta reserva?")) {
-      return;
-    }
-
+  const executeCancelar = async () => {
+    if (!confirmCancel.reserva) return;
     try {
-      await reservasAPI.updateEstado(reserva.id_reserva, "cancelada");
-      await loadReservas();
-      alert("Reserva cancelada exitosamente");
+      const res = await reservasAPI.updateEstado(confirmCancel.reserva.id_reserva, "cancelada");
+      if (res && res._offlineQueued) {
+        setReservas(prev => prev.map(r => 
+          r.id_reserva === confirmCancel.reserva.id_reserva ? { ...r, estado: "cancelada", _isDraft: true } : r
+        ));
+        toast.info("Sin conexión — cancelación guardada para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Reserva cancelada exitosamente");
+        await loadReservas();
+      }
     } catch (err) {
-      alert(err.message || "Error al cancelar reserva");
+      toast.error(err.message || "Error al cancelar reserva");
+    } finally {
+      setConfirmCancel({ isOpen: false, reserva: null });
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-MX", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (timeString) => {
-    if (!timeString) return "N/A";
-    return timeString.substring(0, 5); // HH:MM
-  };
-
-  const getEstadoBadgeClass = (estado) => {
-    switch (estado) {
-      case "pendiente":
-        return "badge-warning";
-      case "confirmada":
-        return "badge-success";
-      case "cancelada":
-        return "badge-danger";
-      default:
-        return "badge-secondary";
-    }
-  };
-
-  const canCancelReserva = (reserva) => {
-    if (reserva.estado === "cancelada") return false;
-    
-    const fechaReserva = new Date(`${reserva.fecha}T${reserva.hora}`);
-    const ahora = new Date();
-    const horasRestantes = (fechaReserva - ahora) / (1000 * 60 * 60);
-    
-    return horasRestantes >= 24;
-  };
+  const statPendientes = reservas.filter((r) => r.estado === "pendiente").length;
+  const statConfirmadas = reservas.filter((r) => r.estado === "confirmada").length;
+  const statCanceladas = reservas.filter((r) => r.estado === "cancelada").length;
+  const statPersonas = reservas
+    .filter((r) => r.estado !== "cancelada")
+    .reduce((sum, r) => sum + (r.numero_personas || 0), 0);
 
   if (loading && reservas.length === 0) {
     return (
@@ -186,27 +169,45 @@ function Reservas() {
   return (
     <Layout>
       <div className="reservas-container">
-        
+
         {/* HEADER */}
         <header className="reservas-header">
           <div className="header-content">
             <div className="header-info">
-              <h1>🍽️ {isTurista ? "Mis Reservaciones" : "Gestión de Reservaciones"}</h1>
+              <h1>
+                <Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />
+                {isTurista ? "Mis Reservaciones" : "Gestión de Reservaciones"}
+              </h1>
               <p className="welcome-text">
                 {isTurista
                   ? "Administra tus reservaciones de restaurantes"
-                  : isOferente
-                  ? "Reservaciones en tus servicios"
-                  : "Administra todas las reservaciones del sistema"}
+                  : isModerador
+                    ? "Visualización de todas las reservaciones del sistema"
+                    : isOferente
+                      ? "Reservaciones en tus servicios"
+                      : "Administra todas las reservaciones del sistema"}
               </p>
             </div>
           </div>
         </header>
 
+        {/* ✅ aviso moderador */}
+        {isModerador && (
+          <div style={{
+            backgroundColor: "var(--bg-card)",
+            padding: "1rem",
+            borderRadius: "8px",
+            borderLeft: "4px solid var(--info-color)",
+            marginBottom: "1.5rem"
+          }}>
+            ⚠️ Estás en modo supervisión. Solo puedes visualizar las reservas.
+          </div>
+        )}
+
         {/* ERROR */}
         {error && (
           <div className="alert alert-error">
-            <span>⚠️</span>
+            <AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />
             <span>{error}</span>
           </div>
         )}
@@ -214,50 +215,36 @@ function Reservas() {
         {/* STATS */}
         <div className="reservas-stats">
           <div className="stat-card">
-            <div className="stat-icon">🍽️</div>
+            <div className="stat-icon"><Utensils size={18} /></div>
             <div className="stat-value">{reservas.length}</div>
             <div className="stat-label">Total Reservas</div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">⏳</div>
-            <div className="stat-value">
-              {reservas.filter((r) => r.estado === "pendiente").length}
-            </div>
+            <div className="stat-icon"><Clock size={18} /></div>
+            <div className="stat-value">{statPendientes}</div>
             <div className="stat-label">Pendientes</div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">✅</div>
-            <div className="stat-value">
-              {reservas.filter((r) => r.estado === "confirmada").length}
-            </div>
+            <div className="stat-icon"><CheckCircle size={18} /></div>
+            <div className="stat-value">{statConfirmadas}</div>
             <div className="stat-label">Confirmadas</div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">❌</div>
-            <div className="stat-value">
-              {reservas.filter((r) => r.estado === "cancelada").length}
-            </div>
+            <div className="stat-icon"><XCircle size={18} /></div>
+            <div className="stat-value">{statCanceladas}</div>
             <div className="stat-label">Canceladas</div>
           </div>
-
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
-            <div className="stat-value">
-              {reservas
-                .filter((r) => r.estado !== "cancelada")
-                .reduce((sum, r) => sum + (r.numero_personas || 0), 0)}
-            </div>
-            <div className="stat-label">Total personas</div>
+            <div className="stat-icon"><Users size={18} /></div>
+            <div className="stat-value">{statPersonas}</div>
+            <div className="stat-label">Total Personas</div>
           </div>
         </div>
 
         {/* FILTERS */}
         <div className="reservas-controls">
           <div className="search-box">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><Search size={18} /></span>
             <input
               type="text"
               placeholder="Buscar por ID, usuario o servicio..."
@@ -266,33 +253,16 @@ function Reservas() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
           <div className="filter-buttons">
-            <button
-              className={`filter-btn ${filterEstado === "" ? "active" : ""}`}
-              onClick={() => setFilterEstado("")}
-            >
-              Todas
-            </button>
-            <button
-              className={`filter-btn ${filterEstado === "pendiente" ? "active" : ""}`}
-              onClick={() => setFilterEstado("pendiente")}
-            >
-              Pendientes
-            </button>
-            <button
-              className={`filter-btn ${filterEstado === "confirmada" ? "active" : ""}`}
-              onClick={() => setFilterEstado("confirmada")}
-            >
-              Confirmadas
-            </button>
-            <button
-              className={`filter-btn ${filterEstado === "cancelada" ? "active" : ""}`}
-              onClick={() => setFilterEstado("cancelada")}
-            >
-              Canceladas
-            </button>
-
+            {["", "pendiente", "confirmada", "cancelada"].map((estado) => (
+              <button
+                key={estado}
+                className={`filter-btn ${filterEstado === estado ? "active" : ""}`}
+                onClick={() => setFilterEstado(estado)}
+              >
+                {estado === "" ? "Todas" : estado.charAt(0).toUpperCase() + estado.slice(1) + "s"}
+              </button>
+            ))}
             {(filterEstado || searchTerm) && (
               <button className="btn btn-outline btn-sm" onClick={clearFilters}>
                 Limpiar Filtros
@@ -306,16 +276,11 @@ function Reservas() {
         </div>
 
         {/* TABLE */}
-        <div className="reservas-table-container">
+        <div className="reservas-table-container table-responsive">
           {filtered.length === 0 ? (
             <div className="empty-state">
-              <span className="empty-icon">🍽️</span>
+              <span className="empty-icon"><Utensils size={32} /></span>
               <p>No hay reservas para mostrar</p>
-              <small>
-                {filterEstado || searchTerm
-                  ? "Intenta cambiar los filtros"
-                  : "Las reservas aparecerán aquí cuando se realicen"}
-              </small>
             </div>
           ) : (
             <table className="reservas-table">
@@ -331,88 +296,52 @@ function Reservas() {
                   <th>Acciones</th>
                 </tr>
               </thead>
-
               <tbody>
                 {filtered.map((reserva) => (
                   <tr key={reserva.id_reserva}>
-                    <td>
-                      <strong>#{reserva.id_reserva}</strong>
-                    </td>
+                    <td>#{reserva.id_reserva}</td>
 
                     {!isTurista && (
-                      <td className="cliente-info">
-                        <div>
-                          <strong>{reserva.nombre_usuario || "N/A"}</strong>
-                          <small>{reserva.email_usuario || ""}</small>
-                        </div>
-                      </td>
+                      <td>{reserva.usuario?.nombre || reserva.usuario_nombre || "N/A"}</td>
                     )}
 
                     {!isOferente && (
-                      <td>
-                        <div className="servicio-info">
-                          <strong>{reserva.nombre_servicio || "N/A"}</strong>
-                          {reserva.nombre_oferente && (
-                            <small>{reserva.nombre_oferente}</small>
-                          )}
-                        </div>
-                      </td>
+                      <td>{reserva.servicio?.nombre}</td>
                     )}
 
-                    <td>{formatDate(reserva.fecha)}</td>
-                    <td className="hora">{formatTime(reserva.hora)}</td>
-                    
-                    <td>
-                      <span className="personas-badge">
-                        {reserva.numero_personas} 👥
-                      </span>
-                    </td>
+                    <td>{formatDateShort(reserva.fecha)}</td>
+                    <td>{formatTime(reserva.hora)}</td>
+                    <td>{reserva.numero_personas}</td>
 
                     <td>
-                      {isAdmin || isOferente ? (
+                      {(isAdmin || isOferente) && !isModerador ? (
                         <select
                           value={reserva.estado}
                           onChange={(e) =>
-                            handleChangeEstado(reserva.id_reserva, e.target.value)
+                            requestChangeEstado(reserva.id_reserva, e.target.value)
                           }
-                          className={`estado-select ${getEstadoBadgeClass(
-                            reserva.estado
-                          )}`}
                         >
-                          <option value="pendiente">⏳ Pendiente</option>
-                          <option value="confirmada">✅ Confirmada</option>
-                          <option value="cancelada">❌ Cancelada</option>
+                          <option value="pendiente">Pendiente</option>
+                          <option value="confirmada">Confirmada</option>
+                          <option value="cancelada">Cancelada</option>
                         </select>
                       ) : (
-                        <span
-                          className={`badge ${getEstadoBadgeClass(reserva.estado)}`}
-                        >
-                          {reserva.estado === "pendiente" && "⏳ Pendiente"}
-                          {reserva.estado === "confirmada" && "✅ Confirmada"}
-                          {reserva.estado === "cancelada" && "❌ Cancelada"}
-                        </span>
+                        reserva.estado
                       )}
                     </td>
 
-                    <td className="actions">
-                      <button
-                        onClick={() => handleViewDetails(reserva)}
-                        className="btn-action btn-view"
-                        title="Ver detalles"
-                      >
-                        👁️
+                    <td>
+                      <button onClick={() => handleViewDetails(reserva)}>
+                        <Eye size={16} />
                       </button>
-                      
-                      {isTurista && canCancelReserva(reserva) && (
-                        <button
-                          onClick={() => handleCancelar(reserva)}
-                          className="btn-action btn-cancel"
-                          title="Cancelar reserva"
-                        >
-                          ❌
+
+                      {isTurista && !isModerador && canCancelReserva(reserva) && (
+                        <button onClick={() => requestCancelar(reserva)}>
+                          <XCircle size={16} />
                         </button>
                       )}
                     </td>
+
                   </tr>
                 ))}
               </tbody>
@@ -421,21 +350,33 @@ function Reservas() {
         </div>
       </div>
 
-      {/* MODAL */}
       {showModal && selectedReserva && (
         <ReservaDetailModal
           reserva={selectedReserva}
           isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedReserva(null);
-          }}
-          onEstadoChange={handleChangeEstado}
-          onCancelar={handleCancelar}
-          canChangeEstado={isAdmin || isOferente}
+          onClose={() => { setShowModal(false); setSelectedReserva(null); }}
+          onEstadoChange={requestChangeEstado}
+          onCancelar={requestCancelar}
+          canChangeEstado={(isAdmin || isOferente) && !isModerador}
           isTurista={isTurista}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmEstado.isOpen}
+        title="Cambiar Estado"
+        message={`¿Estás seguro de cambiar el estado de la reserva a "${confirmEstado.nuevoEstado}"?`}
+        onConfirm={executeChangeEstado}
+        onClose={() => setConfirmEstado({ isOpen: false, id: null, nuevoEstado: '' })}
+      />
+
+      <ConfirmModal
+        isOpen={confirmCancel.isOpen}
+        title="Cancelar Reserva"
+        message="¿Seguro que deseas cancelar?"
+        onConfirm={executeCancelar}
+        onClose={() => setConfirmCancel({ isOpen: false, reserva: null })}
+      />
     </Layout>
   );
 }

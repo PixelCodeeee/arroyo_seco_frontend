@@ -1,28 +1,14 @@
 /* ==============================
-   GLOBAL VARIABLES
-============================== */
-:root {
-  --accent: #e3008c;
-  --bg-dark: #1a1a1a;
-  --bg-card: #222;
-  --text-primary: #fff;
-  --text-secondary: #ccc;
-  --text-muted: #888;
-  --border: #333;
-}
-
-/* ==============================
    USUARIOS CONTAINER
 ============================== */
 .usuarios-container {
   min-height: 100vh;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-primary);
   background-image: url("/images/pattern.svg");
   background-repeat: repeat-y;
   background-position: center;
   background-size: 80px;
   color: var(--text-primary);
-  font-family: 'Montserrat', sans-serif;
 }
 
 /* ==============================
@@ -30,9 +16,9 @@
 ============================== */
 .usuarios-header {
   background-color: var(--bg-card);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   padding: 2rem 0;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 2px solid var(--border-color);
 }
 
 .usuarios-header .header-content {
@@ -74,6 +60,7 @@
   border-radius: 20px;
   font-size: 0.95rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -83,12 +70,12 @@
 
 .btn-primary {
   background-color: var(--accent);
-  color: var(--text-primary);
+  color: #fff;
 }
 
 .btn-primary:hover {
-  background-color: #c9007a;
-  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow-accent);
   transform: translateY(-2px);
 }
 
@@ -100,8 +87,8 @@
 
 .btn-outline:hover {
   background-color: var(--accent);
-  color: var(--text-primary);
-  box-shadow: 0 0 15px rgba(227, 0, 140, 0.5);
+  color: #fff;
+  box-shadow: var(--shadow-accent);
 }
 
 /* ==============================
@@ -115,14 +102,8 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ==============================
@@ -140,14 +121,14 @@
   padding: 2rem;
   border-radius: 20px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
   border-color: var(--accent);
 }
 
@@ -172,9 +153,9 @@
 .usuarios-table-container {
   background-color: var(--bg-card);
   border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-color);
 }
 
 /* ==============================
@@ -186,7 +167,7 @@
 }
 
 .usuarios-table thead {
-  background-color: rgba(227, 0, 140, 0.1);
+  background-color: var(--accent-soft);
 }
 
 .usuarios-table th {
@@ -195,14 +176,14 @@
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--accent);
-  border-bottom: 2px solid var(--border);
+  border-bottom: 2px solid var(--border-color);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .usuarios-table td {
   padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
@@ -212,7 +193,7 @@
 }
 
 .usuarios-table tbody tr:hover {
-  background-color: rgba(227, 0, 140, 0.05);
+  background-color: var(--accent-soft);
 }
 
 .usuarios-table tbody tr:last-child td {
@@ -245,7 +226,7 @@
 }
 
 .badge-admin {
-  background-color: rgba(227, 0, 140, 0.15);
+  background-color: var(--accent-soft);
   color: var(--accent);
   border: 1px solid rgba(227, 0, 140, 0.3);
 }
@@ -289,6 +270,7 @@
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -343,35 +325,14 @@
    RESPONSIVE
 ============================== */
 @media (max-width: 1024px) {
-  .usuarios-table-container {
-    overflow-x: auto;
-  }
-
-  .usuarios-table {
-    min-width: 900px;
-  }
+  .usuarios-table-container { overflow-x: auto; }
+  .usuarios-table { min-width: 900px; }
 }
 
 @media (max-width: 768px) {
-  .usuarios-header .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-actions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .header-actions .btn {
-    width: 100%;
-  }
-
-  .usuarios-content {
-    padding: 2rem 1rem;
-  }
-
-  .usuarios-stats {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
+  .usuarios-header .header-content { flex-direction: column; align-items: flex-start; }
+  .header-actions { width: 100%; flex-direction: column; }
+  .header-actions .btn { width: 100%; }
+  .usuarios-content { padding: 2rem 1rem; }
+  .usuarios-stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 }

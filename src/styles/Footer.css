@@ -1,21 +1,21 @@
 /* ==============================
-   FOOTER COMPONENT STYLES
+   FOOTER
 ============================== */
 .footer {
   margin-top: 20px;
   text-align: center;
   padding: 4rem 2rem;
-  background-color: #111;
-  border-top: 1px solid #333;
+  background-color: var(--accent);
+  border-top: 1px solid var(--border-color);
 }
 
 .footer h3 {
-  color: var(--accent);
+  color: var(--text-primary) ;
   font-weight: 700;
 }
 
 .footer p {
-  color: #bbb;
+  color: var(--dark-bg);
   font-size: 0.9rem;
   margin-top: 0.5rem;
 }
@@ -30,38 +30,48 @@
 .footer-icons i {
   font-size: 1.1rem;
   cursor: pointer;
-  color: #bbb;
-  transition: color 0.3s;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
 }
 
 .footer-icons i:hover {
   color: var(--accent);
 }
 
+.footer-links {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.footer-links a {
+  color: var(--dark-bg);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
 .footer small {
   display: block;
   margin-top: 1rem;
   font-size: 0.75rem;
-  color: #666;
+  color: var(--dark-bg);
 }
 
 /* ==============================
-   RESPONSIVE FOOTER
+   RESPONSIVE
 ============================== */
 @media (max-width: 600px) {
-  .footer {
-    padding: 3rem 1.5rem;
-  }
-
-  .footer h3 {
-    font-size: 1.3rem;
-  }
-
-  .footer p {
-    font-size: 0.85rem;
-  }
-
-  .footer-icons i {
-    font-size: 1rem;
-  }
+  .footer        { padding: 3rem 1.5rem; }
+  .footer h3     { font-size: 1.3rem; }
+  .footer p      { font-size: 0.85rem; }
+  .footer-icons i { font-size: 1rem; }
 }

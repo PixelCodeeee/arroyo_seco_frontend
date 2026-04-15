@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usuariosAPI } from '../services/api';
 import TwoFactorVerification from '../components/TwoFactorVerification';
+import { RefreshCcw } from 'lucide-react';
+
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function Register() {
   const navigate = useNavigate();
   const [step, setStep] = useState('registration'); // 'registration' or '2fa'
   const [userId, setUserId] = useState(null);
+
   const [formData, setFormData] = useState({
     nombre: '',
     correo: '',
@@ -37,10 +41,16 @@ function Register() {
     }
 
     try {
-      const response = await usuariosAPI.register(formData);
-      
-      if (response.requiresVerification) {
-        setUserId(response.userId);
+      const result = await usuariosAPI.register(formData);
+
+      if (result && result._offlineQueued) {
+        // Sin internet: guardado en cola, no podemos hacer 2FA ahora
+        toast.info(result.message || "Sin internet: guardado en cola, se procesará al conectar", { icon: <RefreshCcw size={18} /> });
+        return;
+      }
+
+      if (result?.requiresVerification) {
+        setUserId(result.userId);
         setStep('2fa');
       }
     } catch (err) {
@@ -59,7 +69,7 @@ function Register() {
       localStorage.setItem("currentUser", JSON.stringify(response.user));
 
       // Show success and redirect
-      alert('¡Cuenta creada y verificada exitosamente!');
+      toast.success('¡Cuenta creada y verificada exitosamente!');
       navigate("/");
     } else {
       throw new Error("Error en la verificación");
@@ -87,6 +97,7 @@ function Register() {
         <p className="subtitle">Únete a la comunidad de Arroyo Seco</p>
 
         {error && <div className="error-message">{error}</div>}
+
 
         <form className="auth-form" onSubmit={handleRegistrationSubmit}>
           <div className="form-group">
@@ -133,16 +144,17 @@ function Register() {
           <div className="form-group">
             <label htmlFor="rol">Tipo de Usuario</label>
             <select 
-              id="rol" 
-              name="rol" 
-              value={formData.rol}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Selecciona un rol</option>
-              <option value="turista">Turista</option>
-              <option value="oferente">Oferente</option>
-            </select>
+  id="rol" 
+  name="rol" 
+  value={formData.rol}
+  onChange={handleChange}
+  required
+>
+  <option value="">Selecciona un rol</option>
+  <option value="turista">Turista</option>
+  <option value="oferente">Oferente</option>
+  <option value="moderador">Moderador</option>
+</select>
           </div>
 
           <button 

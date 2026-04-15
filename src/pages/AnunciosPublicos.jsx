@@ -1,3 +1,4 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, Megaphone, Calendar } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { announcementsAPI } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -16,7 +17,7 @@ function AnunciosPublicos() {
     try {
       const data = await announcementsAPI.getAll();
       setAnuncios(data || []);
-    } catch (err) {
+    } catch {
       console.error('Error al cargar anuncios');
     } finally {
       setLoading(false);
@@ -49,13 +50,13 @@ function AnunciosPublicos() {
                 {anuncio.image_url ? (
                   <img src={anuncio.image_url} alt={anuncio.title} />
                 ) : (
-                  <div className="anuncio-imagen-placeholder">📢</div>
+                  <div className="anuncio-imagen-placeholder"><Megaphone size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></div>
                 )}
               </div>
               <div className="anuncio-info">
                 {anuncio.event_date && (
                   <span className="anuncio-fecha">
-                    🗓️ {new Date(anuncio.event_date).toLocaleDateString('es-MX', {
+                    <Calendar size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ {new Date(anuncio.event_date).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'

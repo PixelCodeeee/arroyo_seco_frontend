@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { serviciosAPI } from '../services/api';
+import { serviciosAPI, oferentesAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/auth.css';
 
 function EditarServicio() {
@@ -11,7 +12,7 @@ function EditarServicio() {
     descripcion: '',
     rango_precio: '',
     capacidad: '',
-    esta_disponible: true
+    estatus: true
   });
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -25,12 +26,30 @@ function EditarServicio() {
     try {
       setFetching(true);
       const servicio = await serviciosAPI.getById(id);
+
+      // Ownership guard: oferente can only edit their own services
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      if (currentUser && currentUser.rol === 'oferente') {
+        try {
+          const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+          if (!miOferente || servicio.id_oferente !== miOferente.id_oferente) {
+            toast.error('No tienes permiso para editar este servicio');
+            navigate('/servicios');
+            return;
+          }
+        } catch {
+          toast.error('Error al verificar permisos');
+          navigate('/servicios');
+          return;
+        }
+      }
+
       setFormData({
         nombre: servicio.nombre,
         descripcion: servicio.descripcion || '',
         rango_precio: servicio.rango_precio || '',
         capacidad: servicio.capacidad || '',
-        esta_disponible: servicio.esta_disponible
+        estatus: servicio.estatus
       });
     } catch (err) {
       setError(err.message || 'Error al cargar servicio');
@@ -62,9 +81,10 @@ function EditarServicio() {
       };
 
       await serviciosAPI.update(id, dataToSend);
-      alert('Servicio actualizado exitosamente');
+      toast.success('Servicio actualizado exitosamente');
       navigate('/servicios');
     } catch (err) {
+      toast.error(err.message || 'Error al actualizar servicio');
       setError(err.message || 'Error al actualizar servicio');
     } finally {
       setLoading(false);
@@ -150,8 +170,8 @@ function EditarServicio() {
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                name="esta_disponible"
-                checked={formData.esta_disponible}
+                name="estatus"
+                checked={formData.estatus}
                 onChange={handleChange}
               />
               <span>Servicio disponible</span>
@@ -159,15 +179,15 @@ function EditarServicio() {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => navigate('/servicios')}
               className="btn-secondary"
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="btn-primary"
             >

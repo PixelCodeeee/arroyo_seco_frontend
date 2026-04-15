@@ -1,24 +1,20 @@
 /* ==============================
    ANALITICAS CONTAINER
 ============================== */
-:root {
-  --accent: #e3008c;
-}
-
 .analiticas-container {
   min-height: 100vh;
-  background-color: #1a1a1a;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* ==============================
    HEADER
 ============================== */
 .analiticas-header {
-  background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-bottom: 2px solid var(--accent);
   padding: 2rem 3rem;
-  box-shadow: 0 4px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
 }
 
 .analiticas-header .header-content {
@@ -30,7 +26,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  color: #fff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -50,7 +46,7 @@
 .analiticas-period {
   display: inline-block;
   margin-top: 0.5rem;
-  background-color: rgba(227, 0, 140, 0.15);
+  background-color: var(--accent-soft);
   border: 1px solid rgba(227, 0, 140, 0.3);
   color: var(--accent);
   padding: 0.3rem 0.9rem;
@@ -72,11 +68,11 @@
 }
 
 .stat-card-an {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
   text-align: center;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -86,7 +82,7 @@
 
 .stat-card-an:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
   border-color: var(--accent);
 }
 
@@ -99,7 +95,7 @@
   justify-content: center;
   margin-bottom: 0.3rem;
   color: var(--accent);
-  background-color: rgba(227, 0, 140, 0.1);
+  background-color: var(--accent-soft);
 }
 
 .stat-card-an .stat-value-an {
@@ -110,7 +106,7 @@
 
 .stat-card-an .stat-label-an {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* ==============================
@@ -119,13 +115,13 @@
 .section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .section-title svg {
@@ -145,16 +141,16 @@
 }
 
 .chart-card-an {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .chart-card-an:hover {
   border-color: rgba(227, 0, 140, 0.3);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 /* ==============================
@@ -189,13 +185,13 @@
 .donut-total {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .donut-sub {
   font-size: 0.65rem;
-  color: #666;
+  color: var(--text-faint);
 }
 
 .donut-legend {
@@ -210,7 +206,7 @@
   align-items: center;
   gap: 0.6rem;
   font-size: 0.85rem;
-  color: #aaa;
+  color: var(--text-secondary);
 }
 
 .legend-dot {
@@ -223,7 +219,7 @@
 .legend-count {
   margin-left: auto;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* ==============================
@@ -250,22 +246,22 @@
 .mes-bar {
   width: 100%;
   border-radius: 6px 6px 0 0;
-  background: linear-gradient(180deg, var(--accent), rgba(227, 0, 140, 0.5));
+  background: linear-gradient(180deg, var(--accent), var(--accent-soft));
   transition: height 0.8s ease;
   min-height: 4px;
 }
 
 .mes-bar.purple {
-  background: linear-gradient(180deg, #6366f1, rgba(99, 102, 241, 0.5));
+  background: linear-gradient(180deg, #6366f1, rgba(99, 102, 241, 0.4));
 }
 
 .mes-bar.amber {
-  background: linear-gradient(180deg, #f59e0b, rgba(245, 158, 11, 0.5));
+  background: linear-gradient(180deg, #f59e0b, rgba(245, 158, 11, 0.4));
 }
 
 .mes-label {
   font-size: 0.7rem;
-  color: #666;
+  color: var(--text-faint);
   text-align: center;
   white-space: nowrap;
 }
@@ -293,7 +289,7 @@
 
 .bar-label-an {
   font-size: 0.8rem;
-  color: #999;
+  color: var(--text-muted);
   width: 80px;
   flex-shrink: 0;
   text-align: right;
@@ -302,7 +298,7 @@
 .bar-track-an {
   flex: 1;
   height: 10px;
-  background: #333;
+  background: var(--border-color);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -310,14 +306,14 @@
 .bar-fill-an {
   height: 100%;
   border-radius: 10px;
-  background: linear-gradient(90deg, var(--accent), rgba(227, 0, 140, 0.6));
+  background: linear-gradient(90deg, var(--accent), rgba(227, 0, 140, 0.5));
   transition: width 0.8s ease;
 }
 
 .bar-value-an {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #ccc;
+  color: var(--text-secondary);
   width: 40px;
   text-align: right;
   flex-shrink: 0;
@@ -336,22 +332,21 @@
 }
 
 .top-card-an {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .top-card-an:hover {
   border-color: rgba(227, 0, 140, 0.3);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .top-list-an {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .top-item-an {
@@ -359,7 +354,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
 }
 
@@ -368,7 +363,7 @@
 }
 
 .top-item-an:hover {
-  background-color: rgba(227, 0, 140, 0.05);
+  background-color: var(--accent-soft);
 }
 
 .top-rank-an {
@@ -383,17 +378,35 @@
   flex-shrink: 0;
 }
 
-.top-rank-an.gold   { background-color: rgba(255, 193, 7, 0.2);  color: #FFC107; }
-.top-rank-an.silver { background-color: rgba(158, 158, 158, 0.2); color: #9E9E9E; }
-.top-rank-an.bronze { background-color: rgba(180, 83, 9, 0.2);   color: #f97316; }
-.top-rank-an.normal { background-color: #2a2a2a; color: #666; }
+.top-rank-an.gold {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+}
 
-.top-info-an { flex: 1; overflow: hidden; }
+.top-rank-an.silver {
+  background-color: rgba(158, 158, 158, 0.2);
+  color: #9E9E9E;
+}
+
+.top-rank-an.bronze {
+  background-color: rgba(180, 83, 9, 0.2);
+  color: #f97316;
+}
+
+.top-rank-an.normal {
+  background-color: var(--bg-tertiary);
+  color: var(--text-faint);
+}
+
+.top-info-an {
+  flex: 1;
+  overflow: hidden;
+}
 
 .top-name-an {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -401,7 +414,7 @@
 
 .top-sub-an {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-faint);
 }
 
 .top-stat-an {
@@ -412,31 +425,28 @@
 }
 
 /* ==============================
-   EMPTY / SIN DATOS
+   SIN DATOS / LOADING
 ============================== */
 .sin-datos {
-  color: #555;
+  color: var(--text-faint);
   font-size: 0.9rem;
   text-align: center;
   padding: 1.5rem 0;
 }
 
-/* ==============================
-   LOADING
-============================== */
 .analiticas-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  color: #888;
+  color: var(--text-muted);
   min-height: 100vh;
-  background-color: #1a1a1a;
+  background-color: var(--bg-primary);
 }
 
 .analiticas-spinner {
-  border: 3px solid #333;
+  border: 3px solid var(--border-color);
   border-top: 3px solid var(--accent);
   border-radius: 50%;
   width: 40px;
@@ -446,19 +456,28 @@
 }
 
 @keyframes spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==============================
    RESPONSIVE
 ============================== */
 @media (max-width: 1024px) {
+
   .analiticas-charts,
-  .analiticas-tops { grid-template-columns: 1fr; }
+  .analiticas-tops {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
+
   .analiticas-header,
   .analiticas-charts,
   .analiticas-tops {
@@ -471,5 +490,7 @@
     padding: 1.5rem 1rem;
   }
 
-  .analiticas-header h1 { font-size: 1.5rem; }
+  .analiticas-header h1 {
+    font-size: 1.5rem;
+  }
 }

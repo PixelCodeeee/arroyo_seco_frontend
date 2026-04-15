@@ -1,10 +1,14 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Info, RefreshCcw } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oferentesAPI, usuariosAPI } from '../services/api';
+
+import { toast } from 'sonner';
 import '../styles/crearOferente.css';
 
 function CrearOferente() {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     id_usuario: '',
     nombre_negocio: '',
@@ -16,7 +20,7 @@ function CrearOferente() {
     horario_cierre: '',
     dias_disponibles: []
   });
-  
+
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,26 +37,29 @@ function CrearOferente() {
 
   const initializeComponent = async () => {
     try {
-      // Get current user info from localStorage
       const userData = JSON.parse(localStorage.getItem('currentUser') || 'null');
-      if (userData) {
-        // If user is oferente, auto-select their own user
-        if (userData.rol === 'oferente') {
-          setIsOferente(true);
-          setFormData(prev => ({
-            ...prev,
-            id_usuario: userData.id_usuario.toString()
-          }));
-          // Only show this specific user in the dropdown
-          setUsuarios([userData]);
-        } else {
-          // If admin or other role, fetch all oferente users
-          await fetchUsuarios();
-        }
-      } else {
-        // No user data, fetch all
-        await fetchUsuarios();
+
+      if (!userData) {
+        // No user logged in at all, redirect away
+        navigate('/login');
+        return;
       }
+
+      if (userData.rol === 'oferente') {
+        setIsOferente(true);
+        setFormData(prev => ({
+          ...prev,
+          id_usuario: userData.id_usuario.toString()
+        }));
+        setUsuarios([userData]);
+
+      } else if (userData.rol === 'admin') {
+        await fetchUsuarios();
+
+      } else {
+        navigate('/');
+      }
+
     } catch (err) {
       console.error('Error initializing component:', err);
       setError('Error al cargar información del usuario');
@@ -76,7 +83,7 @@ function CrearOferente() {
       ...prev,
       [name]: value
     }));
-    
+
     // Limpiar error del campo cuando el usuario escribe
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
@@ -138,14 +145,12 @@ function CrearOferente() {
     setLoading(true);
 
     try {
-      // Preparar horario_disponibilidad como objeto JSON
       const horario_disponibilidad = {
         dias: formData.dias_disponibles,
         horario_apertura: formData.horario_apertura || null,
         horario_cierre: formData.horario_cierre || null
       };
 
-      // Preparar datos para enviar al backend
       const dataToSend = {
         id_usuario: formData.id_usuario,
         nombre_negocio: formData.nombre_negocio,
@@ -156,13 +161,16 @@ function CrearOferente() {
         telefono: formData.telefono || null
       };
 
-      await oferentesAPI.create(dataToSend);
-      
-      alert('✅ Oferente creado exitosamente (estado: pendiente)');
+      const result = await oferentesAPI.create(dataToSend);
+      if (result && result._offlineQueued) {
+        toast.info(result.message || "Sin conexión — guardado en cola para sincronizar", { icon: <RefreshCcw size={18} /> });
+      } else {
+        toast.success("Oferente creado exitosamente");
+      }
       navigate('/oferentes');
     } catch (err) {
+      toast.error(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
       setError(err.message || 'Error al crear oferente. Por favor intenta nuevamente.');
-      console.error('Error creating oferente:', err);
     } finally {
       setLoading(false);
     }
@@ -172,8 +180,8 @@ function CrearOferente() {
     <div className="crear-oferente-container">
       <div className="crear-oferente-card">
         <div className="oferente-header">
-          <button 
-            onClick={() => navigate('/oferentes')} 
+          <button
+            onClick={() => navigate('/oferentes')}
             className="back-button"
             aria-label="Volver"
           >
@@ -185,16 +193,17 @@ function CrearOferente() {
 
         {error && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
             <span>{error}</span>
           </div>
         )}
+
 
         <form onSubmit={handleSubmit} className="oferente-form">
           {/* Usuario Oferente */}
           <div className="form-section">
             <h3 className="section-title">Información del Usuario</h3>
-            
+
             <div className="form-group">
               <label htmlFor="id_usuario">
                 Usuario Oferente <span className="required">*</span>
@@ -220,7 +229,7 @@ function CrearOferente() {
               )}
               {isOferente && (
                 <small className="field-hint">
-                  ℹ️ Como oferente, estás registrando tu propio negocio
+                  <Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Como oferente, estás registrando tu propio negocio
                 </small>
               )}
             </div>
@@ -229,7 +238,7 @@ function CrearOferente() {
           {/* Información del Negocio */}
           <div className="form-section">
             <h3 className="section-title">Información del Negocio</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="nombre_negocio">
@@ -261,8 +270,8 @@ function CrearOferente() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="restaurante">🍽️ Restaurante</option>
-                  <option value="artesanal">🎨 Artesanal</option>
+                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Restaurante</option>
+                  <option value="artesanal"><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</option>
                 </select>
               </div>
             </div>
@@ -284,7 +293,7 @@ function CrearOferente() {
           {/* Información de Contacto */}
           <div className="form-section">
             <h3 className="section-title">Información de Contacto</h3>
-            
+
             <div className="form-group">
               <label htmlFor="direccion">
                 Dirección <span className="required">*</span>
@@ -326,7 +335,7 @@ function CrearOferente() {
           {/* Horarios y Disponibilidad */}
           <div className="form-section">
             <h3 className="section-title">Horarios y Disponibilidad</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="horario_apertura">Horario de Apertura</label>
@@ -374,16 +383,16 @@ function CrearOferente() {
 
           {/* Botones de Acción */}
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => navigate('/oferentes')}
               className="btn btn-secondary"
               disabled={loading}
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="btn btn-primary"
             >
@@ -393,7 +402,7 @@ function CrearOferente() {
                   Creando...
                 </>
               ) : (
-                '✓ Crear Oferente'
+                'Crear Oferente'
               )}
             </button>
           </div>

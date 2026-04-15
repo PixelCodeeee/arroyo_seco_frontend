@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productosAPI } from "../services/api";
 import Layout from "../components/Layout";
+import { Pencil, Trash2, Plus } from "lucide-react";
+import { toast } from "sonner";
+import ConfirmModal from "../components/ConfirmModal";
 import "../styles/Usuarios.css";
 
 function Productos() {
@@ -12,10 +15,12 @@ function Productos() {
   const [filterCategoria, setFilterCategoria] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
 
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
   const isOferente = user?.rol === "oferente";
+  const isModerador = user?.rol === "moderador";
 
   useEffect(() => {
     loadProductos();
@@ -24,17 +29,19 @@ function Productos() {
   const loadProductos = async () => {
     try {
       setLoading(true);
-      const res = await productosAPI.getAll();
 
-      let data = res.productos;
-
-      if (isOferente && user?.oferenteId) {
-        data = data.filter((p) => p.id_oferente === user.oferenteId);
+      if (isOferente) {
+        const res = await productosAPI.getMis();
+        setProductos(res.productos);
+        setFiltered(res.productos);
+        const allRes = await productosAPI.getAll();
+        setCategorias(allRes.categorias);
+      } else {
+        const res = await productosAPI.getAll();
+        setProductos(res.productos);
+        setFiltered(res.productos);
+        setCategorias(res.categorias);
       }
-
-      setProductos(data);
-      setFiltered(data);
-      setCategorias(res.categorias);
     } catch (err) {
       setError(err.message || "Error al cargar productos");
     } finally {
@@ -54,13 +61,20 @@ function Productos() {
 
   const clearFilters = () => setFilterCategoria("");
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Eliminar producto?")) return;
+  const requestDelete = (id) => {
+    setConfirmDelete({ isOpen: true, id });
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
     try {
-      await productosAPI.delete(id);
+      await productosAPI.delete(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success("Producto eliminado exitosamente");
       loadProductos();
     } catch (err) {
-      alert(err.message || "Error al eliminar");
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.message || "Error al eliminar");
     }
   };
 
@@ -91,7 +105,8 @@ function Productos() {
             <div className="header-actions">
               {(isAdmin || isOferente) && (
                 <Link to="/productos/crear" className="btn btn-primary">
-                  + Nuevo Producto
+                  <Plus size={16} />
+                  Nuevo Producto
                 </Link>
               )}
             </div>
@@ -145,7 +160,7 @@ function Productos() {
         </div>
 
         {/* TABLE */}
-        <div className="usuarios-table-container">
+        <div className="usuarios-table-container table-responsive">
           <table className="usuarios-table">
             <thead>
               <tr>
@@ -169,48 +184,65 @@ function Productos() {
               ) : (
                 filtered.map((p) => (
                   <tr key={p.id_producto}>
-                    <td>{p.id_producto}</td>
+                    <td data-label="ID">{p.id_producto}</td>
 
-                    <td>
+                    <td data-label="Nombre">
                       <strong>{p.nombre}</strong>
                     </td>
 
-                    <td>
-                      {categorias.find((c) => c.id_categoria === p.id_categoria)?.nombre ||
-                        "N/A"}
+                    <td data-label="Categoría">
+                      {categorias.find((c) => c.id_categoria === p.id_categoria)?.nombre || "N/A"}
                     </td>
 
-                    <td>${p.precio}</td>
-                    <td>{p.inventario}</td>
+                    <td data-label="Precio">${p.precio}</td>
+                    <td data-label="Inventario">{p.inventario}</td>
 
-                    <td>{Array.isArray(p.imagenes) ? p.imagenes.length : 0}</td>
+                    <td data-label="Imágenes">{Array.isArray(p.imagenes) ? p.imagenes.length : 0}</td>
 
-                    <td>
+                    <td data-label="Estatus">
                       <span className={`badge ${p.estatus ? "badge-success" : "badge-danger"}`}>
                         {p.estatus ? "Activo" : "Inactivo"}
                       </span>
                     </td>
 
-                    {isAdmin && <td>{p.id_oferente}</td>}
+                    {isAdmin && <td data-label="Oferente">{p.id_oferente}</td>}
 
-                    <td className="actions">
-                      <Link to={`/productos/editar/${p.id_producto}`} className="btn-action btn-edit">
-                        ✏️
+                    <td data-label="Acciones" className="actions">
+                      <Link
+                        to={`/productos/editar/${p.id_producto}`}
+                        className="btn-action btn-edit"
+                        title="Editar"
+                      >
+                        <Pencil size={18} />
                       </Link>
 
-                      <button onClick={() => handleDelete(p.id_producto)} className="btn-action btn-delete">
-                        🗑️
-                      </button>
+                      {!isModerador && (
+                        <button
+                          onClick={() => requestDelete(p.id_producto)}
+                          className="btn-action btn-delete"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
-
           </table>
         </div>
 
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar producto"
+        message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </Layout>
   );
 }

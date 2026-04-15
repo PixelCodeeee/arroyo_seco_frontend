@@ -1,6 +1,8 @@
+import { Clock, CheckCircle, Truck, XCircle, CreditCard, Utensils, Palette, AlertTriangle, Ban } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/crearOferente.css';
 
 function EditarOferente() {
@@ -20,7 +22,7 @@ function EditarOferente() {
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
-  const [currentUser, setCurrentUser] = useState(null);
+  const [, setCurrentUser] = useState(null);
   const [isOferente, setIsOferente] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(true);
 
@@ -37,11 +39,11 @@ function EditarOferente() {
       // Get current user from localStorage
       const userData = JSON.parse(localStorage.getItem('currentUser') || 'null');
       setCurrentUser(userData);
-      
+
       if (userData && userData.rol === 'oferente') {
         setIsOferente(true);
       }
-      
+
       // Fetch the oferente data
       await fetchOferente(userData);
     } catch (err) {
@@ -54,7 +56,7 @@ function EditarOferente() {
     try {
       setFetching(true);
       const oferente = await oferentesAPI.getById(id);
-      
+
       // Authorization check: if user is oferente, verify they own this profile
       if (userData && userData.rol === 'oferente') {
         if (oferente.id_usuario !== userData.id_usuario) {
@@ -64,10 +66,10 @@ function EditarOferente() {
           return;
         }
       }
-      
+
       // Extraer datos del horario_disponibilidad JSON
       const horario = oferente.horario_disponibilidad || {};
-      
+
       setFormData({
         nombre_negocio: oferente.nombre_negocio || '',
         direccion: oferente.direccion || '',
@@ -91,7 +93,7 @@ function EditarOferente() {
       ...prev,
       [name]: value
     }));
-    
+
     // Limpiar error del campo
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
@@ -167,9 +169,10 @@ function EditarOferente() {
       };
 
       await oferentesAPI.update(id, dataToSend);
-      alert('✅ Oferente actualizado exitosamente');
+      toast.success('Oferente actualizado exitosamente');
       navigate('/oferentes');
     } catch (err) {
+      toast.error(err.message || 'Error al actualizar oferente');
       setError(err.message || 'Error al actualizar oferente');
     } finally {
       setLoading(false);
@@ -182,8 +185,8 @@ function EditarOferente() {
       <div className="crear-oferente-container">
         <div className="crear-oferente-card">
           <div className="oferente-header">
-            <button 
-              onClick={() => navigate('/oferentes')} 
+            <button
+              onClick={() => navigate('/oferentes')}
               className="back-button"
               aria-label="Volver"
             >
@@ -191,9 +194,9 @@ function EditarOferente() {
             </button>
             <h2>Acceso Denegado</h2>
           </div>
-          
+
           <div className="alert alert-error">
-            <span className="alert-icon">🚫</span>
+            <span className="alert-icon"><Ban size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /></span>
             <div>
               <strong>No tienes permiso para editar este oferente</strong>
               <p>Solo puedes editar tu propio perfil de oferente.</p>
@@ -201,7 +204,7 @@ function EditarOferente() {
           </div>
 
           <div className="form-actions">
-            <button 
+            <button
               onClick={() => navigate('/oferentes')}
               className="btn btn-primary"
             >
@@ -227,8 +230,8 @@ function EditarOferente() {
     <div className="crear-oferente-container">
       <div className="crear-oferente-card">
         <div className="oferente-header">
-          <button 
-            onClick={() => navigate('/oferentes')} 
+          <button
+            onClick={() => navigate('/oferentes')}
             className="back-button"
             aria-label="Volver"
           >
@@ -236,7 +239,7 @@ function EditarOferente() {
           </button>
           <h2>{isOferente ? 'Editar Mi Perfil' : 'Editar Oferente'}</h2>
           <p className="subtitle">
-            {isOferente 
+            {isOferente
               ? 'Actualiza la información de tu negocio'
               : 'Actualiza la información del oferente'
             }
@@ -245,14 +248,14 @@ function EditarOferente() {
 
         {error && !isAuthorized && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
 
         {error && isAuthorized && (
           <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+            <span className="alert-icon"><AlertTriangle size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
             <span>{error}</span>
           </div>
         )}
@@ -261,7 +264,7 @@ function EditarOferente() {
           {/* Información del Negocio */}
           <div className="form-section">
             <h3 className="section-title">Información del Negocio</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="nombre_negocio">
@@ -293,8 +296,8 @@ function EditarOferente() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="restaurante">🍽️ Restaurante</option>
-                  <option value="artesanal">🎨 Artesanal</option>
+                  <option value="restaurante"><Utensils size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️ Restaurante</option>
+                  <option value="artesanal"><Palette size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Artesanal</option>
                 </select>
               </div>
             </div>
@@ -316,7 +319,7 @@ function EditarOferente() {
           {/* Información de Contacto */}
           <div className="form-section">
             <h3 className="section-title">Información de Contacto</h3>
-            
+
             <div className="form-group">
               <label htmlFor="direccion">
                 Dirección <span className="required">*</span>
@@ -358,7 +361,7 @@ function EditarOferente() {
           {/* Horarios y Disponibilidad */}
           <div className="form-section">
             <h3 className="section-title">Horarios y Disponibilidad</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="horario_apertura">Horario de Apertura</label>
@@ -406,16 +409,16 @@ function EditarOferente() {
 
           {/* Botones de Acción */}
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => navigate('/oferentes')}
               className="btn btn-secondary"
               disabled={loading}
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="btn btn-primary"
             >

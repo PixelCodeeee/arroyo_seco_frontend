@@ -1,0 +1,54 @@
+{
+    "app": {
+        "title": "Arroyo Seco System",
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search..."
+    },
+    "nav": {
+        "home": "Home",
+        "events": "Events",
+        "gastronomy": "Gastronomy",
+        "handicrafts": "Handicrafts",
+        "recommendations": "Recommendations",
+        "contact": "Contact",
+        "oferente_panel": "Provider Panel",
+        "admin_panel": "Admin Panel",
+        "profile": "My Profile",
+        "login": "Log in",
+        "register": "Register",
+        "logout": "Logout",
+        "settings": "Settings"
+    },
+    "home": {
+        "welcome": "Welcome to",
+        "welcome_system": "the Management System",
+        "subtitle": "Select an option from the menu to get started",
+        "hero_prefix": "Discover",
+        "hero_highlight": "Arroyo Seco",
+        "tesoro_title1": "The",
+        "tesoro_highlight": "Hidden Treasure",
+        "tesoro_title2": "Of Querétaro",
+        "tesoro_desc": "Experience the natural beauty, cultural heritage, and unmatched gastronomy of out town. A unique place waiting for you.",
+        "gastronomy_title": "Our",
+        "gastronomy_desc": "Taste the authentic flavors of the region, from traditional dishes to exquisite local creations that will delight your palate.",
+        "explore": "Explore",
+        "handicrafts_title": "Our"
+    },
+    "settings": {
+        "title": "Settings & Accessibility",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "high_contrast": "High Contrast",
+        "dyslexia_font": "Dyslexia-friendly Font",
+        "font_size": "Font Size",
+        "language": "Language",
+        "english": "English",
+        "spanish": "Spanish"
+    }
+}

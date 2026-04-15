@@ -115,7 +115,12 @@ function Login() {
           </button>
         </form>
 
-        <div className="auth-footer">
+        <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <p>
+            <Link to="/recuperar-password" className="link" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
           <p>
             ¿No tienes cuenta?{" "}
             <Link to="/register" className="link">

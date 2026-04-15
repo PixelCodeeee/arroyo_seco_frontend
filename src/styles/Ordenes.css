@@ -1,20 +1,20 @@
-/* ============================== 
-   ORDENES CONTAINER 
+/* ==============================
+   ORDENES CONTAINER
 ============================== */
 .ordenes-container {
   min-height: 100vh;
-  background-color: #1a1a1a;
-  color: #fff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-/* ============================== 
-   HEADER 
+/* ==============================
+   HEADER
 ============================== */
 .ordenes-header {
-  background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   border-bottom: 2px solid var(--accent);
   padding: 2rem 3rem;
-  box-shadow: 0 4px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
 }
 
 .header-content {
@@ -26,7 +26,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .welcome-text {
@@ -36,8 +36,8 @@
   font-weight: 500;
 }
 
-/* ============================== 
-   STATS 
+/* ==============================
+   STATS
 ============================== */
 .ordenes-stats {
   display: grid;
@@ -49,17 +49,17 @@
 }
 
 .stat-card {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
   text-align: center;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 20px rgba(227, 0, 140, 0.2);
+  box-shadow: var(--shadow-accent);
   border-color: var(--accent);
 }
 
@@ -77,11 +77,11 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: #999;
+  color: var(--text-muted);
 }
 
-/* ============================== 
-   CONTROLS 
+/* ==============================
+   CONTROLS
 ============================== */
 .ordenes-controls {
   display: flex;
@@ -108,23 +108,25 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.2rem;
+  color: var(--text-muted);
 }
 
 .search-input {
   width: 100%;
   padding: 0.8rem 1rem 0.8rem 3rem;
-  background-color: #222;
-  border: 1px solid #333;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 25px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.95rem;
+  font-family: inherit;
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(227, 0, 140, 0.3);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 
 .filter-buttons {
@@ -136,18 +138,19 @@
 .filter-btn {
   padding: 0.6rem 1.2rem;
   background-color: transparent;
-  border: 1px solid #444;
-  color: #999;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .filter-btn:hover {
   border-color: var(--accent);
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .filter-btn.active {
@@ -158,22 +161,22 @@
 
 .results-count {
   padding: 0 3rem 1rem;
-  color: #999;
+  color: var(--text-muted);
   font-size: 0.9rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* ============================== 
-   TABLE 
+/* ==============================
+   TABLE
 ============================== */
 .ordenes-table-container {
-  background-color: #222;
+  background-color: var(--bg-card);
   border-radius: 15px;
   padding: 1.5rem;
   margin: 0 3rem 3rem;
   overflow-x: auto;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
@@ -185,7 +188,7 @@
 }
 
 .ordenes-table thead {
-  background-color: #1a1a1a;
+  background-color: var(--bg-primary);
 }
 
 .ordenes-table th {
@@ -196,21 +199,21 @@
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .ordenes-table tbody tr {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
 }
 
 .ordenes-table tbody tr:hover {
-  background-color: rgba(227, 0, 140, 0.05);
+  background-color: var(--accent-soft);
 }
 
 .ordenes-table td {
   padding: 1rem;
-  color: #ccc;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   vertical-align: middle;
 }
@@ -223,11 +226,11 @@
 }
 
 .cliente-info strong {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .cliente-info small {
-  color: #888;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
@@ -235,7 +238,7 @@
 .items-badge {
   display: inline-block;
   padding: 0.3rem 0.8rem;
-  background-color: rgba(227, 0, 140, 0.2);
+  background-color: var(--accent-soft);
   color: var(--accent);
   border-radius: 12px;
   font-size: 0.85rem;
@@ -244,7 +247,7 @@
 
 /* Monto */
 .monto strong {
-  color: #4CAF50;
+  color: var(--success);
   font-size: 1.05rem;
 }
 
@@ -254,25 +257,15 @@
   border-radius: 15px;
   font-size: 0.85rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   border: none;
   transition: all 0.3s;
 }
 
-.estado-select.badge-warning {
-  background-color: rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-}
-
-.estado-select.badge-success {
-  background-color: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.estado-select.badge-info {
-  background-color: rgba(33, 150, 243, 0.2);
-  color: #2196F3;
-}
+.estado-select.badge-warning { background-color: rgba(255, 193, 7, 0.2); color: #FFC107; }
+.estado-select.badge-success { background-color: rgba(76, 175, 80, 0.2);  color: #4CAF50; }
+.estado-select.badge-info    { background-color: rgba(33, 150, 243, 0.2); color: #2196F3; }
 
 .estado-select:hover {
   transform: scale(1.05);
@@ -287,25 +280,10 @@
   display: inline-block;
 }
 
-.badge-warning {
-  background-color: rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-}
-
-.badge-success {
-  background-color: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.badge-info {
-  background-color: rgba(33, 150, 243, 0.2);
-  color: #2196F3;
-}
-
-.badge-secondary {
-  background-color: rgba(158, 158, 158, 0.2);
-  color: #9E9E9E;
-}
+.badge-warning   { background-color: rgba(255, 193, 7, 0.2);  color: #FFC107; }
+.badge-success   { background-color: rgba(76, 175, 80, 0.2);  color: #4CAF50; }
+.badge-info      { background-color: rgba(33, 150, 243, 0.2); color: #2196F3; }
+.badge-secondary { background-color: rgba(158, 158, 158, 0.2); color: #9E9E9E; }
 
 /* Actions */
 .actions {
@@ -317,7 +295,7 @@
   padding: 0.4rem 0.6rem;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   font-size: 1.3rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -328,16 +306,16 @@
 }
 
 .btn-view:hover {
-  color: #2196F3;
+  color: var(--info);
 }
 
-/* ============================== 
-   EMPTY STATE 
+/* ==============================
+   EMPTY STATE
 ============================== */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: #666;
+  color: var(--text-faint);
 }
 
 .empty-icon {
@@ -349,15 +327,16 @@
 .empty-state p {
   font-size: 1.1rem;
   margin: 0.5rem 0;
+  color: var(--text-faint);
 }
 
 .empty-state small {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-faint);
 }
 
-/* ============================== 
-   LOADING 
+/* ==============================
+   LOADING
 ============================== */
 .loading {
   display: flex;
@@ -365,11 +344,11 @@
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
 .spinner {
-  border: 3px solid #333;
+  border: 3px solid var(--border-color);
   border-top: 3px solid var(--accent);
   border-radius: 50%;
   width: 40px;
@@ -379,12 +358,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* ============================== 
-   ALERT 
+/* ==============================
+   ALERT
 ============================== */
 .alert {
   display: flex;
@@ -405,11 +384,14 @@
   color: #ff6b6b;
 }
 
-/* ============================== 
-   RESPONSIVE 
+/* ==============================
+   RESPONSIVE
 ============================== */
 @media (max-width: 768px) {
-  .ordenes-header,
+  .ordenes-header {
+    padding: 2rem 1rem;
+  }
+
   .ordenes-controls,
   .ordenes-table-container,
   .alert {
@@ -422,6 +404,8 @@
   .ordenes-stats {
     grid-template-columns: repeat(2, 1fr);
     padding: 1.5rem 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
   }
 
   .ordenes-controls {

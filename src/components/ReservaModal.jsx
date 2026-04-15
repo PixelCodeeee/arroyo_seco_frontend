@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, Info } from 'lucide-react';
+import { X, AlertCircle, Info, Utensils, Frown, CheckCircle } from 'lucide-react';
 import { serviciosAPI, reservasAPI } from '../services/api';
+import { toast } from 'sonner';
 import '../styles/ReservaModal.css';
 
 function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
@@ -42,11 +43,11 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
     try {
       setLoadingServicios(true);
       const response = await serviciosAPI.getByOferenteId(oferente.id_oferente);
-      
+
       // Filtrar solo servicios activos
-      const serviciosActivos = (response.servicios || []).filter(s => s.estatus === 1);
+      const serviciosActivos = (response.servicios || []).filter(s => s.estatus);
       setServicios(serviciosActivos);
-      
+
       // Auto-seleccionar el primer servicio si solo hay uno
       if (serviciosActivos.length === 1) {
         setFormData(prev => ({ ...prev, id_servicio: serviciosActivos[0].id_servicio }));
@@ -62,12 +63,12 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Limpiar error del campo
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: '' }));
     }
-    
+
     // Limpiar error general
     if (error) {
       setError('');
@@ -85,7 +86,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
             formData.fecha,
             formData.hora
           );
-          
+
           if (!response.disponible) {
             setFieldErrors(prev => ({
               ...prev,
@@ -114,11 +115,11 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
 
   const validate = () => {
     const errors = {};
-    
+
     if (!formData.id_servicio) {
       errors.id_servicio = 'Selecciona un servicio';
     }
-    
+
     if (!formData.fecha) {
       errors.fecha = 'Selecciona una fecha';
     } else {
@@ -126,20 +127,20 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
       const fechaSeleccionada = new Date(formData.fecha);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
-      
+
       if (fechaSeleccionada < hoy) {
         errors.fecha = 'La fecha debe ser futura';
       }
     }
-    
+
     if (!formData.hora) {
       errors.hora = 'Selecciona una hora';
     }
-    
+
     if (!formData.numero_personas || formData.numero_personas < 1) {
       errors.numero_personas = 'Mínimo 1 persona';
     }
-    
+
     // Verificar capacidad del servicio seleccionado
     if (formData.id_servicio && formData.numero_personas) {
       const servicioSeleccionado = servicios.find(s => s.id_servicio == formData.id_servicio);
@@ -147,35 +148,35 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
         errors.numero_personas = `Máximo ${servicioSeleccionado.capacidad} personas`;
       }
     }
-    
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validar que el usuario esté autenticado
     if (!currentUser || !currentUser.id_usuario) {
       setError('Debes iniciar sesión para hacer una reserva');
       return;
     }
-    
+
     // Validar términos y condiciones
     if (!aceptaTerminos) {
       setError('Debes aceptar los términos y condiciones de cancelación');
       return;
     }
-    
+
     // Validar formulario
     if (!validate()) {
       setError('Por favor corrige los errores en el formulario');
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       // Verificar disponibilidad una última vez antes de crear
       const disponibilidad = await reservasAPI.checkDisponibilidad(
@@ -183,13 +184,13 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
         formData.fecha,
         formData.hora
       );
-      
+
       if (!disponibilidad.disponible) {
         setError('Lo sentimos, este horario acaba de ser reservado. Por favor selecciona otro.');
         setFieldErrors({ hora: 'Horario no disponible' });
         return;
       }
-      
+
       // Preparar datos de la reserva
       const reservaData = {
         id_usuario: currentUser.id_usuario,
@@ -200,10 +201,10 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
         estado: 'pendiente', // Las nuevas reservas inician como pendientes
         notas: formData.notas.trim() || null,
       };
-      
+
       // Crear la reserva
       const response = await reservasAPI.create(reservaData);
-      
+
       // Reset form
       setFormData({
         id_servicio: '',
@@ -213,21 +214,21 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
         notas: '',
       });
       setAceptaTerminos(false);
-      
+
       // Llamar callback de éxito
       if (onSuccess) {
         onSuccess(response.reserva);
       }
-      
+
       // Cerrar modal
       onClose();
-      
+
       // Mostrar mensaje de éxito
-      alert('¡Reserva creada exitosamente! Recibirás una confirmación pronto.');
-      
+      toast.success('¡Reserva creada exitosamente! Recibirás una confirmación pronto.');
+
     } catch (err) {
       console.error('Error creating reserva:', err);
-      
+
       // Manejar diferentes tipos de errores
       if (err.message.includes('Ya existe una reserva')) {
         setError(err.message);
@@ -261,21 +262,21 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        
+
         {/* Header */}
         <div className="modal-header">
           <div>
-            <h2>🍽️ Hacer Reservación</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Utensils size={24} /> Hacer Reservación</h2>
             <p className="modal-subtitle">{oferente.nombre_negocio}</p>
           </div>
           <button className="modal-close" onClick={onClose} disabled={loading}>
             <X size={24} />
           </button>
         </div>
-        
+
         {/* Content */}
         <div className="modal-body">
-          
+
           {/* Mensaje de error general */}
           {error && (
             <div className="alert alert-error">
@@ -283,7 +284,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
               <span>{error}</span>
             </div>
           )}
-          
+
           {/* Mensaje de autenticación */}
           {!currentUser && (
             <div className="alert alert-warning">
@@ -291,7 +292,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
               <span>Debes iniciar sesión para hacer una reserva</span>
             </div>
           )}
-          
+
           {loadingServicios ? (
             <div className="loading-state">
               <div className="spinner"></div>
@@ -299,12 +300,12 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
             </div>
           ) : servicios.length === 0 ? (
             <div className="empty-state">
-              <p>😔 No hay servicios disponibles en este momento.</p>
+              <Frown size={24} style={{ display: 'block', margin: '0 auto 8px', color: '#999' }} /><p>No hay servicios disponibles en este momento.</p>
               <small>Por favor intenta más tarde o contacta al establecimiento.</small>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="reserva-form">
-              
+
               {/* Servicio */}
               <div className="form-group">
                 <label htmlFor="id_servicio">
@@ -322,7 +323,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   <option value="">Selecciona un servicio</option>
                   {servicios.map(servicio => (
                     <option key={servicio.id_servicio} value={servicio.id_servicio}>
-                      {servicio.nombre} - {servicio.rango_precio} 
+                      {servicio.nombre} - {servicio.rango_precio}
                       {servicio.capacidad && ` (hasta ${servicio.capacidad} personas)`}
                     </option>
                   ))}
@@ -331,7 +332,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   <span className="field-error">{fieldErrors.id_servicio}</span>
                 )}
               </div>
-              
+
               {/* Descripción del servicio seleccionado */}
               {formData.id_servicio && (
                 <div className="servicio-info">
@@ -341,7 +342,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   </p>
                 </div>
               )}
-              
+
               {/* Fecha y Hora */}
               <div className="form-row">
                 <div className="form-group">
@@ -364,7 +365,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                     <span className="field-error">{fieldErrors.fecha}</span>
                   )}
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="hora">
                     Hora <span className="required">*</span>
@@ -387,7 +388,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   )}
                 </div>
               </div>
-              
+
               {/* Número de Personas */}
               <div className="form-group">
                 <label htmlFor="numero_personas">
@@ -400,7 +401,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   value={formData.numero_personas}
                   onChange={handleChange}
                   min="1"
-                  max={formData.id_servicio 
+                  max={formData.id_servicio
                     ? servicios.find(s => s.id_servicio == formData.id_servicio)?.capacidad || 100
                     : 100}
                   className={fieldErrors.numero_personas ? 'error' : ''}
@@ -416,7 +417,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   </small>
                 )}
               </div>
-              
+
               {/* Notas */}
               <div className="form-group">
                 <label htmlFor="notas">
@@ -436,7 +437,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   {formData.notas.length}/500 caracteres
                 </small>
               </div>
-              
+
               {/* Términos y Condiciones */}
               <div className="form-group">
                 <div className="checkbox-group">
@@ -448,8 +449,8 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                     disabled={loading || !currentUser}
                   />
                   <label htmlFor="aceptaTerminos" className="checkbox-label">
-                    <strong>Acepto los términos de cancelación:</strong> Entiendo que cualquier 
-                    cancelación debe realizarse con <strong>al menos 24 horas de anticipación</strong> a 
+                    <strong>Acepto los términos de cancelación:</strong> Entiendo que cualquier
+                    cancelación debe realizarse con <strong>al menos 24 horas de anticipación</strong> a
                     la fecha y hora de la reserva. <span className="required">*</span>
                   </label>
                 </div>
@@ -457,7 +458,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   <span className="field-error">Debes aceptar los términos de cancelación</span>
                 )}
               </div>
-              
+
               {/* Información adicional */}
               <div className="info-box">
                 <Info size={16} />
@@ -470,7 +471,7 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   </ul>
                 </div>
               </div>
-              
+
               {/* Actions */}
               <div className="modal-actions">
                 <button
@@ -485,9 +486,9 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                   type="submit"
                   className="btn btn-primary"
                   disabled={
-                    loading || 
-                    !currentUser || 
-                    servicios.length === 0 || 
+                    loading ||
+                    !currentUser ||
+                    servicios.length === 0 ||
                     checkingDisponibilidad ||
                     !aceptaTerminos
                   }
@@ -498,14 +499,14 @@ function ReservaModal({ oferente, isOpen, onClose, onSuccess }) {
                       Reservando...
                     </>
                   ) : (
-                    '✓ Confirmar Reserva'
+                    <><CheckCircle size={16} /> Confirmar Reserva</>
                   )}
                 </button>
               </div>
-              
+
             </form>
           )}
-          
+
         </div>
       </div>
     </div>

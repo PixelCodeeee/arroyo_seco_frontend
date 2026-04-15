@@ -1,124 +1,193 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme as useOldTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/ThemeProvider";
+import ConfirmModal from "./ConfirmModal";
+import { getPendingOperations } from "../services/localDB";
+import {
+  Home,
+  Store,
+  Package,
+  BellRing,
+  Tag,
+  ClipboardList,
+  CalendarDays,
+  Users,
+  BarChart2,
+  Megaphone,
+  LogOut,
+  Menu,
+  X,
+  Type,
+  Settings,
+} from "lucide-react";
 import "../styles/Sidebar.css";
 
+function FontSizeToggle({ collapsed }) {
+  const { fontSize, cycleFontSize } = useOldTheme();
+  const labels = { normal: "Normal", large: "Grande", xlarge: "Extra" };
+  const nextLabel = { normal: "Grande", large: "Extra grande", xlarge: "Normal" };
+
+  return (
+    <button
+      className="sidebar-fontsize-btn"
+      onClick={cycleFontSize}
+      title={`Tamaño ${labels[fontSize]} → click para ${nextLabel[fontSize]}`}
+    >
+      <span className="sidebar-fontsize-icon">
+        <Type size={16} />
+      </span>
+      {!collapsed && (
+        <span className="sidebar-fontsize-label">
+          Texto: {labels[fontSize]}
+          <span className="sidebar-fontsize-dots">
+            <span className={fontSize === "normal" ? "sdot active" : "sdot"} />
+            <span className={fontSize === "large" ? "sdot active" : "sdot"} />
+            <span className={fontSize === "xlarge" ? "sdot active" : "sdot"} />
+          </span>
+        </span>
+      )}
+    </button>
+  );
+}
+
 function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
+  const { isSettingsOpen, setIsSettingsOpen } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = currentUser?.rol === "admin";
   const isOferente = currentUser?.rol === "oferente";
+  const isModerador = currentUser?.rol === "moderador";
 
-  const handleLogout = () => {
-    if (window.confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-      localStorage.removeItem("currentUser");
-      localStorage.removeItem("token");
-      navigate("/login");
-    }
+  const [pendingCounts, setPendingCounts] = useState({
+    ordenes: 0,
+    reservas: 0,
+    productos: 0
+  });
+
+  React.useEffect(() => {
+    const checkPending = async () => {
+      try {
+        const ops = await getPendingOperations();
+        setPendingCounts({
+          ordenes: ops.filter(o => o.endpoint.includes('/pedidos') || o.endpoint.includes('/ordenes')).length,
+          reservas: ops.filter(o => o.endpoint.includes('/reservas')).length,
+          productos: ops.filter(o => o.endpoint.includes('/productos')).length,
+        });
+      } catch (err) {
+        console.warn('Error reading pending operations', err);
+      }
+    };
+    checkPending();
+    const interval = setInterval(checkPending, 8000);
+    window.addEventListener('dashboard-synced', checkPending);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('dashboard-synced', checkPending);
+    };
+  }, []);
+
+  const requestLogout = () => {
+    setConfirmLogout(true);
   };
 
-  // Helper to check if route is active
-  const isActive = (path) => {
-    return (
-      location.pathname === path || location.pathname.startsWith(path + "/")
-    );
+  const executeLogout = () => {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
-  // Menu items configuration
-  // Menu items configuration
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   const menuItems = [
     {
       id: "home",
       label: "Inicio",
-      icon: "🏠",
+      icon: <Home size={20} />,
       path: "/",
-      roles: ["admin", "oferente", "turista"],
+      roles: ["admin", "oferente", "turista", "moderador"],
     },
     {
       id: "oferentes",
       label: isOferente ? "Mi Perfil" : "Oferentes",
-      icon: "🏪",
+      icon: <Store size={20} />,
       path: "/oferentes",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
       id: "productos",
       label: "Productos",
-      icon: "📦",
+      icon: <Package size={20} />,
       path: "/productos",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
+      badge: pendingCounts.productos > 0 ? pendingCounts.productos : null,
     },
     {
       id: "servicios",
       label: "Servicios",
-      icon: "🛎️",
+      icon: <BellRing size={20} />,
       path: "/servicios",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
       id: "categorias",
       label: "Categorías",
-      icon: "🏷️",
+      icon: <Tag size={20} />,
       path: "/categorias",
-      roles: ["oferente", "admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "ordenes",
       label: "Órdenes",
-      icon: "📋",
+      icon: <ClipboardList size={20} />,
       path: "/ordenes",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "turista", "moderador"],
+      badge: pendingCounts.ordenes > 0 ? pendingCounts.ordenes : null,
     },
     {
       id: "reservas",
       label: "Reservas",
-      icon: "📅",
+      icon: <CalendarDays size={20} />,
       path: "/reservas",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "turista", "moderador"],
+      badge: pendingCounts.reservas > 0 ? pendingCounts.reservas : null,
     },
     {
-      id: "divider-1",
+      id: "divider-admin",
       type: "divider",
-      roles: ["admin"],
+      roles: ["admin", "moderador"],
     },
     {
       id: "usuarios",
       label: "Usuarios",
-      icon: "👥",
+      icon: <Users size={20} />,
       path: "/usuarios",
-      roles: ["admin"],
-      badge: "Admin",
+      roles: ["admin", "moderador"],
     },
     {
       id: "analiticas",
       label: "Analíticas",
-      icon: "📊",
+      icon: <BarChart2 size={20} />,
       path: "/analiticas",
-      roles: ["admin", "oferente"],
-      badge: "Nuevo",
+      roles: ["admin", "moderador"],
     },
     {
-      id: "categorias",
-      label: "Categorías",
-      icon: "🏷️",
-      path: "/categorias",
-      roles: ["admin"],
-    },
-    {
-      id: "divider-2",
+      id: "divider-bottom",
       type: "divider",
-      roles: ["admin", "oferente"],
+      roles: ["admin", "oferente", "moderador"],
     },
     {
-  id: 'anuncios',
-  label: 'Anuncios',
-  icon: '📢',
-  path: '/anuncios',
-  roles: ['admin', 'oferente']
-},
+      id: "anuncios",
+      label: "Anuncios",
+      icon: <Megaphone size={20} />,
+      path: "/anuncios",
+      roles: ["admin", "moderador"],
+    },
   ];
 
-  // Filter menu items based on user role
   const visibleMenuItems = menuItems.filter((item) => {
     if (!item.roles) return true;
     return item.roles.includes(currentUser?.rol);
@@ -138,13 +207,17 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
           onClick={onToggle}
           title={isCollapsed ? "Expandir" : "Colapsar"}
         >
-          {isCollapsed ? "☰" : "✕"}
+          {isCollapsed ? <Menu size={18} /> : <X size={18} />}
         </button>
       </div>
 
       {/* User Info */}
       {currentUser && (
-        <div className="sidebar-user">
+        <Link
+          to="/perfil"
+          className="sidebar-user"
+          style={{ textDecoration: "none", color: "inherit", cursor: "pointer", display: "flex", alignItems: "center", padding: "10px 20px" }}
+        >
           <div className="user-avatar">
             {currentUser.nombre?.charAt(0).toUpperCase() || "?"}
           </div>
@@ -152,18 +225,17 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
             <div className="user-info">
               <div className="user-name">{currentUser.nombre}</div>
               <div className="user-role">
-                {isAdmin ? "👑 Administrador" : "🏪 Oferente"}
+                {isAdmin ? "Administrador" : isOferente ? "Oferente" : isModerador ? "Moderador" : "Turista"}
               </div>
             </div>
           )}
-        </div>
+        </Link>
       )}
 
       {/* Navigation Menu */}
       <nav className="sidebar-nav">
         <ul className="nav-list">
           {visibleMenuItems.map((item) => {
-            // Render divider
             if (item.type === "divider") {
               return (
                 <li key={item.id} className="nav-divider">
@@ -172,7 +244,6 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
               );
             }
 
-            // Render menu item
             return (
               <li key={item.id} className="nav-item">
                 <Link
@@ -199,15 +270,34 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
 
       {/* Sidebar Footer */}
       <div className="sidebar-footer">
+        <FontSizeToggle collapsed={isCollapsed} />
+        <button
+          className="sidebar-settings-btn logout-button"
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          title={isCollapsed ? "Cerrar Ajustes" : ""}
+          style={{ marginBottom: '8px' }}
+        >
+          <span className="nav-icon"><Settings size={20} /></span>
+          {!isCollapsed && <span>Ajustes Globales</span>}
+        </button>
         <button
           className="logout-button"
-          onClick={handleLogout}
+          onClick={requestLogout}
           title={isCollapsed ? "Cerrar Sesión" : ""}
         >
-          <span className="nav-icon">🚪</span>
+          <span className="nav-icon"><LogOut size={20} /></span>
           {!isCollapsed && <span>Cerrar Sesión</span>}
         </button>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmLogout}
+        title="Cerrar Sesión"
+        message="¿Estás seguro de que deseas cerrar sesión?"
+        onConfirm={executeLogout}
+        onClose={() => setConfirmLogout(false)}
+        confirmText="Cerrar sesión"
+      />
     </aside>
   );
 }

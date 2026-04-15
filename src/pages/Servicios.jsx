@@ -1,43 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { serviciosAPI, oferentesAPI } from '../services/api';
+import { Link } from 'react-router-dom';
+import { Edit, Trash2 } from 'lucide-react';
+import { serviciosAPI } from '../services/api';
 import Layout from '../components/Layout';
+import ConfirmModal from '../components/ConfirmModal';
+import { toast } from 'sonner';
 import '../styles/Usuarios.css';
 
 function Servicios() {
-  const navigate = useNavigate();
   const [servicios, setServicios] = useState([]);
   const [stats, setStats] = useState({ total: 0, disponibles: 0, no_disponibles: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isModerador = currentUser?.rol === 'moderador';
 
-  // Cargar datos
   useEffect(() => {
     fetchServicios();
   }, []);
 
   const fetchServicios = async () => {
-  try {
-    setLoading(true);
-    const data = await serviciosAPI.getAll(); // ← devuelve { servicios, stats, total }
-    setServicios(data.servicios || []);
-    setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
-  } catch (err) {
-    setError('Error al cargar servicios');
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Seguro que deseas eliminar este servicio?')) return;
-
     try {
-      await serviciosAPI.delete(id);
-      alert('Servicio eliminado');
+      setLoading(true);
+      setError(null);
+      const data = await serviciosAPI.getAll();
+      setServicios(data.servicios || []);
+      setStats(data.stats || { total: 0, disponibles: 0, no_disponibles: 0 });
+    } catch (err) {
+      console.error(err);
+      setError('Error al cargar servicios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const requestDelete = (id) => {
+    setConfirmDelete({ isOpen: true, id });
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDelete.id) return;
+    try {
+      await serviciosAPI.delete(confirmDelete.id);
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.success('Servicio eliminado exitosamente');
       fetchServicios();
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al eliminar');
+      setConfirmDelete({ isOpen: false, id: null });
+      toast.error(err.response?.data?.error || 'Error al eliminar');
     }
   };
 
@@ -65,13 +76,16 @@ function Servicios() {
                 </p>
               )}
             </div>
-            <Link to="/servicios/crear" className="btn btn-primary">
-              + Nuevo Servicio
-            </Link>
+            {!isModerador && (
+              <Link to="/servicios/crear" className="btn btn-primary">
+                + Nuevo Servicio
+              </Link>
+            )}
           </div>
         </header>
 
-        {/* Estadísticas */}
+        {error && <div className="error-message">{error}</div>}
+
         <div className="usuarios-content">
           <div className="usuarios-stats">
             <div className="stat-card">
@@ -88,8 +102,7 @@ function Servicios() {
             </div>
           </div>
 
-          {/* Tabla */}
-          <div className="usuarios-table-container">
+          <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
                 <tr>
@@ -110,43 +123,56 @@ function Servicios() {
                     </td>
                   </tr>
                 ) : (
-                  servicios.map(s => (
-                    <tr key={s.id_servicio}>
-                      <td>{s.id_servicio}</td>
-                      <td>
-                        {/* Aquí deberías tener el nombre del oferente si lo traes en el backend */}
-                        #{s.id_oferente}
-                      </td>
-                      <td>{s.nombre}</td>
-                      <td>{s.rango_precio || '—'}</td>
-                      <td>{s.capacidad ? `${s.capacidad} pers.` : '—'}</td>
-                      <td>
-  <span className={`status ${s.estatus === 1 ? 'active' : 'inactive'}`}>
-    {s.estatus === 1 ? 'Disponible' : 'No Disponible'}
-  </span>
-</td>
-                      <td className="actions">
-                        <Link
-                          to={`/servicios/editar/${s.id_servicio}`}
-                          className="btn-action btn-edit"
-                        >
-                          Editar
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(s.id_servicio)}
-                          className="btn-action btn-delete"
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  servicios.map(s => {
+                    const isActive = s.estatus === true;
+                    return (
+                      <tr key={s.id_servicio}>
+                        <td data-label="ID">{s.id_servicio}</td>
+                        <td data-label="Restaurante">#{s.id_oferente}</td>
+                        <td data-label="Servicio">{s.nombre}</td>
+                        <td data-label="Rango Precio">{s.rango_precio || '—'}</td>
+                        <td data-label="Capacidad">{s.capacidad ? `${s.capacidad} pers.` : '—'}</td>
+                        <td data-label="Estado">
+                          <span className={`status ${isActive ? 'active' : 'inactive'}`}>
+                            {isActive ? 'Disponible' : 'No Disponible'}
+                          </span>
+                        </td>
+                        <td data-label="Acciones" className="actions">
+                          <Link
+                            to={`/servicios/editar/${s.id_servicio}`}
+                            className="btn-action btn-edit"
+                            title="Editar"
+                          >
+                            <Edit size={18} />
+                          </Link>
+                          {!isModerador && (
+                            <button
+                              onClick={() => requestDelete(s.id_servicio)}
+                              className="btn-action btn-delete"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmDelete.isOpen}
+        title="Eliminar servicio"
+        message="¿Estás seguro de que deseas eliminar este servicio? Esta acción no puede revertirse."
+        onConfirm={executeDelete}
+        onClose={() => setConfirmDelete({ isOpen: false, id: null })}
+        confirmText="Eliminar"
+      />
     </Layout>
   );
 }
