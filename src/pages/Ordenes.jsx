@@ -43,7 +43,7 @@ function Ordenes() {
       if (isTurista) {
         response = await pedidosAPI.getMisPedidos();
       } else if (isOferente) {
-        response = await pedidosAPI.getByOferente(user.id_usuario); // solo sus productos
+        response = await pedidosAPI.getByOferenteId(user.id_usuario); // solo sus productos
       } else {
         // admin y moderador: todos los pedidos
         response = await pedidosAPI.getAll();

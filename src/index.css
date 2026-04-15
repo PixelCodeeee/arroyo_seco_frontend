@@ -184,7 +184,9 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;           /* Evita scroll en todo el body */
+  /* overflow NOT hidden here — pages outside Layout (auth, catalog) need to scroll.
+     Dashboard pages are handled by .layout-with-sidebar { overflow: hidden }
+     and .main-content { overflow-y: auto } in Sidebar.css */
 }
 
 #root {
