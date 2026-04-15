@@ -42,10 +42,8 @@ function Ordenes() {
 
       if (isTurista) {
         response = await pedidosAPI.getMisPedidos();
-      } else if (isOferente) {
-        response = await pedidosAPI.getByOferenteId(user.id_usuario); // solo sus productos
       } else {
-        // admin y moderador: todos los pedidos
+        // admin, moderador, and oferente: backend scopes by role in obtenerPedidos
         response = await pedidosAPI.getAll();
       }
 
@@ -357,14 +355,14 @@ function Ordenes() {
                         </div>
                       </td>
                     )}
-<td data-label="Fecha">{formatDate(pedido.fecha_creacion)}</td>
+<td data-label="Fecha">{formatDate(pedido.fecha_pedido)}</td>
 <td data-label="Items">
   <span className="items-badge">
     {pedido.total_items || 0} items
   </span>
 </td>
 <td data-label="Total" className="monto">
-  <strong>{formatCurrency(pedido.monto_total)}</strong>
+  <strong>{formatCurrency(pedido.total)}</strong>
 </td>
 
                     <td data-label="Estado">
