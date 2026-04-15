@@ -18,13 +18,16 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 
   try {
+    // ✅ FIXED
+    const { headers: customHeaders, ...restOptions } = options;
+
     const response = await fetch(`${API_URL}${endpoint}`, {
+      ...restOptions,
       headers: {
         'Content-Type': 'application/json',
         'x-frontend-version': import.meta.env.VITE_FRONTEND_VERSION || 'stable',
-        ...options.headers,
+        ...customHeaders,
       },
-      ...options,
     });
 
     const responseTime = Date.now() - startTime;
@@ -99,7 +102,7 @@ const apiRequest = async (endpoint, options = {}) => {
         };
       } else if (method.toUpperCase() === 'GET') {
         console.warn('📡 Red desconectada: Recuperando datos cacheados para GET', endpoint);
-        
+
         let cacheStore = 'cached_pedidos';
         if (endpoint.includes('/pedidos') || endpoint.includes('/ordenes')) cacheStore = 'cached_pedidos';
         else if (endpoint.includes('/reservas')) cacheStore = 'cached_reservas';
@@ -110,17 +113,17 @@ const apiRequest = async (endpoint, options = {}) => {
         else if (endpoint.includes('/announcements')) cacheStore = 'cached_announcements';
 
         const cachedData = await getCache(cacheStore, endpoint);
-        
+
         if (cachedData) {
           console.log(`📦 Serving cached data for ${endpoint}`);
           // Add a custom marker to signal to the UI that these are offline results
           if (Array.isArray(cachedData)) {
-            cachedData._isCache = true; 
+            cachedData._isCache = true;
           }
           return cachedData;
         } else {
-           console.warn(`📦 No offline cache found for ${endpoint}`);
-           throw new Error('No hay conexión y no hay datos guardados para mostrar.');
+          console.warn(`📦 No offline cache found for ${endpoint}`);
+          throw new Error('No hay conexión y no hay datos guardados para mostrar.');
         }
       }
     }

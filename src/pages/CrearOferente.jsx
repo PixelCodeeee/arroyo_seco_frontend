@@ -20,7 +20,7 @@ function CrearOferente() {
     horario_cierre: '',
     dias_disponibles: []
   });
-  
+
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,26 +37,29 @@ function CrearOferente() {
 
   const initializeComponent = async () => {
     try {
-      // Get current user info from localStorage
       const userData = JSON.parse(localStorage.getItem('currentUser') || 'null');
-      if (userData) {
-        // If user is oferente, auto-select their own user
-        if (userData.rol === 'oferente') {
-          setIsOferente(true);
-          setFormData(prev => ({
-            ...prev,
-            id_usuario: userData.id_usuario.toString()
-          }));
-          // Only show this specific user in the dropdown
-          setUsuarios([userData]);
-        } else {
-          // If admin or other role, fetch all oferente users
-          await fetchUsuarios();
-        }
-      } else {
-        // No user data, fetch all
-        await fetchUsuarios();
+
+      if (!userData) {
+        // No user logged in at all, redirect away
+        navigate('/login');
+        return;
       }
+
+      if (userData.rol === 'oferente') {
+        setIsOferente(true);
+        setFormData(prev => ({
+          ...prev,
+          id_usuario: userData.id_usuario.toString()
+        }));
+        setUsuarios([userData]);
+
+      } else if (userData.rol === 'admin') {
+        await fetchUsuarios();
+
+      } else {
+        navigate('/');
+      }
+
     } catch (err) {
       console.error('Error initializing component:', err);
       setError('Error al cargar información del usuario');
@@ -80,7 +83,7 @@ function CrearOferente() {
       ...prev,
       [name]: value
     }));
-    
+
     // Limpiar error del campo cuando el usuario escribe
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({
@@ -177,8 +180,8 @@ function CrearOferente() {
     <div className="crear-oferente-container">
       <div className="crear-oferente-card">
         <div className="oferente-header">
-          <button 
-            onClick={() => navigate('/oferentes')} 
+          <button
+            onClick={() => navigate('/oferentes')}
             className="back-button"
             aria-label="Volver"
           >
@@ -200,7 +203,7 @@ function CrearOferente() {
           {/* Usuario Oferente */}
           <div className="form-section">
             <h3 className="section-title">Información del Usuario</h3>
-            
+
             <div className="form-group">
               <label htmlFor="id_usuario">
                 Usuario Oferente <span className="required">*</span>
@@ -235,7 +238,7 @@ function CrearOferente() {
           {/* Información del Negocio */}
           <div className="form-section">
             <h3 className="section-title">Información del Negocio</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="nombre_negocio">
@@ -290,7 +293,7 @@ function CrearOferente() {
           {/* Información de Contacto */}
           <div className="form-section">
             <h3 className="section-title">Información de Contacto</h3>
-            
+
             <div className="form-group">
               <label htmlFor="direccion">
                 Dirección <span className="required">*</span>
@@ -332,7 +335,7 @@ function CrearOferente() {
           {/* Horarios y Disponibilidad */}
           <div className="form-section">
             <h3 className="section-title">Horarios y Disponibilidad</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="horario_apertura">Horario de Apertura</label>
@@ -380,16 +383,16 @@ function CrearOferente() {
 
           {/* Botones de Acción */}
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => navigate('/oferentes')}
               className="btn btn-secondary"
               disabled={loading}
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="btn btn-primary"
             >
