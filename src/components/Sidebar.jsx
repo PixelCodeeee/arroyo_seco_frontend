@@ -117,14 +117,14 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const menuItems = [
     {
       id: "home",
-      label: "Inicio",
+      label: "Volver a Inicio",
       icon: <Home size={20} />,
       path: "/",
       roles: ["admin", "oferente", "turista"],
     },
     {
       id: "oferentes",
-      label: isOferente ? "Mi Perfil" : "Oferentes",
+      label: isOferente ? "Mi Negocio" : "Oferentes",
       icon: <Store size={20} />,
       path: "/oferentes",
       roles: ["admin", "oferente"],
@@ -230,9 +230,9 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
 
       {/* User Info */}
       {currentUser && (
-        <Link 
-          to="/perfil" 
-          className="sidebar-user" 
+        <Link
+          to="/perfil"
+          className="sidebar-user"
           style={{ textDecoration: "none", color: "inherit", cursor: "pointer", display: "flex", alignItems: "center", padding: "10px 20px" }}
         >
           <div className="user-avatar">

@@ -205,7 +205,6 @@ function Productos() {
           <table className="usuarios-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Categoría</th>
                 <th>Precio</th>
@@ -225,7 +224,7 @@ function Productos() {
               ) : (
                 filtered.map((p) => (
                   <tr key={p.id_producto}>
-                    <td data-label="ID">{p.id_producto}</td>
+                   
 
                     <td data-label="Nombre">
                       <strong>{p.nombre}</strong>

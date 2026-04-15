@@ -158,7 +158,7 @@ function Categorias() {
           <table className="usuarios-table">
             <thead>
               <tr>
-                <th>ID</th>
+             
                 <th>Nombre</th>
                 <th>Tipo</th>
                 {isAdmin && <th>Acciones</th>}
@@ -172,7 +172,7 @@ function Categorias() {
               ) : (
                 filtered.map((cat) => (
                   <tr key={cat.id_categoria}>
-                    <td data-label="ID">{cat.id_categoria}</td>
+                 
                     <td data-label="Nombre"><strong>{cat.nombre}</strong></td>
                     <td data-label="Tipo">
                       <span className={`badge badge-${cat.tipo}`}>

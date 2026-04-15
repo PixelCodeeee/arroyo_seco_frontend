@@ -103,11 +103,7 @@ function Navbar() {
         </Link>
 
         <Link to="/gastronomia" className={isActive("/gastronomia") ? "active" : ""}>
-          {t('nav.gastronomy', 'Gastronomía')}
-        </Link>
-
-        <Link to="/artesanias" className={isActive("/artesanias") ? "active" : ""}>
-          {t('nav.handicrafts', 'Artesanías')}
+          {t('nav.gastronomy', 'Sabores y Artes')}
         </Link>
 
         {/* Fixed: Added missing </Link> */}

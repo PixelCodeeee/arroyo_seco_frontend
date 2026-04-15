@@ -60,8 +60,7 @@ function Home() {
             El <span>Tesoro Escondido</span> <br /> De Querétaro
           </h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua...
+            En el corazón de la Sierra Gorda queretana se encuentra Arroyo Seco, un rincón mágico donde los ríos de aguas turquesa y esmeralda se encuentran sin mezclarse, los bosques de encinos y pinos custodian historias milenarias, y la calidez de su gente se siente en cada platillo y en cada pieza artesanal.
           </p>
           <Link to="/register" className="btn-primary">
             Regístrate
@@ -93,8 +92,7 @@ function Home() {
             Nuestra <span>Gastronomía</span>
           </h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua...
+            En las cocinas de Arroyo Seco late el alma de la Sierra Gorda. Sabores intensos, ingredientes locales y recetas que se han transmitido de generación en generación te esperan. Ven y descubre por qué nuestra gastronomía es uno de los mayores tesoros de Querétaro.
           </p>
           <Link to="/gastronomia" className="btn-secondary">
             Explora
@@ -109,10 +107,9 @@ function Home() {
             Nuestras <span>Artesanías</span>
           </h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua...
+            Las manos de nuestros artesanos cuentan la historia de Arroyo Seco. Con cuero, madera y barro crean obras llenas de color, tradición y orgullo serrano. Ven y descubre las auténticas artesanías que hacen único a nuestro municipio.
           </p>
-          <Link to="/artesanias" className="btn-primary">
+          <Link to="/gastronomia" className="btn-primary">
             Explora
           </Link>
         </div>

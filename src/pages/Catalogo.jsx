@@ -174,11 +174,10 @@ function Catalogo() {
       <section className="Catalogo-hero">
         <div className="hero-container">
           <div className="hero-text">
-            <h1>Nuestra selección Semanal</h1>
+            <h1>Nuestros Restaurantes y Artesanos</h1>
             <p className="hero-subtitle">
-              Descubre lo mejor de Arroyo Seco. Desde deliciosa gastronomía local hasta 
-              artesanías únicas hechas a mano. Explora nuestros negocios destacados y 
-              encuentra experiencias auténticas que celebran nuestra cultura y tradición.
+              Aquí te mostramos los restaurantes y artesanos que forman parte de nuestra plataforma. <br /> <br />
+Encuentra una gran variedad de platillos típicos de la Sierra Gorda y artesanías auténticas elaboradas con tradición y cariño por nuestra gente de Arroyo Seco.
             </p>
           </div>
           
