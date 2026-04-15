@@ -106,11 +106,11 @@ function App() {
 
             <Route path="/recomendaciones" element={<Recomendaciones />} />
 
-            {/* Categorias - Viewer/Editor */}
+            {/* Categorias - Admin only */}
             <Route 
               path="/categorias" 
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <Categorias />
                 </RequireRole>
               } 
@@ -194,7 +194,7 @@ function App() {
             <Route 
               path="/oferentes/crear" 
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["admin", "oferente"]}>
                   <CrearOferente />
                 </RequireRole>
               } 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { serviciosAPI } from '../services/api';
+import { serviciosAPI, oferentesAPI } from '../services/api';
 import { toast } from 'sonner';
 import '../styles/auth.css';
 
@@ -26,6 +26,24 @@ function EditarServicio() {
     try {
       setFetching(true);
       const servicio = await serviciosAPI.getById(id);
+
+      // Ownership guard: oferente can only edit their own services
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      if (currentUser && currentUser.rol === 'oferente') {
+        try {
+          const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+          if (!miOferente || servicio.id_oferente !== miOferente.id_oferente) {
+            toast.error('No tienes permiso para editar este servicio');
+            navigate('/servicios');
+            return;
+          }
+        } catch {
+          toast.error('Error al verificar permisos');
+          navigate('/servicios');
+          return;
+        }
+      }
+
       setFormData({
         nombre: servicio.nombre,
         descripcion: servicio.descripcion || '',

@@ -26,6 +26,7 @@ const apiRequest = async (endpoint, options = {}) => {
       headers: {
         'Content-Type': 'application/json',
         'x-frontend-version': import.meta.env.VITE_FRONTEND_VERSION || 'stable',
+        ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {}),
         ...customHeaders,
       },
     });

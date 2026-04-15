@@ -53,6 +53,22 @@ function EditarProducto() {
           return;
         }
 
+        // Ownership guard: oferente can only edit their own products
+        if (currentUser && currentUser.rol === 'oferente') {
+          try {
+            const miOferente = await oferentesAPI.getByUserId(currentUser.id_usuario);
+            if (!miOferente || producto.id_oferente !== miOferente.id_oferente) {
+              toast.error('No tienes permiso para editar este producto');
+              navigate('/productos');
+              return;
+            }
+          } catch {
+            toast.error('Error al verificar permisos');
+            navigate('/productos');
+            return;
+          }
+        }
+
         setFormData({
           nombre: producto.nombre || '',
           descripcion: producto.descripcion || '',

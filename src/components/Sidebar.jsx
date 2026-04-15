@@ -136,7 +136,7 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Categorías",
       icon: <Tag size={20} />,
       path: "/categorias",
-      roles: ["admin", "oferente"], // unified — no duplicate needed
+      roles: ["admin"],
     },
     {
       id: "ordenes",
