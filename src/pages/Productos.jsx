@@ -21,6 +21,7 @@ function Productos() {
   const user = JSON.parse(localStorage.getItem("currentUser") || "null");
   const isAdmin = user?.rol === "admin";
   const isOferente = user?.rol === "oferente";
+  const isModerador = user?.rol === "moderador";
 
   useEffect(() => {
     loadProductos();
@@ -48,15 +49,10 @@ function Productos() {
         }
 
         const res = await productosAPI.getMis();
-        setProductos(res.productos || []);
-        setFiltered(res.productos || []);
-        // categorias not returned by this endpoint — fetch separately
-        try {
-          const catRes = await productosAPI.getCategorias();
-          setCategorias(catRes.categorias || []);
-        } catch {
-          // non-critical
-        }
+        setProductos(res.productos);
+        setFiltered(res.productos);
+        const allRes = await productosAPI.getAll();
+        setCategorias(allRes.categorias);
       } else {
         const res = await productosAPI.getAll();
         setProductos(res.productos || []);
@@ -224,7 +220,7 @@ function Productos() {
               ) : (
                 filtered.map((p) => (
                   <tr key={p.id_producto}>
-                   
+
 
                     <td data-label="Nombre">
                       <strong>{p.nombre}</strong>
@@ -256,13 +252,15 @@ function Productos() {
                         <Pencil size={18} />
                       </Link>
 
-                      <button
-                        onClick={() => requestDelete(p.id_producto)}
-                        className="btn-action btn-delete"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {!isModerador && (
+                        <button
+                          onClick={() => requestDelete(p.id_producto)}
+                          className="btn-action btn-delete"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

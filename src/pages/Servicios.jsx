@@ -20,8 +20,8 @@ function Servicios() {
   // Oferente-specific state
   const [hasOferenteProfile, setHasOferenteProfile] = useState(true);
   const [oferenteTipo, setOferenteTipo] = useState(null);
+  const isModerador = currentUser?.rol === 'moderador';
 
-  // Cargar datos
   useEffect(() => {
     initializeAndFetch();
   }, []);
@@ -112,13 +112,15 @@ function Servicios() {
                 </p>
               )}
             </div>
-            <Link
-              to="/servicios/crear"
-              className="btn btn-primary"
-              style={isOferente && (!hasOferenteProfile || oferenteTipo !== 'restaurante') ? { pointerEvents: 'none', opacity: 0.5 } : {}}
-            >
-              + Nuevo Servicio
-            </Link>
+            {!isModerador && (
+              <Link
+                to="/servicios/crear"
+                className="btn btn-primary"
+                style={isOferente && (!hasOferenteProfile || oferenteTipo !== 'restaurante') ? { pointerEvents: 'none', opacity: 0.5 } : {}}
+              >
+                + Nuevo Servicio
+              </Link>
+            )}
           </div>
         </header>
 
@@ -148,7 +150,7 @@ function Servicios() {
               <div>
                 <strong style={{ fontSize: '1.05em' }}>Esta sección es exclusiva para restaurantes.</strong>
                 <p style={{ marginTop: 8, opacity: 0.9 }}>
-                  Los servicios están diseñados para oferentes tipo restaurante que desean ofrecer experiencias culinarias, 
+                  Los servicios están diseñados para oferentes tipo restaurante que desean ofrecer experiencias culinarias,
                   servicios de buffet, eventos gastronómicos y similares.
                 </p>
                 <p style={{ marginTop: 4, fontSize: '0.9em', opacity: 0.7 }}>
@@ -162,7 +164,44 @@ function Servicios() {
           </div>
         )}
 
-        {/* Estadísticas */}
+        {/* Oferente without profile */}
+        {isOferente && !hasOferenteProfile && (
+          <div className="usuarios-content">
+            <div className="alert alert-info" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '20px', borderRadius: 8, background: 'var(--info-bg, #e0f2fe)', color: 'var(--info-color, #0369a1)', border: '1px solid var(--info-border, #7dd3fc)' }}>
+              <Info size={22} style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ fontSize: '1.05em' }}>Necesitas crear tu perfil de oferente para gestionar servicios.</strong>
+                <p style={{ marginTop: 8, opacity: 0.9 }}>Antes de crear servicios de restaurante, debes registrar tu negocio como oferente.</p>
+                <Link to="/oferentes/crear" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                  <Store size={16} style={{ verticalAlign: 'middle', marginRight: 4 }} /> Crear Mi Perfil de Oferente
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Oferente with wrong tipo */}
+        {isOferente && hasOferenteProfile && oferenteTipo && oferenteTipo !== 'restaurante' && (
+          <div className="usuarios-content">
+            <div className="alert alert-info" style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '20px', borderRadius: 8, background: 'var(--warning-bg, #fefce8)', color: 'var(--warning-color, #854d0e)', border: '1px solid var(--warning-border, #fde047)' }}>
+              <AlertTriangle size={22} style={{ flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ fontSize: '1.05em' }}>Esta sección es exclusiva para restaurantes.</strong>
+                <p style={{ marginTop: 8, opacity: 0.9 }}>
+                  Los servicios están diseñados para oferentes tipo restaurante que desean ofrecer experiencias culinarias,
+                  servicios de buffet, eventos gastronómicos y similares.
+                </p>
+                <p style={{ marginTop: 4, fontSize: '0.9em', opacity: 0.7 }}>
+                  Tu perfil es de tipo <strong>{oferenteTipo}</strong>. Puedes gestionar tus productos desde la sección de Productos.
+                </p>
+                <Link to="/productos" className="btn btn-primary" style={{ display: 'inline-block', marginTop: 12, textDecoration: 'none' }}>
+                  Ir a Productos
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="usuarios-content">
           <div className="usuarios-stats">
             <div className="stat-card">
@@ -179,12 +218,11 @@ function Servicios() {
             </div>
           </div>
 
-          {/* Tabla */}
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
                 <tr>
-            
+
                   <th>Restaurante</th>
                   <th>Servicio</th>
                   <th>Rango Precio</th>
@@ -202,11 +240,10 @@ function Servicios() {
                   </tr>
                 ) : (
                   servicios.map(s => {
-                    const isActive = s.estatus === true; // Prisma already returns boolean
-
+                    const isActive = s.estatus === true;
                     return (
                       <tr key={s.id_servicio}>
-               
+
                         <td data-label="Restaurante">#{s.id_oferente}</td>
                         <td data-label="Servicio">{s.nombre}</td>
                         <td data-label="Rango Precio">{s.rango_precio || '—'}</td>
@@ -224,13 +261,15 @@ function Servicios() {
                           >
                             <Edit size={18} />
                           </Link>
-                          <button
-                            onClick={() => requestDelete(s.id_servicio)}
-                            className="btn-action btn-delete"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          {!isModerador && (
+                            <button
+                              onClick={() => requestDelete(s.id_servicio)}
+                              className="btn-action btn-delete"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

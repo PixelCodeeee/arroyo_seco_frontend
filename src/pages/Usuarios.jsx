@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Edit, Trash2 } from 'lucide-react';
 import { usuariosAPI } from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
+import Layout from '../components/Layout';
 import { toast } from 'sonner';
-import Layout from '../components/Layout';   // ← Importar Layout
 import '../styles/Usuarios.css';
 
 function Usuarios() {
-  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  const isAdmin = currentUser?.rol === 'admin';
+  const isModerador = currentUser?.rol === 'moderador';
 
   useEffect(() => {
     fetchUsuarios();
@@ -32,6 +34,10 @@ function Usuarios() {
   };
 
   const requestDelete = (id) => {
+    if (isModerador) {
+      toast.error('No tienes permisos para eliminar usuarios');
+      return;
+    }
     setConfirmDelete({ isOpen: true, id });
   };
 
@@ -50,7 +56,7 @@ function Usuarios() {
 
   if (loading) {
     return (
-      <Layout>                                   {/* ← Agregar Layout aquí */}
+      <Layout>
         <div className="usuarios-container">
           <div className="loading">Cargando usuarios...</div>
         </div>
@@ -59,8 +65,10 @@ function Usuarios() {
   }
 
   return (
-    <Layout>                                     {/* ← Agregar Layout aquí */}
+    <Layout>
       <div className="usuarios-container">
+
+        {/* HEADER */}
         <header className="usuarios-header">
           <div className="header-content">
             <div>
@@ -71,17 +79,33 @@ function Usuarios() {
                 </p>
               )}
             </div>
+
             <div className="header-actions">
-              <Link to="/register" className="btn btn-primary">
-                + Nuevo Usuario
-              </Link>
-              {/* Quitamos el botón de Cerrar Sesión porque ya está en el sidebar */}
+              {isAdmin && (
+                <Link to="/register" className="btn btn-primary">
+                  + Nuevo Usuario
+                </Link>
+              )}
             </div>
           </div>
         </header>
 
+        {/* Moderator notice */}
+        {isModerador && (
+          <div style={{
+            backgroundColor: "var(--bg-card)",
+            padding: "1rem",
+            borderRadius: "8px",
+            borderLeft: "4px solid var(--info-color)",
+            marginBottom: "1.5rem"
+          }}>
+            ⚠️ Estás en modo supervisión. Solo puedes visualizar los usuarios.
+          </div>
+        )}
+
         {error && <div className="error-message">{error}</div>}
 
+        {/* STATS */}
         <div className="usuarios-content">
           <div className="usuarios-stats">
             <div className="stat-card">
@@ -108,6 +132,7 @@ function Usuarios() {
             </div>
           </div>
 
+          {/* TABLE */}
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
@@ -117,7 +142,7 @@ function Usuarios() {
                   <th>Rol</th>
                   <th>Estado</th>
                   <th>Fecha Creación</th>
-                  <th>Acciones</th>
+                  {isAdmin && <th>Acciones</th>}
                 </tr>
               </thead>
               <tbody>
@@ -138,22 +163,24 @@ function Usuarios() {
                     <td data-label="Fecha Creación">
                       {new Date(usuario.fecha_creacion).toLocaleDateString()}
                     </td>
-                    <td data-label="Acciones" className="actions">
-                      <Link
-                        to={`/usuarios/editar/${usuario.id_usuario}`}
-                        className="btn-action btn-edit"
-                        title="Editar"
-                      >
-                        <Edit size={18} />
-                      </Link>
-                      <button
-                        onClick={() => requestDelete(usuario.id_usuario)}
-                        className="btn-action btn-delete"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
+                    {isAdmin && (
+                      <td data-label="Acciones" className="actions">
+                        <Link
+                          to={`/usuarios/editar/${usuario.id_usuario}`}
+                          className="btn-action btn-edit"
+                          title="Editar"
+                        >
+                          <Edit size={18} />
+                        </Link>
+                        <button
+                          onClick={() => requestDelete(usuario.id_usuario)}
+                          className="btn-action btn-delete"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -165,10 +192,9 @@ function Usuarios() {
       <ConfirmModal
         isOpen={confirmDelete.isOpen}
         title="Eliminar usuario"
-        message="¿Estás seguro de que deseas eliminar este usuario del sistema?"
+        message="¿Estás seguro?"
         onConfirm={executeDelete}
         onClose={() => setConfirmDelete({ isOpen: false, id: null })}
-        confirmText="Eliminar"
       />
     </Layout>
   );

@@ -552,8 +552,6 @@ export const reservasAPI = {
       },
     }),
 
-  // In reservasAPI object, add this method:
-
   getMisReservas: () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
     if (!currentUser) throw new Error("Usuario no autenticado");
@@ -563,7 +561,7 @@ export const reservasAPI = {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
   },
-  // Add this to reservasAPI in api.js:
+
   getMisReservasComoOferente: async () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
     if (!currentUser) throw new Error("Usuario no autenticado");
@@ -686,6 +684,7 @@ export const mercadopagoAPI = {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     }),
+
   // Obtener URL de autorización OAuth (redirige a MP)
   getOAuthUrl: () =>
     apiRequest('/mercadopago/mp/oauth-url', {
@@ -704,43 +703,38 @@ export const mercadopagoAPI = {
       },
     }),
 };
+
 /* ======================================================
    ANNOUNCEMENTS API
 ====================================================== */
 export const announcementsAPI = {
   getMaintenance: () =>
-    apiRequest('/announcements/maintenance'),
+    apiRequest('/announcements/public'),   // ✅
 
   getAll: () =>
-    apiRequest('/announcements'),
+    apiRequest('/announcements'),           // ✅
 
   getById: (id) =>
-    apiRequest(`/announcements/${id}`),
+    apiRequest(`/announcements/${id}`),     // ✅
 
   create: (data) =>
     apiRequest('/announcements', {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 
   update: (id, data) =>
     apiRequest(`/announcements/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 
   delete: (id) =>
     apiRequest(`/announcements/${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     }),
 };
 

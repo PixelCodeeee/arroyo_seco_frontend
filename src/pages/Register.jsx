@@ -144,16 +144,17 @@ function Register() {
           <div className="form-group">
             <label htmlFor="rol">Tipo de Usuario</label>
             <select 
-              id="rol" 
-              name="rol" 
-              value={formData.rol}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Selecciona un rol</option>
-              <option value="turista">Turista</option>
-              <option value="oferente">Oferente</option>
-            </select>
+  id="rol" 
+  name="rol" 
+  value={formData.rol}
+  onChange={handleChange}
+  required
+>
+  <option value="">Selecciona un rol</option>
+  <option value="turista">Turista</option>
+  <option value="oferente">Oferente</option>
+  <option value="moderador">Moderador</option>
+</select>
           </div>
 
           <button 

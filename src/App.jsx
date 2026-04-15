@@ -40,6 +40,7 @@ import EditarAnuncio from './pages/EditarAnuncio';
 import Recomendaciones from "./pages/Recomendaciones";
 import Analiticas from "./pages/Analiticas";
 import InstallPrompt from "./components/InstallPrompt";
+import PanelModerador from "./pages/PanelModerador";
 
 import EULA from "./pages/EULA";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -53,6 +54,7 @@ import { useMaintenance } from "./hooks/useMaintenance";
 function App() {
   useOffline();
   const maintenance = useMaintenance();
+
   const initialOptions = {
     clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
     currency: "MXN",
@@ -62,85 +64,64 @@ function App() {
   return (
     <PayPalScriptProvider options={initialOptions}>
       <ThemeProvider>
+
         {maintenance.show_banner && maintenance.message && (
           <div style={{
             backgroundColor: '#ff4d4f',
             color: 'white',
             textAlign: 'center',
             padding: '10px',
-            position: 'fixed',     
+            position: 'fixed',
             top: 0,
             zIndex: 99999,
           }}>
             ⚠️ {maintenance.message}
           </div>
         )}
-        <InstallPrompt />
 
+        <InstallPrompt />
         <SettingsModal />
+
         <Router>
           <ScrollToTop />
           <Toaster position="top-right" richColors />
+
           <Routes>
+
             <Route path="/contacto" element={<Contact />} />
 
             {/* Reservas */}
-            <Route 
-              path="/reservas" 
+            <Route
+              path="/reservas"
               element={
-                <RequireRole allowed={["admin", "oferente", "turista"]}>
+                <RequireRole allowed={["admin", "oferente", "turista", "moderador"]}>
                   <Reservas />
                 </RequireRole>
-              } 
+              }
             />
 
             {/* Ordenes */}
-            <Route 
-              path="/ordenes" 
+            <Route
+              path="/ordenes"
               element={
-                <RequireRole allowed={["admin", "oferente", "turista"]}>
+                <RequireRole allowed={["admin", "oferente", "turista", "moderador"]}>
                   <Ordenes />
                 </RequireRole>
-              } 
+              }
             />
 
             <Route path="/recomendaciones" element={<Recomendaciones />} />
 
-            {/* Categorias - Admin only */}
-            <Route 
-              path="/categorias" 
+            {/* Categorias */}
+            <Route
+              path="/categorias"
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["admin", "moderador"]}>
                   <Categorias />
                 </RequireRole>
-              } 
-            />
-
-            <Route
-              path="/analiticas"
-              element={
-                <RequireRole allowed={["admin"]}>
-                  <Analiticas />
-                </RequireRole>
               }
             />
 
-            {/* Perfil: cualquier usuario */}
-            <Route
-              path="/perfil"
-              element={
-                <RequireRole allowed={["turista", "oferente", "admin"]}>
-                  <MiPerfil />
-                </RequireRole>
-              }
-            />
-
-            {/* Settings (Now a Modal, Route removed) */}
-
-            {/* Página de error */}
-            <Route path="/error" element={<ErrorPage />} />
-
-            {/* Categorías - SOLO admin */}
             <Route
               path="/categorias/crear"
               element={
@@ -149,6 +130,7 @@ function App() {
                 </RequireRole>
               }
             />
+
             <Route
               path="/categorias/editar/:id"
               element={
@@ -158,21 +140,44 @@ function App() {
               }
             />
 
-            {/* Inicio y auth */}
+            {/* 🔥 ANALITICAS (CORREGIDO) */}
+            <Route
+              path="/analiticas"
+              element={
+                <RequireRole allowed={["admin", "moderador"]}>
+                  <Analiticas />
+                </RequireRole>
+              }
+            />
+
+            {/* Perfil */}
+            <Route
+              path="/perfil"
+              element={
+                <RequireRole allowed={["turista", "oferente", "admin", "moderador"]}>
+                  <MiPerfil />
+                </RequireRole>
+              }
+            />
+
+            <Route path="/error" element={<ErrorPage />} />
+
+            {/* Auth */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/recuperar-password" element={<RecuperarPassword />} />
 
-            {/* Usuarios - SOLO admin */}
+            {/* 🔥 USUARIOS (CORREGIDO) */}
             <Route
               path="/usuarios"
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["admin", "moderador"]}>
                   <Usuarios />
                 </RequireRole>
               }
             />
+
             <Route
               path="/usuarios/editar/:id"
               element={
@@ -183,26 +188,28 @@ function App() {
             />
 
             {/* Oferentes */}
-            <Route 
-              path="/oferentes" 
+            <Route
+              path="/oferentes"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin", "oferente", "moderador"]}>
                   <Oferentes />
                 </RequireRole>
-              } 
+              }
             />
-            <Route 
-              path="/oferentes/crear" 
+
+            <Route
+              path="/oferentes/crear"
               element={
                 <RequireRole allowed={["admin", "oferente"]}>
                   <CrearOferente />
                 </RequireRole>
-              } 
+              }
             />
+
             <Route
               path="/oferentes/editar/:id"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin", "oferente", "moderador"]}>
                   <EditarOferente />
                 </RequireRole>
               }
@@ -212,49 +219,53 @@ function App() {
             <Route
               path="/servicios"
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["admin", "moderador", "oferente"]}>
                   <Servicios />
                 </RequireRole>
               }
             />
+
             <Route
               path="/servicios/crear"
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["admin", "oferente"]}>
                   <CrearServicio />
                 </RequireRole>
               }
             />
+
             <Route
               path="/servicios/editar/:id"
               element={
-                <RequireRole allowed={["admin"]}>
+                <RequireRole allowed={["oferente", "admin", "moderador"]}>
                   <EditarServicio />
                 </RequireRole>
               }
             />
 
             {/* Productos */}
-            <Route 
-              path="/productos" 
+            <Route
+              path="/productos"
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin", "oferente", "moderador"]}>
                   <Productos />
                 </RequireRole>
-              } 
+              }
             />
-            <Route 
-              path="/productos/crear" 
+
+            <Route
+              path="/productos/crear"
               element={
                 <RequireRole allowed={["admin", "oferente"]}>
                   <CrearProducto />
                 </RequireRole>
-              } 
+              }
             />
+
             <Route
               path="/productos/editar/:id"
               element={
-                <RequireRole allowed={["oferente", "admin"]}>
+                <RequireRole allowed={["oferente", "admin", "moderador"]}>
                   <EditarProducto />
                 </RequireRole>
               }
@@ -262,12 +273,10 @@ function App() {
 
             {/* Público */}
             <Route path="/catalogo" element={<Catalogo />} />
-
-            {/* Rutas de categorías */}
             <Route path="/gastronomia" element={<Catalogo />} />
             <Route path="/artesanias" element={<Catalogo />} />
 
-            {/* Panel oferente */}
+            {/* Paneles */}
             <Route
               path="/panel-oferente"
               element={
@@ -276,28 +285,12 @@ function App() {
                 </RequireRole>
               }
             />
-            {/* Anuncios  */}
+
             <Route
-              path="/anuncios"
+              path="/panel-moderador"
               element={
-                <RequireRole allowed={["admin"]}>
-                  <Anuncios />
-                </RequireRole>
-              }
-            />
-            <Route
-              path="/anuncios/crear"
-              element={
-                <RequireRole allowed={["admin"]}>
-                  <CrearAnuncio />
-                </RequireRole>
-              }
-            />
-            <Route
-              path="/anuncios/editar/:id"
-              element={
-                <RequireRole allowed={["admin"]}>
-                  <EditarAnuncio />
+                <RequireRole allowed={["moderador", "admin"]}>
+                  <PanelModerador />
                 </RequireRole>
               }
             />
@@ -310,21 +303,49 @@ function App() {
                 </RequireRole>
               }
             />
-            {/* Anuncios públicos - todos pueden ver */}
+
+            {/* Anuncios */}
+            <Route
+              path="/anuncios"
+              element={
+                <RequireRole allowed={["admin", "moderador"]}>
+                  <Anuncios />
+                </RequireRole>
+              }
+            />
+
+            <Route
+              path="/anuncios/crear"
+              element={
+                <RequireRole allowed={["admin"]}>
+                  <CrearAnuncio />
+                </RequireRole>
+              }
+            />
+
+            <Route
+              path="/anuncios/editar/:id"
+              element={
+                <RequireRole allowed={["admin", "moderador"]}>
+                  <EditarAnuncio />
+                </RequireRole>
+              }
+            />
+
             <Route path="/anuncios-publicos" element={<AnunciosPublicos />} />
 
             <Route path="/oferente/:id" element={<OferenteDetail />} />
             <Route path="/carrito" element={<Carrito />} />
-            
-            {/* Legal Pages */}
+
+            {/* Legal */}
             <Route path="/eula" element={<EULA />} />
             <Route path="/privacidad" element={<PrivacyPolicy />} />
             <Route path="/terminos" element={<TermsOfService />} />
             <Route path="/equipo" element={<AboutTeam />} />
             <Route path="/faq" element={<FAQ />} />
-            
-            {/* Catch-all route for robust 404 rendering */}
+
             <Route path="*" element={<ErrorPage />} />
+
           </Routes>
         </Router>
       </ThemeProvider>
