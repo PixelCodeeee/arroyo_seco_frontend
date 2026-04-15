@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2, Info, Store, AlertTriangle } from 'lucide-react';
+import { Edit, Trash2, Info, Store, AlertTriangle, Search } from 'lucide-react';
 import { serviciosAPI, oferentesAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ConfirmModal from '../components/ConfirmModal';
@@ -9,10 +9,15 @@ import '../styles/Usuarios.css';
 
 function Servicios() {
   const [servicios, setServicios] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [stats, setStats] = useState({ total: 0, disponibles: 0, no_disponibles: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+
+  // Search & Filter
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterEstatus, setFilterEstatus] = useState('');
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   const isOferente = currentUser?.rol === 'oferente';
   const isAdmin = currentUser?.rol === 'admin';
@@ -70,6 +75,26 @@ function Servicios() {
       setLoading(false);
     }
   };
+
+  // Derive filtered list
+  useEffect(() => {
+    let data = [...servicios];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter(s =>
+        (s.nombre || '').toLowerCase().includes(term) ||
+        (s.nombre_negocio || '').toLowerCase().includes(term)
+      );
+    }
+    if (filterEstatus === 'disponible') {
+      data = data.filter(s => s.estatus === 1);
+    } else if (filterEstatus === 'no_disponible') {
+      data = data.filter(s => s.estatus === 0);
+    }
+    setFiltered(data);
+  }, [searchTerm, filterEstatus, servicios]);
+
+  const clearFilters = () => { setSearchTerm(''); setFilterEstatus(''); };
 
   const requestDelete = (id) => {
     setConfirmDelete({ isOpen: true, id });
@@ -218,6 +243,40 @@ function Servicios() {
             </div>
           </div>
 
+          {/* SEARCH & FILTERS */}
+          <div className="ordenes-controls" style={{ marginBottom: '1.5rem' }}>
+            <div className="search-box">
+              <span className="search-icon"><Search size={18} /></span>
+              <input
+                type="text"
+                placeholder="Buscar por nombre de servicio o restaurante..."
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-buttons">
+              {['', 'disponible', 'no_disponible'].map(val => (
+                <button
+                  key={val}
+                  className={`filter-btn ${filterEstatus === val ? 'active' : ''}`}
+                  onClick={() => setFilterEstatus(val)}
+                >
+                  {val === '' ? 'Todos' : val === 'disponible' ? 'Disponibles' : 'No Disponibles'}
+                </button>
+              ))}
+              {(searchTerm || filterEstatus) && (
+                <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+                  Limpiar Filtros
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="results-count" style={{ marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Mostrando {filtered.length} de {servicios.length} servicios
+          </div>
+
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
               <thead>
@@ -239,7 +298,7 @@ function Servicios() {
                     </td>
                   </tr>
                 ) : (
-                  servicios.map(s => {
+                  filtered.map(s => {
                     const isActive = s.estatus === true;
                     return (
                       <tr key={s.id_servicio}>

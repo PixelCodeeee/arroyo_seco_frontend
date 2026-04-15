@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { productosAPI, oferentesAPI } from "../services/api";
 import Layout from "../components/Layout";
-import { Pencil, Trash2, Plus, Info, Store } from "lucide-react";
+import { Pencil, Trash2, Plus, Info, Store, Search } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "../components/ConfirmModal";
 import "../styles/Usuarios.css";
@@ -13,6 +13,8 @@ function Productos() {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterCategoria, setFilterCategoria] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterEstatus, setFilterEstatus] = useState("");
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
@@ -72,15 +74,27 @@ function Productos() {
 
   const applyFilters = () => {
     let data = [...productos];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter((p) =>
+        (p.nombre || '').toLowerCase().includes(term) ||
+        (p.descripcion || '').toLowerCase().includes(term)
+      );
+    }
     if (filterCategoria) {
       data = data.filter((p) => p.id_categoria === parseInt(filterCategoria));
+    }
+    if (filterEstatus === 'activo') {
+      data = data.filter((p) => p.estatus === 1);
+    } else if (filterEstatus === 'inactivo') {
+      data = data.filter((p) => p.estatus === 0);
     }
     setFiltered(data);
   };
 
-  useEffect(applyFilters, [filterCategoria, productos]);
+  useEffect(applyFilters, [filterCategoria, searchTerm, filterEstatus, productos]);
 
-  const clearFilters = () => setFilterCategoria("");
+  const clearFilters = () => { setFilterCategoria(""); setSearchTerm(""); setFilterEstatus(""); };
 
   const requestDelete = (id) => {
     setConfirmDelete({ isOpen: true, id });
@@ -166,34 +180,48 @@ function Productos() {
           </div>
         </div>
 
-        {/* FILTERS */}
-        <div className="filters-section">
-          <div className="filters-row">
-            <div className="filter-group">
-              <label>Categoría:</label>
-              <select
-                value={filterCategoria}
-                onChange={(e) => setFilterCategoria(e.target.value)}
-              >
-                <option value="">Todas</option>
-                {categorias.map((c) => (
-                  <option key={c.id_categoria} value={c.id_categoria}>
-                    {c.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {filterCategoria && (
-              <button className="btn btn-secondary btn-sm" onClick={clearFilters}>
-                Limpiar
+        {/* SEARCH & FILTERS */}
+        <div className="ordenes-controls" style={{ marginBottom: '1.5rem' }}>
+          <div className="search-box">
+            <span className="search-icon"><Search size={18} /></span>
+            <input
+              type="text"
+              placeholder="Buscar por nombre o descripción..."
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="filter-buttons">
+            <select
+              value={filterCategoria}
+              onChange={(e) => setFilterCategoria(e.target.value)}
+              style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'inherit' }}
+            >
+              <option value="">Categoría: Todas</option>
+              {categorias.map((c) => (
+                <option key={c.id_categoria} value={c.id_categoria}>{c.nombre}</option>
+              ))}
+            </select>
+            <select
+              value={filterEstatus}
+              onChange={(e) => setFilterEstatus(e.target.value)}
+              style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'inherit' }}
+            >
+              <option value="">Estatus: Todos</option>
+              <option value="activo">Activos</option>
+              <option value="inactivo">Inactivos</option>
+            </select>
+            {(filterCategoria || searchTerm || filterEstatus) && (
+              <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+                Limpiar Filtros
               </button>
             )}
           </div>
+        </div>
 
-          <div className="results-count">
-            Mostrando {filtered.length} de {productos.length}
-          </div>
+        <div className="results-count" style={{ marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          Mostrando {filtered.length} de {productos.length} productos
         </div>
 
         {/* TABLE */}

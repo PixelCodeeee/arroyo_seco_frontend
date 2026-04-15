@@ -1,4 +1,4 @@
-import { Clock, CheckCircle, XCircle, CreditCard, Utensils, Palette, Info, Trash2, Edit } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, CreditCard, Utensils, Palette, Info, Trash2, Edit, Search } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { oferentesAPI } from '../services/api';
@@ -14,6 +14,7 @@ function Oferentes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({ estado: '', tipo: '' });
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [isOferente, setIsOferente] = useState(false);
   const [isModerador, setIsModerador] = useState(false);
@@ -33,7 +34,7 @@ function Oferentes() {
 
   useEffect(() => {
     applyFilters();
-  }, [oferentes, filters]);
+  }, [oferentes, filters, searchTerm]);
 
   const checkMpQueryParams = () => {
     const params = new URLSearchParams(window.location.search);
@@ -143,6 +144,13 @@ function Oferentes() {
 
   const applyFilters = () => {
     let filtered = [...oferentes];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(o =>
+        (o.nombre_negocio || '').toLowerCase().includes(term) ||
+        (o.descripcion || '').toLowerCase().includes(term)
+      );
+    }
     if (filters.estado) filtered = filtered.filter(o => o.estado === filters.estado);
     if (filters.tipo) filtered = filtered.filter(o => o.tipo === filters.tipo);
     setFilteredOferentes(filtered);
@@ -153,7 +161,7 @@ function Oferentes() {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const clearFilters = () => setFilters({ estado: '', tipo: '' });
+  const clearFilters = () => { setFilters({ estado: '', tipo: '' }); setSearchTerm(''); };
 
   const requestEstadoChange = (id, nuevoEstado) => {
     if (isOferente) {
@@ -341,32 +349,38 @@ function Oferentes() {
             )}
 
             {!isOferente && oferentes.length > 1 && (
-              <div className="filters-section">
-                <div className="filters-row">
-                  <div className="filter-group">
-                    <label htmlFor="filter-estado">Estado:</label>
-                    <select id="filter-estado" name="estado" value={filters.estado} onChange={handleFilterChange}>
-                      <option value="">Todos</option>
-                      <option value="pendiente">Pendiente</option>
-                      <option value="aprobado">Aprobado</option>
-                      <option value="suspendido">Suspendido</option>
-                    </select>
-                  </div>
-                  <div className="filter-group">
-                    <label htmlFor="filter-tipo">Tipo:</label>
-                    <select id="filter-tipo" name="tipo" value={filters.tipo} onChange={handleFilterChange}>
-                      <option value="">Todos</option>
-                      <option value="restaurante">Restaurante</option>
-                      <option value="artesanal">Artesanal</option>
-                    </select>
-                  </div>
-                  {(filters.estado || filters.tipo) && (
-                    <button onClick={clearFilters} className="btn btn-secondary btn-sm">
+              <div className="ordenes-controls" style={{ marginBottom: '1.5rem' }}>
+                <div className="search-box">
+                  <span className="search-icon"><Search size={18} /></span>
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre de negocio..."
+                    className="search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="filter-buttons">
+                  <select name="estado" value={filters.estado} onChange={handleFilterChange}
+                    style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'inherit' }}>
+                    <option value="">Estado: Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="aprobado">Aprobado</option>
+                    <option value="suspendido">Suspendido</option>
+                  </select>
+                  <select name="tipo" value={filters.tipo} onChange={handleFilterChange}
+                    style={{ padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'inherit' }}>
+                    <option value="">Tipo: Todos</option>
+                    <option value="restaurante">Restaurante</option>
+                    <option value="artesanal">Artesanal</option>
+                  </select>
+                  {(filters.estado || filters.tipo || searchTerm) && (
+                    <button onClick={clearFilters} className="btn btn-outline btn-sm">
                       Limpiar Filtros
                     </button>
                   )}
                 </div>
-                <div className="results-count">
+                <div className="results-count" style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   Mostrando {filteredOferentes.length} de {oferentes.length} oferentes
                 </div>
               </div>

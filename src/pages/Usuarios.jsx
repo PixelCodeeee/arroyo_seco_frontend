@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Search } from 'lucide-react';
 import { usuariosAPI } from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
 import Layout from '../components/Layout';
@@ -9,9 +9,15 @@ import '../styles/Usuarios.css';
 
 function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+
+  // Search & Filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterRol, setFilterRol] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
   const isAdmin = currentUser?.rol === 'admin';
@@ -20,6 +26,27 @@ function Usuarios() {
   useEffect(() => {
     fetchUsuarios();
   }, []);
+
+  // Derive filtered list whenever data or filters change
+  useEffect(() => {
+    let data = [...usuarios];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter(u =>
+        (u.nombre || '').toLowerCase().includes(term) ||
+        (u.correo || '').toLowerCase().includes(term)
+      );
+    }
+    if (filterRol) {
+      data = data.filter(u => u.rol === filterRol);
+    }
+    if (filterStatus === 'activo') {
+      data = data.filter(u => u.esta_activo);
+    } else if (filterStatus === 'inactivo') {
+      data = data.filter(u => !u.esta_activo);
+    }
+    setFiltered(data);
+  }, [searchTerm, filterRol, filterStatus, usuarios]);
 
   const fetchUsuarios = async () => {
     try {
@@ -31,6 +58,12 @@ function Usuarios() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilterRol('');
+    setFilterStatus('');
   };
 
   const requestDelete = (id) => {
@@ -132,6 +165,57 @@ function Usuarios() {
             </div>
           </div>
 
+          {/* SEARCH & FILTERS */}
+          <div className="ordenes-controls" style={{ marginBottom: '1.5rem' }}>
+            <div className="search-box">
+              <span className="search-icon"><Search size={18} /></span>
+              <input
+                type="text"
+                placeholder="Buscar por nombre o correo..."
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-buttons">
+              {['', 'turista', 'oferente', 'admin', 'moderador'].map(rol => (
+                <button
+                  key={rol}
+                  className={`filter-btn ${filterRol === rol ? 'active' : ''}`}
+                  onClick={() => setFilterRol(rol)}
+                >
+                  {rol === '' ? 'Todos' : rol.charAt(0).toUpperCase() + rol.slice(1)}
+                </button>
+              ))}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontFamily: 'inherit'
+                }}
+              >
+                <option value="">Estado: Todos</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+              </select>
+              {(searchTerm || filterRol || filterStatus) && (
+                <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+                  Limpiar Filtros
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="results-count" style={{ marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Mostrando {filtered.length} de {usuarios.length} usuarios
+          </div>
+
           {/* TABLE */}
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
@@ -146,7 +230,7 @@ function Usuarios() {
                 </tr>
               </thead>
               <tbody>
-                {usuarios.map((usuario) => (
+                {filtered.map((usuario) => (
                   <tr key={usuario.id_usuario}>
                     <td data-label="Nombre">{usuario.nombre}</td>
                     <td data-label="Correo">{usuario.correo}</td>

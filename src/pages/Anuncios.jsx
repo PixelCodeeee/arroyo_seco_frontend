@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Search } from 'lucide-react';
 import { announcementsAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ConfirmModal from '../components/ConfirmModal';
@@ -9,9 +9,14 @@ import '../styles/Usuarios.css';
 
 function Anuncios() {
   const [anuncios, setAnuncios] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null });
+
+  // Search & Filter
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterActive, setFilterActive] = useState('');
 
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
@@ -36,6 +41,26 @@ function Anuncios() {
       setLoading(false);
     }
   };
+
+  // Derive filtered list
+  useEffect(() => {
+    let data = [...anuncios];
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter(a =>
+        (a.title || '').toLowerCase().includes(term) ||
+        (a.description || '').toLowerCase().includes(term)
+      );
+    }
+    if (filterActive === 'activo') {
+      data = data.filter(a => a.is_active);
+    } else if (filterActive === 'inactivo') {
+      data = data.filter(a => !a.is_active);
+    }
+    setFiltered(data);
+  }, [searchTerm, filterActive, anuncios]);
+
+  const clearFilters = () => { setSearchTerm(''); setFilterActive(''); };
 
   const requestDelete = (id) => {
     if (!isAdmin) {
@@ -130,6 +155,40 @@ function Anuncios() {
             </div>
           </div>
 
+          {/* SEARCH & FILTERS */}
+          <div className="ordenes-controls" style={{ marginBottom: '1.5rem' }}>
+            <div className="search-box">
+              <span className="search-icon"><Search size={18} /></span>
+              <input
+                type="text"
+                placeholder="Buscar por título o descripción..."
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-buttons">
+              {['', 'activo', 'inactivo'].map(val => (
+                <button
+                  key={val}
+                  className={`filter-btn ${filterActive === val ? 'active' : ''}`}
+                  onClick={() => setFilterActive(val)}
+                >
+                  {val === '' ? 'Todos' : val === 'activo' ? 'Activos' : 'Inactivos'}
+                </button>
+              ))}
+              {(searchTerm || filterActive) && (
+                <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+                  Limpiar Filtros
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="results-count" style={{ marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Mostrando {filtered.length} de {anuncios.length} anuncios
+          </div>
+
           {/* TABLA */}
           <div className="usuarios-table-container table-responsive">
             <table className="usuarios-table">
@@ -145,14 +204,14 @@ function Anuncios() {
               </thead>
 
               <tbody>
-                {anuncios.length === 0 ? (
+                {filtered.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                      No hay anuncios registrados aún
+                      {anuncios.length === 0 ? 'No hay anuncios registrados aún' : 'Sin resultados para los filtros aplicados'}
                     </td>
                   </tr>
                 ) : (
-                  anuncios.map(a => (
+                  filtered.map(a => (
                     <tr key={a.id}>
               
                       <td data-label="Título">{a.title}</td>

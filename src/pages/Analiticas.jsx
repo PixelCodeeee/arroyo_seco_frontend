@@ -71,6 +71,15 @@ const Icons = {
   ),
 };
 
+/* ── Opciones de período ── */
+const PERIOD_OPTIONS = [
+  { label: "7 días", value: 7 },
+  { label: "30 días", value: 30 },
+  { label: "90 días", value: 90 },
+  { label: "1 año", value: 365 },
+  { label: "Todo", value: 9999 },
+];
+
 /* ── Dona SVG ── */
 function Donut({ data, total }) {
   const r = 50;
@@ -121,6 +130,7 @@ function Analiticas() {
   const [usuariosStats, setUsuariosStats] = useState(null);
   const [topProductos, setTopProductos] = useState([]);
   const [topServicios, setTopServicios] = useState([]);
+  const [days, setDays] = useState(30);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -128,11 +138,11 @@ function Analiticas() {
       setError(null);
       try {
         const [ped, res, usr, prods, servs] = await Promise.all([
-          fetchAuth(`${API_URL}/pedidos/analiticas/stats`),
-          fetchAuth(`${API_URL}/reservas/analiticas/stats`),
+          fetchAuth(`${API_URL}/pedidos/analiticas/stats?days=${days}`),
+          fetchAuth(`${API_URL}/reservas/analiticas/stats?days=${days}`),
           fetchAuth(`${API_URL}/usuarios/analiticas/stats`),
-          fetch(`${API_URL}/pedidos/recomendaciones/top-productos?limit=5`).then(r => r.json()),
-          fetch(`${API_URL}/reservas/recomendaciones/top-servicios?limit=5`).then(r => r.json()),
+          fetchAuth(`${API_URL}/pedidos/recomendaciones/top-productos?limit=5`),
+          fetchAuth(`${API_URL}/reservas/recomendaciones/top-servicios?limit=5`),
         ]);
         setPedidosStats(ped);
         setReservasStats(res);
@@ -146,7 +156,7 @@ function Analiticas() {
       }
     };
     fetchAll();
-  }, []);
+  }, [days]);
 
   const getRankClass = (i) => {
     if (i === 0) return "gold";
@@ -157,6 +167,8 @@ function Analiticas() {
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(amount || 0);
+
+  const periodLabel = PERIOD_OPTIONS.find(p => p.value === days)?.label || `${days} días`;
 
   if (loading) {
     return (
@@ -213,7 +225,18 @@ function Analiticas() {
             <div className="header-info">
               <h1>{Icons.chart} Analíticas</h1>
               <p className="welcome-text">Resumen general del desempeño de Arroyo Seco</p>
-              <span className="analiticas-period">Últimos 30 días</span>
+            </div>
+            {/* Period selector */}
+            <div className="analiticas-period-selector">
+              {PERIOD_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  className={`period-btn ${days === opt.value ? "active" : ""}`}
+                  onClick={() => setDays(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
         </header>
@@ -223,17 +246,17 @@ function Analiticas() {
           <div className="stat-card-an">
             <div className="stat-icon-an">{Icons.money}</div>
             <div className="stat-value-an">{formatCurrency(pedidosStats?.ingresos_totales)}</div>
-            <div className="stat-label-an">Ingresos totales</div>
+            <div className="stat-label-an">Ingresos ({periodLabel})</div>
           </div>
           <div className="stat-card-an">
             <div className="stat-icon-an">{Icons.cart}</div>
             <div className="stat-value-an">{pedidosStats?.total_pedidos || 0}</div>
-            <div className="stat-label-an">Pedidos este mes</div>
+            <div className="stat-label-an">Pedidos ({periodLabel})</div>
           </div>
           <div className="stat-card-an">
             <div className="stat-icon-an">{Icons.calendar}</div>
             <div className="stat-value-an">{reservasStats?.total_reservas || 0}</div>
-            <div className="stat-label-an">Reservas este mes</div>
+            <div className="stat-label-an">Reservas ({periodLabel})</div>
           </div>
           <div className="stat-card-an">
             <div className="stat-icon-an">{Icons.users}</div>

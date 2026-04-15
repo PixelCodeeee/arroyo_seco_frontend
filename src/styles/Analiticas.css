@@ -43,16 +43,35 @@
   font-weight: 500;
 }
 
-.analiticas-period {
-  display: inline-block;
-  margin-top: 0.5rem;
-  background-color: var(--accent-soft);
-  border: 1px solid rgba(227, 0, 140, 0.3);
-  color: var(--accent);
-  padding: 0.3rem 0.9rem;
+.analiticas-period-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.period-btn {
+  background-color: var(--bg-tertiary, var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.35rem 0.9rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.period-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.period-btn.active {
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ==============================
