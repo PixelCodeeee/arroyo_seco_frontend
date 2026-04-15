@@ -106,7 +106,7 @@ function Servicios() {
             <table className="usuarios-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+            
                   <th>Restaurante</th>
                   <th>Servicio</th>
                   <th>Rango Precio</th>
@@ -128,7 +128,7 @@ function Servicios() {
 
                     return (
                       <tr key={s.id_servicio}>
-                        <td data-label="ID">{s.id_servicio}</td>
+               
                         <td data-label="Restaurante">#{s.id_oferente}</td>
                         <td data-label="Servicio">{s.nombre}</td>
                         <td data-label="Rango Precio">{s.rango_precio || '—'}</td>

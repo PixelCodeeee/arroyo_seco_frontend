@@ -68,9 +68,9 @@ function App() {
             color: 'white',
             textAlign: 'center',
             padding: '10px',
-            position: 'sticky',
+            position: 'fixed',     
             top: 0,
-            zIndex: 9999,
+            zIndex: 99999,
           }}>
             ⚠️ {maintenance.message}
           </div>
@@ -110,7 +110,7 @@ function App() {
             <Route 
               path="/categorias" 
               element={
-                <RequireRole allowed={["admin", "oferente"]}>
+                <RequireRole allowed={["admin"]}>
                   <Categorias />
                 </RequireRole>
               } 
@@ -212,7 +212,7 @@ function App() {
             <Route
               path="/servicios"
               element={
-                <RequireRole allowed={["oferente", "admin"]}>
+                <RequireRole allowed={["admin"]}>
                   <Servicios />
                 </RequireRole>
               }
@@ -220,7 +220,7 @@ function App() {
             <Route
               path="/servicios/crear"
               element={
-                <RequireRole allowed={["oferente", "admin"]}>
+                <RequireRole allowed={["admin"]}>
                   <CrearServicio />
                 </RequireRole>
               }
@@ -228,7 +228,7 @@ function App() {
             <Route
               path="/servicios/editar/:id"
               element={
-                <RequireRole allowed={["oferente", "admin"]}>
+                <RequireRole allowed={["admin"]}>
                   <EditarServicio />
                 </RequireRole>
               }
@@ -272,7 +272,7 @@ function App() {
               path="/panel-oferente"
               element={
                 <RequireRole allowed={["oferente", "admin"]}>
-                  <Servicios />
+                  <Oferentes />
                 </RequireRole>
               }
             />

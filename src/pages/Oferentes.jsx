@@ -718,7 +718,7 @@ function Oferentes() {
         <header className="usuarios-header">
           <div className="header-content">
             <div>
-              <h1>{isOferente ? 'Mi Perfil de Oferente' : 'Gestión de Oferentes'}</h1>
+              <h1>{isOferente ? 'Negocio' : 'Gestión de Oferentes'}</h1>
               {currentUser && (
                 <p className="welcome-text">
                   Bienvenido, {currentUser.nombre} ({currentUser.rol})
@@ -728,7 +728,7 @@ function Oferentes() {
             <div className="header-actions">
               {(!isOferente || !hasOferenteProfile) && (
                 <Link to="/oferentes/crear" className="btn btn-primary">
-                  + {isOferente ? 'Crear Mi Perfil' : 'Nuevo Oferente'}
+                  + {isOferente ? 'Crear Negocio' : 'Nuevo Oferente'}
                 </Link>
               )}
 
@@ -775,10 +775,10 @@ function Oferentes() {
             <div className="alert alert-info">
               <span className="alert-icon"><Info size={18} style={{ verticalAlign: "middle", marginRight: "4px" }} />️</span>
               <div>
-                <strong>No tienes un perfil de oferente</strong>
-                <p>Crea tu perfil para empezar a ofrecer tus servicios o productos.</p>
+                <strong>No tienes un negocio como oferente</strong>
+                <p>Crea tu negocio para empezar a ofrecer tus servicios o productos.</p>
                 <Link to="/oferentes/crear" className="btn btn-primary" style={{ marginTop: '10px' }}>
-                  Crear Mi Perfil de Oferente
+                  Crear Mi Negocio
                 </Link>
               </div>
             </div>
@@ -876,7 +876,7 @@ function Oferentes() {
               <table className="usuarios-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+           
                     <th>Nombre Negocio</th>
                     {!isOferente && <th>Propietario</th>}
                     <th>Tipo</th>
@@ -896,7 +896,7 @@ function Oferentes() {
                   ) : (
                     filteredOferentes.map((oferente) => (
                       <tr key={oferente.id_oferente}>
-                        <td data-label="ID">{oferente.id_oferente}</td>
+                    
                         <td data-label="Nombre Negocio">
                           <strong>{oferente.nombre_negocio}</strong>
                         </td>

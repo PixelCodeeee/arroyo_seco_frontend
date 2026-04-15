@@ -134,53 +134,19 @@
 
 /* ==============================
    VARIABLES — TEMA CLARO */
-[data-theme="light"] {
-  /* Fondos */
-  --bg-primary:       #f5f5f5;
-  --bg-secondary:     #ffffff;
-  --bg-tertiary:      #ebebeb;
-  --bg-card:          #ffffff;
-
-  /* Textos */
-  --text-primary:     #111111;
-  --text-secondary:   #333333;
-  --text-muted:       #666666;
-  --text-faint:       #999999;
-
-  /* Bordes */
-  --border-color:     #dddddd;
-  --border-subtle:    rgba(0, 0, 0, 0.08);
-
-  /* Acento (mismo) */
-  --accent:           #e3008c;
-  --accent-hover:     #c4007a;
-  --accent-soft:      rgba(227, 0, 140, 0.1);
-  --accent-glow:      rgba(227, 0, 140, 0.15);
-
-  /* Amber */
-  --amber:            #d97706;
-  --amber-soft:       rgba(217, 119, 6, 0.1);
-
-  /* Estados */
-  --success:          #2e7d32;
-  --warning:          #f57f17;
-  --info:             #1565c0;
-  --danger:           #c62828;
-
-  /* Navbar */
-  --dark-bg:          rgba(255, 255, 255, 0.95);
-
-  /* Sombras */
-  --shadow-sm:        0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md:        0 4px 15px rgba(0, 0, 0, 0.1);
-  --shadow-lg:        0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-accent:    0 5px 20px rgba(227, 0, 140, 0.15);
-
-  /* Sidebar */
-  --sidebar-bg:       #1e293b;
-  --sidebar-bg-end:   #0f172a;
+:root.theme-light {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #ebebeb;
+  --bg-card: #ffffff;
+  --text-primary: #111111;
+  --text-secondary: #333333;
+  --text-muted: #666666;
+  --border-color: #dddddd;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 15px rgba(0,0,0,0.1);
+  --shadow-accent: 0 5px 20px rgba(227,0,140,0.15);
 }
-
 /* ==============================
    BASE GLOBAL */
 html {
@@ -214,10 +180,19 @@ body {
   word-spacing: 0.1em;
   line-height: 1.6;
 }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;           /* Evita scroll en todo el body */
+}
 
 #root {
-  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
 
 h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.2; }
 h2 { font-size: clamp(1.4rem, 3vw, 2rem);   font-weight: 700; line-height: 1.3; }

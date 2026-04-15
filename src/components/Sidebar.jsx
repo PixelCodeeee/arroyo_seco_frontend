@@ -104,14 +104,14 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
   const menuItems = [
     {
       id: "home",
-      label: "Inicio",
+      label: "Volver a Inicio",
       icon: <Home size={20} />,
       path: "/",
       roles: ["admin", "oferente", "turista"],
     },
     {
       id: "oferentes",
-      label: isOferente ? "Mi Perfil" : "Oferentes",
+      label: isOferente ? "Mi Negocio" : "Oferentes",
       icon: <Store size={20} />,
       path: "/oferentes",
       roles: ["admin", "oferente"],
@@ -129,14 +129,14 @@ function Sidebar({ isCollapsed, onToggle, isOpen, onMobileToggle }) {
       label: "Servicios",
       icon: <BellRing size={20} />,
       path: "/servicios",
-      roles: ["admin", "oferente"],
+      roles: ["admin"],
     },
     {
       id: "categorias",
       label: "Categorías",
       icon: <Tag size={20} />,
       path: "/categorias",
-      roles: ["admin", "oferente"], // unified — no duplicate needed
+      roles: ["admin"], // unified — no duplicate needed
     },
     {
       id: "ordenes",

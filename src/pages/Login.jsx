@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { usuariosAPI } from "../services/api";
 import TwoFactorVerification from "../components/TwoFactorVerification";
 import "../styles/auth.css";
+import { Eye, EyeOff } from "lucide-react";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -22,6 +24,9 @@ function Login() {
     });
     setError("");
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
@@ -94,17 +99,39 @@ function Login() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="contrasena">Contraseña</label>
-            <input
-              type="password"
-              id="contrasena"
-              name="contrasena"
-              placeholder="••••••••"
-              value={formData.contrasena}
-              onChange={handleChange}
-              required
-            />
-          </div>
+  <label htmlFor="contrasena">Contraseña</label>
+  <div style={{ position: "relative" }}>
+    <input
+      type={showPassword ? "text" : "password"}
+      id="contrasena"
+      name="contrasena"
+      placeholder="••••••••"
+      value={formData.contrasena}
+      onChange={handleChange}
+      required
+      style={{ paddingRight: "2.5rem", width: "100%" }}
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: "absolute",
+        right: "0.75rem",
+        top: "50%",
+        transform: "translateY(-50%)",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: "var(--text-muted)",
+        display: "flex",
+        alignItems: "center",
+        padding: 0,
+      }}
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+</div>
 
           <button
             type="submit"

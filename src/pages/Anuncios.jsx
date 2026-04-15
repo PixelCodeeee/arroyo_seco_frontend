@@ -100,7 +100,7 @@ function Anuncios() {
             <table className="usuarios-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+               
                   <th>Título</th>
                   <th>Descripción</th>
                   <th>Fecha Evento</th>
@@ -118,7 +118,7 @@ function Anuncios() {
                 ) : (
                   anuncios.map(a => (
                     <tr key={a.id}>
-                      <td data-label="ID">{a.id}</td>
+              
                       <td data-label="Título">{a.title}</td>
                       <td data-label="Descripción">{a.description?.substring(0, 60)}...</td>
                       <td data-label="Fecha Evento">{a.event_date ? new Date(a.event_date).toLocaleDateString('es-MX') : '—'}</td>
