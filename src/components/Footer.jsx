@@ -5,7 +5,7 @@ import "../styles/Footer.css";
 function Footer() {
   return (
     <footer className="footer">
-      <h3>Arroyo Seco</h3>
+      <h3>Arroyo Seco V2</h3>
       <p>Descubre la riqueza cultural y gastronómica de nuestro pueblo</p>
       <p>super ultra new canary test version</p>
 
